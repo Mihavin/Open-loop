@@ -11,8 +11,8 @@
 
 #define PWM_TIMER_FREQUENCY_HZ   25000U
 #define VBUS_mV                 24000U
-#define OPEN_LOOP_FREQ_HZ       5.0f
-#define MAX_MODULATION_INDEX    0.25f   // Limit voltage amplitude to roughly 25% to curb current draw
+#define OPEN_LOOP_FREQ_HZ       5000.0f
+#define MAX_MODULATION_INDEX    0.1f   // Limit voltage amplitude to roughly 25% to curb current draw
 #define TWO_PI                  6.28318530718f
 
 static TIM_HandleTypeDef htim1;

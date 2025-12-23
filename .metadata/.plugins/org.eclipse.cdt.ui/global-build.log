@@ -1,11 +1,11 @@
-11:19:45 **** Incremental Build of configuration Debug for project Open loop ****
+11:39:41 **** Incremental Build of configuration Debug for project Open loop ****
 make -j48 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m7 -std=gnu11 -g3 -DDEBUG -DUSE_PWR_LDO_SUPPLY -DUSE_HAL_DRIVER -DSTM32H723xx -c -I../Core/Inc -I../Drivers/STM32H7xx_HAL_Driver/Inc -I../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:206:13: warning: 'MX_ADC1_Init' defined but not used [-Wunused-function]
-  206 | static void MX_ADC1_Init(void)
+../Core/Src/main.c:232:13: warning: 'MX_ADC1_Init' defined but not used [-Wunused-function]
+  232 | static void MX_ADC1_Init(void)
       |             ^~~~~~~~~~~~
-../Core/Src/main.c:21:17: warning: 'adc_buffer' defined but not used [-Wunused-variable]
-   21 | static uint16_t adc_buffer[3];
+../Core/Src/main.c:22:17: warning: 'adc_buffer' defined but not used [-Wunused-variable]
+   22 | static uint16_t adc_buffer[3];
       |                 ^~~~~~~~~~
 arm-none-eabi-g++ -o "Open loop.elf" @"objects.list"   -mcpu=cortex-m7 -T"C:\STProjects\Open-loop\Open loop\STM32H723ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Open loop.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 Finished building target: Open loop.elf
@@ -13,15 +13,15 @@ Finished building target: Open loop.elf
 arm-none-eabi-size  Open\ loop.elf 
 arm-none-eabi-objdump -h -S Open\ loop.elf  > "Open loop.list"
    text	   data	    bss	    dec	    hex	filename
-  16260	     96	   2320	  18676	   48f4	Open loop.elf
+  16932	     96	   2320	  19348	   4b94	Open loop.elf
 Finished building: default.size.stdout
  
 Finished building: Open loop.list
  
-11:19:59 **** Incremental Build of configuration Debug for project Open loop ****
+11:39:49 **** Incremental Build of configuration Debug for project Open loop ****
 make -j48 all 
 arm-none-eabi-size  Open\ loop.elf 
    text	   data	    bss	    dec	    hex	filename
-  16260	     96	   2320	  18676	   48f4	Open loop.elf
+  16932	     96	   2320	  19348	   4b94	Open loop.elf
 Finished building: default.size.stdout
  
