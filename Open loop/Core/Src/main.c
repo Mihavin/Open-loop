@@ -55,6 +55,9 @@ int main(void)
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
+    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
+    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
     __HAL_TIM_MOE_ENABLE(&htim1);
 
     while (1)
@@ -107,15 +110,37 @@ static void MX_GPIO_Init(void)
     __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOG_CLK_ENABLE();
     __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOE_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
 
-    // TIM1 channel outputs (PA8/PA9/PA10) routed to DRV8323S PWM inputs
+    // TIM1 channel outputs routed to DRV8323S PWM inputs
     GPIO_InitTypeDef GPIO_InitStruct = {0};
-    GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    // INHA -> TIM1_CH1 on PE9
+    GPIO_InitStruct.Pin = INHA_Pin;
+    HAL_GPIO_Init(INHA_GPIO_Port, &GPIO_InitStruct);
+
+    // INHB -> TIM1_CH2 on PA9
+    GPIO_InitStruct.Pin = INHB_Pin;
+    HAL_GPIO_Init(INHB_GPIO_Port, &GPIO_InitStruct);
+
+    // INHC -> TIM1_CH3 on PA10
+    GPIO_InitStruct.Pin = INHC_Pin;
+    HAL_GPIO_Init(INHC_GPIO_Port, &GPIO_InitStruct);
+
+    // INLA/INLB/INLC -> TIM1 complementary outputs (x6 PWM default on DRV8323S)
+    GPIO_InitStruct.Pin = INLA_Pin;
+    HAL_GPIO_Init(INLA_GPIO_Port, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = INLB_Pin;
+    HAL_GPIO_Init(INLB_GPIO_Port, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = INLC_Pin;
+    HAL_GPIO_Init(INLC_GPIO_Port, &GPIO_InitStruct);
 
     // LED pins
 
