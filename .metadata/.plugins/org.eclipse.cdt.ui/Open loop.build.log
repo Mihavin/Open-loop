@@ -1,10 +1,10 @@
-11:39:49 **** Incremental Build of configuration Debug for project Open loop ****
-make -j48 all 
+19:47:18 **** Incremental Build of configuration Debug for project Open loop ****
+make -j24 all 
 arm-none-eabi-size  Open\ loop.elf 
    text	   data	    bss	    dec	    hex	filename
-  16932	     96	   2320	  19348	   4b94	Open loop.elf
+  17492	     96	   2336	  19924	   4dd4	Open loop.elf
 Finished building: default.size.stdout
  
 
-11:39:51 Build Finished. 0 errors, 0 warnings. (took 2s.117ms)
+19:47:19 Build Finished. 0 errors, 0 warnings. (took 299ms)
 
