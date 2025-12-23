@@ -70,11 +70,69 @@ int main(void)
 static void RunOpenLoopSVPWM(void)
 {
     static float electrical_angle = 0.0f;
-    const float angle_step = TWO_PI * OPEN_LOOP_FREQ_HZ / PWM_TIMER_FREQUENCY_HZ;
+
+    typedef enum
+    {
+        PROFILE_RAMP_UP,
+        PROFILE_HOLD,
+        PROFILE_RAMP_DOWN
+    } OpenLoopProfileState;
+
+    static OpenLoopProfileState state = PROFILE_RAMP_UP;
+    static uint32_t last_tick_ms = 0U;
+    static uint32_t state_start_ms = 0U;
+
+    const float target_rpm = 2000.0f;
+    const uint32_t ramp_duration_ms = 10000U;
+    const uint32_t hold_duration_ms = 5000U;
+
+    uint32_t now_ms = HAL_GetTick();
+    if (last_tick_ms == 0U)
+    {
+        last_tick_ms = now_ms;
+        state_start_ms = now_ms;
+    }
+
+    float dt_s = (now_ms - last_tick_ms) / 1000.0f;
+    last_tick_ms = now_ms;
+
+    float current_rpm = 0.0f;
+    switch (state)
+    {
+    case PROFILE_RAMP_UP:
+        current_rpm = target_rpm * fminf(1.0f, (now_ms - state_start_ms) / (float)ramp_duration_ms);
+        if ((now_ms - state_start_ms) >= ramp_duration_ms)
+        {
+            state = PROFILE_HOLD;
+            state_start_ms = now_ms;
+        }
+        break;
+
+    case PROFILE_HOLD:
+        current_rpm = target_rpm;
+        if ((now_ms - state_start_ms) >= hold_duration_ms)
+        {
+            state = PROFILE_RAMP_DOWN;
+            state_start_ms = now_ms;
+        }
+        break;
+
+    case PROFILE_RAMP_DOWN:
+        current_rpm = target_rpm * fmaxf(0.0f, 1.0f - (now_ms - state_start_ms) / (float)ramp_duration_ms);
+        if ((now_ms - state_start_ms) >= ramp_duration_ms)
+        {
+            state = PROFILE_RAMP_UP;
+            state_start_ms = now_ms;
+        }
+        break;
+    }
+
+    float electrical_speed_rps = current_rpm / 60.0f;
+    float angle_step = TWO_PI * electrical_speed_rps * dt_s;
 
     // Advance angle for open-loop rotation
     electrical_angle += angle_step;
-    if (electrical_angle > TWO_PI)
+    while (electrical_angle > TWO_PI)
     {
         electrical_angle -= TWO_PI;
     }
