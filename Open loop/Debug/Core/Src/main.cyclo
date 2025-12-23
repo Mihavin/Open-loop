@@ -1,6 +1,7 @@
 ../Core/Src/main.c:29:5:main	1
-../Core/Src/main.c:53:13:RunOpenLoopSVPWM	2
-../Core/Src/main.c:87:13:SystemClock_Config	1
-../Core/Src/main.c:92:13:MX_GPIO_Init	1
-../Core/Src/main.c:125:13:MX_TIM1_Init	1
-../Core/Src/main.c:179:13:MX_ADC1_Init	1
+../Core/Src/main.c:66:13:RunOpenLoopSVPWM	2
+../Core/Src/main.c:100:13:SystemClock_Config	1
+../Core/Src/main.c:105:13:MX_GPIO_Init	1
+../Core/Src/main.c:152:13:MX_TIM1_Init	1
+../Core/Src/main.c:206:13:MX_ADC1_Init	1
+../Core/Src/main.c:263:6:Error_Handler	1

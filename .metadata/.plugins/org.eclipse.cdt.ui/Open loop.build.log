@@ -1,20 +1,10 @@
-10:52:15 **** Incremental Build of configuration Debug for project Open loop ****
+11:19:59 **** Incremental Build of configuration Debug for project Open loop ****
 make -j48 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m7 -std=gnu11 -g3 -DDEBUG -DUSE_PWR_LDO_SUPPLY -DUSE_HAL_DRIVER -DSTM32H723xx -c -I../Core/Inc -I../Drivers/STM32H7xx_HAL_Driver/Inc -I../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:41:5: warning: implicit declaration of function 'HAL_TIMEx_EnableDeadTimePreload' [-Wimplicit-function-declaration]
-   41 |     HAL_TIMEx_EnableDeadTimePreload(&htim1);
-      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-arm-none-eabi-g++ -o "Open loop.elf" @"objects.list"   -mcpu=cortex-m7 -T"C:\STProjects\Open-loop\Open loop\STM32H723ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Open loop.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
-C:/ST/STM32CubeIDE_1.19.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/bin/ld.exe: ./Core/Src/adc.o: in function `HAL_ADC_MspInit':
-C:/STProjects/Open-loop/Open loop/Debug/../Core/Src/adc.c:276:(.text.HAL_ADC_MspInit+0xda): undefined reference to `Error_Handler'
-C:/ST/STM32CubeIDE_1.19.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/bin/ld.exe: C:/STProjects/Open-loop/Open loop/Debug/../Core/Src/adc.c:319:(.text.HAL_ADC_MspInit+0x1ae): undefined reference to `Error_Handler'
-C:/ST/STM32CubeIDE_1.19.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/bin/ld.exe: C:/STProjects/Open-loop/Open loop/Debug/../Core/Src/adc.c:358:(.text.HAL_ADC_MspInit+0x26c): undefined reference to `Error_Handler'
-C:/ST/STM32CubeIDE_1.19.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/bin/ld.exe: ./Core/Src/main.o: in function `main':
-C:/STProjects/Open-loop/Open loop/Debug/../Core/Src/main.c:41:(.text.main+0x32): undefined reference to `HAL_TIMEx_EnableDeadTimePreload'
-collect2.exe: error: ld returned 1 exit status
-make: *** [makefile:88: Open loop.elf] Error 1
-"make -j48 all" terminated with exit code 2. Build might be incomplete.
+arm-none-eabi-size  Open\ loop.elf 
+   text	   data	    bss	    dec	    hex	filename
+  16260	     96	   2320	  18676	   48f4	Open loop.elf
+Finished building: default.size.stdout
+ 
 
-10:52:21 Build Failed. 5 errors, 1 warnings. (took 5s.328ms)
+11:20:01 Build Finished. 0 errors, 0 warnings. (took 2s.423ms)
 
