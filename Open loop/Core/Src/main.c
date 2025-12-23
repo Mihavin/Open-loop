@@ -1,4 +1,4 @@
-#include "stm32h7xx_hal.h"
+#include "main.h"
 #include <math.h>
 
 /**
@@ -38,7 +38,6 @@ int main(void)
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
-    HAL_TIMEx_EnableDeadTimePreload(&htim1);
     __HAL_TIM_MOE_ENABLE(&htim1);
 
     HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED);
@@ -231,4 +230,12 @@ static void MX_ADC1_Init(void)
     HAL_DMA_Init(&hdma_adc1);
 
     __HAL_LINKDMA(&hadc1, DMA_Handle, hdma_adc1);
+}
+
+void Error_Handler(void)
+{
+    __disable_irq();
+    while (1)
+    {
+    }
 }
