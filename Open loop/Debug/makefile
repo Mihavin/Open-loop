@@ -84,8 +84,8 @@ all: main-build
 main-build: Open\ loop.elf secondary-outputs
 
 # Tool invocations
-Open\ loop.elf Open\ loop.map: $(OBJS) $(USER_OBJS) C:\STProjects\Open-loop\Open\ loop\STM32H723ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "Open loop.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\STProjects\Open-loop\Open loop\STM32H723ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Open loop.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Open\ loop.elf Open\ loop.map: $(OBJS) $(USER_OBJS) C:\GitHub\Open-loop\Open\ loop\STM32H723ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "Open loop.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\GitHub\Open-loop\Open loop\STM32H723ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Open loop.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
