@@ -9,10 +9,11 @@
  * - LED0 (PC15), LED1 (PG14), LED3 (PC8) toggle for basic sanity checks.
  */
 
-#define PWM_TIMER_FREQUENCY_HZ 25000U
-#define VBUS_mV               24000U
-#define OPEN_LOOP_FREQ_HZ     5.0f
-#define TWO_PI                6.28318530718f
+#define PWM_TIMER_FREQUENCY_HZ   25000U
+#define VBUS_mV                 24000U
+#define OPEN_LOOP_FREQ_HZ       5.0f
+#define MAX_MODULATION_INDEX    0.25f   // Limit voltage amplitude to roughly 25% to curb current draw
+#define TWO_PI                  6.28318530718f
 
 static TIM_HandleTypeDef htim1;
 static ADC_HandleTypeDef hadc1;
@@ -83,9 +84,9 @@ static void RunOpenLoopSVPWM(void)
     float sin_b = sinf(electrical_angle - TWO_PI / 3.0f);
     float sin_c = sinf(electrical_angle + TWO_PI / 3.0f);
 
-    float duty_a = 0.5f + 0.5f * sin_a;
-    float duty_b = 0.5f + 0.5f * sin_b;
-    float duty_c = 0.5f + 0.5f * sin_c;
+    float duty_a = 0.5f + 0.5f * MAX_MODULATION_INDEX * sin_a;
+    float duty_b = 0.5f + 0.5f * MAX_MODULATION_INDEX * sin_b;
+    float duty_c = 0.5f + 0.5f * MAX_MODULATION_INDEX * sin_c;
 
     uint32_t period = htim1.Instance->ARR + 1U;
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, (uint32_t)(duty_a * period));
