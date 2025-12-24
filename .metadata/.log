@@ -43,3 +43,6 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\STProjects\Op
 
 !ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2025-12-23 11:16:21.243
 !MESSAGE Existing sessions are:
+
+!ENTRY org.eclipse.cdt.core 1 0 2025-12-23 20:15:49.637
+!MESSAGE Indexed 'FRW3_0' (41 sources, 141 headers) in 2.94 sec: 20,990 declarations; 154,175 references; 3 unresolved inclusions; 46 syntax errors; 171 unresolved names (0.098%)
