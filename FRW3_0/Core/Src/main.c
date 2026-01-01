@@ -1359,6 +1359,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOD, LED2_Pin|LED1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(QSPI_RST_GPIO_Port, QSPI_RST_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LTDC_STNDB_GPIO_Port, LTDC_STNDB_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : LED0_Pin */
@@ -1427,6 +1430,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : QSPI_RST_Pin */
+  GPIO_InitStruct.Pin = QSPI_RST_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(QSPI_RST_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LTDC_STNDB_Pin */
   GPIO_InitStruct.Pin = LTDC_STNDB_Pin;

@@ -139,6 +139,8 @@ void Error_Handler(void);
 #define DRV_MISO_GPIO_Port GPIOG
 #define DRV_NSS_Pin GPIO_PIN_10
 #define DRV_NSS_GPIO_Port GPIOG
+#define QSPI_RST_Pin GPIO_PIN_13
+#define QSPI_RST_GPIO_Port GPIOG
 #define LTDC_STNDB_Pin GPIO_PIN_5
 #define LTDC_STNDB_GPIO_Port GPIOB
 #define A_PED_ENC_Pin GPIO_PIN_7
