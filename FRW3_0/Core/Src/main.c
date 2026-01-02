@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "app_touchgfx.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -47,6 +48,8 @@ DMA_HandleTypeDef hdma_adc1;
 DMA_HandleTypeDef hdma_adc2;
 DMA_HandleTypeDef hdma_adc3;
 
+CRC_HandleTypeDef hcrc;
+
 DMA2D_HandleTypeDef hdma2d;
 
 LTDC_HandleTypeDef hltdc;
@@ -56,6 +59,10 @@ QSPI_HandleTypeDef hqspi;
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi2;
 SPI_HandleTypeDef hspi3;
+DMA_HandleTypeDef hdma_spi2_rx;
+DMA_HandleTypeDef hdma_spi2_tx;
+DMA_HandleTypeDef hdma_spi3_rx;
+DMA_HandleTypeDef hdma_spi3_tx;
 
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
@@ -96,6 +103,7 @@ static void MX_TIM8_Init(void);
 static void MX_FMC_Init(void);
 static void MX_TIM5_Init(void);
 static void MX_USART3_UART_Init(void);
+static void MX_CRC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -159,6 +167,8 @@ int main(void)
   MX_FMC_Init();
   MX_TIM5_Init();
   MX_USART3_UART_Init();
+  MX_CRC_Init();
+  MX_TouchGFX_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -169,6 +179,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
+  MX_TouchGFX_Process();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -253,7 +264,7 @@ void PeriphCommonClock_Config(void)
   PeriphClkInitStruct.PLL2.PLL2N = 62;
   PeriphClkInitStruct.PLL2.PLL2P = 4;
   PeriphClkInitStruct.PLL2.PLL2Q = 2;
-  PeriphClkInitStruct.PLL2.PLL2R = 2;
+  PeriphClkInitStruct.PLL2.PLL2R = 4;
   PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_2;
   PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
   PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
@@ -534,6 +545,37 @@ static void MX_ADC3_Init(void)
 }
 
 /**
+  * @brief CRC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_CRC_Init(void)
+{
+
+  /* USER CODE BEGIN CRC_Init 0 */
+
+  /* USER CODE END CRC_Init 0 */
+
+  /* USER CODE BEGIN CRC_Init 1 */
+
+  /* USER CODE END CRC_Init 1 */
+  hcrc.Instance = CRC;
+  hcrc.Init.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_ENABLE;
+  hcrc.Init.DefaultInitValueUse = DEFAULT_INIT_VALUE_ENABLE;
+  hcrc.Init.InputDataInversionMode = CRC_INPUTDATA_INVERSION_NONE;
+  hcrc.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_DISABLE;
+  hcrc.InputDataFormat = CRC_INPUTDATA_FORMAT_BYTES;
+  if (HAL_CRC_Init(&hcrc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN CRC_Init 2 */
+
+  /* USER CODE END CRC_Init 2 */
+
+}
+
+/**
   * @brief DMA2D Initialization Function
   * @param None
   * @retval None
@@ -552,7 +594,7 @@ static void MX_DMA2D_Init(void)
   hdma2d.Init.Mode = DMA2D_M2M;
   hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
   hdma2d.Init.OutputOffset = 0;
-  hdma2d.LayerCfg[1].InputOffset = 0;
+  hdma2d.LayerCfg[1].InputOffset = 255;
   hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_ARGB8888;
   hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
   hdma2d.LayerCfg[1].InputAlpha = 0;
@@ -586,7 +628,6 @@ static void MX_LTDC_Init(void)
   /* USER CODE END LTDC_Init 0 */
 
   LTDC_LayerCfgTypeDef pLayerCfg = {0};
-  LTDC_LayerCfgTypeDef pLayerCfg1 = {0};
 
   /* USER CODE BEGIN LTDC_Init 1 */
 
@@ -594,16 +635,16 @@ static void MX_LTDC_Init(void)
   hltdc.Instance = LTDC;
   hltdc.Init.HSPolarity = LTDC_HSPOLARITY_AL;
   hltdc.Init.VSPolarity = LTDC_VSPOLARITY_AL;
-  hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AL;
+  hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AH;
   hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IPC;
-  hltdc.Init.HorizontalSync = 7;
+  hltdc.Init.HorizontalSync = 3;
   hltdc.Init.VerticalSync = 3;
-  hltdc.Init.AccumulatedHBP = 14;
-  hltdc.Init.AccumulatedVBP = 5;
-  hltdc.Init.AccumulatedActiveW = 654;
-  hltdc.Init.AccumulatedActiveH = 485;
-  hltdc.Init.TotalWidth = 660;
-  hltdc.Init.TotalHeigh = 487;
+  hltdc.Init.AccumulatedHBP = 46;
+  hltdc.Init.AccumulatedVBP = 15;
+  hltdc.Init.AccumulatedActiveW = 526;
+  hltdc.Init.AccumulatedActiveH = 287;
+  hltdc.Init.TotalWidth = 534;
+  hltdc.Init.TotalHeigh = 295;
   hltdc.Init.Backcolor.Blue = 0;
   hltdc.Init.Backcolor.Green = 0;
   hltdc.Init.Backcolor.Red = 0;
@@ -612,40 +653,21 @@ static void MX_LTDC_Init(void)
     Error_Handler();
   }
   pLayerCfg.WindowX0 = 0;
-  pLayerCfg.WindowX1 = 0;
+  pLayerCfg.WindowX1 = 480;
   pLayerCfg.WindowY0 = 0;
-  pLayerCfg.WindowY1 = 0;
+  pLayerCfg.WindowY1 = 272;
   pLayerCfg.PixelFormat = LTDC_PIXEL_FORMAT_ARGB8888;
-  pLayerCfg.Alpha = 0;
-  pLayerCfg.Alpha0 = 0;
+  pLayerCfg.Alpha = 255;
+  pLayerCfg.Alpha0 = 255;
   pLayerCfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_CA;
   pLayerCfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_CA;
-  pLayerCfg.FBStartAdress = 0;
-  pLayerCfg.ImageWidth = 0;
-  pLayerCfg.ImageHeight = 0;
+  pLayerCfg.FBStartAdress = 0xC0000000;
+  pLayerCfg.ImageWidth = 480;
+  pLayerCfg.ImageHeight = 272;
   pLayerCfg.Backcolor.Blue = 0;
   pLayerCfg.Backcolor.Green = 0;
   pLayerCfg.Backcolor.Red = 0;
   if (HAL_LTDC_ConfigLayer(&hltdc, &pLayerCfg, 0) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  pLayerCfg1.WindowX0 = 0;
-  pLayerCfg1.WindowX1 = 0;
-  pLayerCfg1.WindowY0 = 0;
-  pLayerCfg1.WindowY1 = 0;
-  pLayerCfg1.PixelFormat = LTDC_PIXEL_FORMAT_ARGB8888;
-  pLayerCfg1.Alpha = 0;
-  pLayerCfg1.Alpha0 = 0;
-  pLayerCfg1.BlendingFactor1 = LTDC_BLENDING_FACTOR1_CA;
-  pLayerCfg1.BlendingFactor2 = LTDC_BLENDING_FACTOR2_CA;
-  pLayerCfg1.FBStartAdress = 0;
-  pLayerCfg1.ImageWidth = 0;
-  pLayerCfg1.ImageHeight = 0;
-  pLayerCfg1.Backcolor.Blue = 0;
-  pLayerCfg1.Backcolor.Green = 0;
-  pLayerCfg1.Backcolor.Red = 0;
-  if (HAL_LTDC_ConfigLayer(&hltdc, &pLayerCfg1, 1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -672,11 +694,11 @@ static void MX_QUADSPI_Init(void)
   /* USER CODE END QUADSPI_Init 1 */
   /* QUADSPI parameter configuration*/
   hqspi.Instance = QUADSPI;
-  hqspi.Init.ClockPrescaler = 255;
+  hqspi.Init.ClockPrescaler = 1;
   hqspi.Init.FifoThreshold = 1;
-  hqspi.Init.SampleShifting = QSPI_SAMPLE_SHIFTING_NONE;
-  hqspi.Init.FlashSize = 1;
-  hqspi.Init.ChipSelectHighTime = QSPI_CS_HIGH_TIME_1_CYCLE;
+  hqspi.Init.SampleShifting = QSPI_SAMPLE_SHIFTING_HALFCYCLE;
+  hqspi.Init.FlashSize = 24;
+  hqspi.Init.ChipSelectHighTime = QSPI_CS_HIGH_TIME_2_CYCLE;
   hqspi.Init.ClockMode = QSPI_CLOCK_MODE_0;
   hqspi.Init.FlashID = QSPI_FLASH_ID_1;
   hqspi.Init.DualFlash = QSPI_DUALFLASH_DISABLE;
@@ -1270,6 +1292,18 @@ static void MX_DMA_Init(void)
   /* DMA1_Stream1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
+  /* DMA1_Stream2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream2_IRQn);
+  /* DMA1_Stream3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+  /* DMA1_Stream4_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
+  /* DMA1_Stream5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
 
 }
 
@@ -1296,19 +1330,19 @@ static void MX_FMC_Init(void)
   hsdram1.Init.RowBitsNumber = FMC_SDRAM_ROW_BITS_NUM_12;
   hsdram1.Init.MemoryDataWidth = FMC_SDRAM_MEM_BUS_WIDTH_16;
   hsdram1.Init.InternalBankNumber = FMC_SDRAM_INTERN_BANKS_NUM_4;
-  hsdram1.Init.CASLatency = FMC_SDRAM_CAS_LATENCY_1;
+  hsdram1.Init.CASLatency = FMC_SDRAM_CAS_LATENCY_3;
   hsdram1.Init.WriteProtection = FMC_SDRAM_WRITE_PROTECTION_DISABLE;
-  hsdram1.Init.SDClockPeriod = FMC_SDRAM_CLOCK_DISABLE;
-  hsdram1.Init.ReadBurst = FMC_SDRAM_RBURST_DISABLE;
-  hsdram1.Init.ReadPipeDelay = FMC_SDRAM_RPIPE_DELAY_0;
+  hsdram1.Init.SDClockPeriod = FMC_SDRAM_CLOCK_PERIOD_2;
+  hsdram1.Init.ReadBurst = FMC_SDRAM_RBURST_ENABLE;
+  hsdram1.Init.ReadPipeDelay = FMC_SDRAM_RPIPE_DELAY_1;
   /* SdramTiming */
-  SdramTiming.LoadToActiveDelay = 16;
-  SdramTiming.ExitSelfRefreshDelay = 16;
-  SdramTiming.SelfRefreshTime = 16;
-  SdramTiming.RowCycleDelay = 16;
-  SdramTiming.WriteRecoveryTime = 16;
-  SdramTiming.RPDelay = 16;
-  SdramTiming.RCDDelay = 16;
+  SdramTiming.LoadToActiveDelay = 2;
+  SdramTiming.ExitSelfRefreshDelay = 7;
+  SdramTiming.SelfRefreshTime = 4;
+  SdramTiming.RowCycleDelay = 7;
+  SdramTiming.WriteRecoveryTime = 3;
+  SdramTiming.RPDelay = 2;
+  SdramTiming.RCDDelay = 2;
 
   if (HAL_SDRAM_Init(&hsdram1, &SdramTiming) != HAL_OK)
   {
@@ -1416,6 +1450,30 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(FAN_FAULT_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : PH7 PH9 */
+  GPIO_InitStruct.Pin = GPIO_PIN_7|GPIO_PIN_9;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PD11 PD2 PD3 */
+  GPIO_InitStruct.Pin = GPIO_PIN_11|GPIO_PIN_2|GPIO_PIN_3;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PG2 PG3 PG14 */
+  GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_14;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PC7 PC8 */
+  GPIO_InitStruct.Pin = GPIO_PIN_7|GPIO_PIN_8;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
   /*Configure GPIO pin : PC9 */
   GPIO_InitStruct.Pin = GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -1423,6 +1481,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.Alternate = GPIO_AF0_MCO;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PI1 PI3 */
+  GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_3;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LED2_Pin LED1_Pin */
   GPIO_InitStruct.Pin = LED2_Pin|LED1_Pin;
@@ -1482,6 +1546,20 @@ void MPU_Config(void)
   MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
   MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
   MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+
+  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+
+  /** Initializes and configures the Region and the memory to be protected
+  */
+  MPU_InitStruct.Number = MPU_REGION_NUMBER1;
+  MPU_InitStruct.BaseAddress = 0x08000000;
+  MPU_InitStruct.Size = MPU_REGION_SIZE_2MB;
+  MPU_InitStruct.SubRegionDisable = 0x0;
+  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1;
+  MPU_InitStruct.AccessPermission = MPU_REGION_PRIV_RO;
+  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+  MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
+  MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
   /* Enables the MPU */

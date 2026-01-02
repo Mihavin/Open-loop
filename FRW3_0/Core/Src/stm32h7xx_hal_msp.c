@@ -29,6 +29,14 @@ extern DMA_HandleTypeDef hdma_adc2;
 
 extern DMA_HandleTypeDef hdma_adc3;
 
+extern DMA_HandleTypeDef hdma_spi2_rx;
+
+extern DMA_HandleTypeDef hdma_spi2_tx;
+
+extern DMA_HandleTypeDef hdma_spi3_rx;
+
+extern DMA_HandleTypeDef hdma_spi3_tx;
+
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
 
@@ -309,6 +317,51 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 }
 
 /**
+  * @brief CRC MSP Initialization
+  * This function configures the hardware resources used in this example
+  * @param hcrc: CRC handle pointer
+  * @retval None
+  */
+void HAL_CRC_MspInit(CRC_HandleTypeDef* hcrc)
+{
+  if(hcrc->Instance==CRC)
+  {
+    /* USER CODE BEGIN CRC_MspInit 0 */
+
+    /* USER CODE END CRC_MspInit 0 */
+    /* Peripheral clock enable */
+    __HAL_RCC_CRC_CLK_ENABLE();
+    /* USER CODE BEGIN CRC_MspInit 1 */
+
+    /* USER CODE END CRC_MspInit 1 */
+
+  }
+
+}
+
+/**
+  * @brief CRC MSP De-Initialization
+  * This function freeze the hardware resources used in this example
+  * @param hcrc: CRC handle pointer
+  * @retval None
+  */
+void HAL_CRC_MspDeInit(CRC_HandleTypeDef* hcrc)
+{
+  if(hcrc->Instance==CRC)
+  {
+    /* USER CODE BEGIN CRC_MspDeInit 0 */
+
+    /* USER CODE END CRC_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_CRC_CLK_DISABLE();
+    /* USER CODE BEGIN CRC_MspDeInit 1 */
+
+    /* USER CODE END CRC_MspDeInit 1 */
+  }
+
+}
+
+/**
   * @brief DMA2D MSP Initialization
   * This function configures the hardware resources used in this example
   * @param hdma2d: DMA2D handle pointer
@@ -376,7 +429,7 @@ void HAL_LTDC_MspInit(LTDC_HandleTypeDef* hltdc)
     PeriphClkInitStruct.PLL3.PLL3N = 23;
     PeriphClkInitStruct.PLL3.PLL3P = 2;
     PeriphClkInitStruct.PLL3.PLL3Q = 2;
-    PeriphClkInitStruct.PLL3.PLL3R = 30;
+    PeriphClkInitStruct.PLL3.PLL3R = 32;
     PeriphClkInitStruct.PLL3.PLL3RGE = RCC_PLL3VCIRANGE_3;
     PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOWIDE;
     PeriphClkInitStruct.PLL3.PLL3FRACN = 0;
@@ -804,6 +857,46 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
     HAL_GPIO_Init(ENC_NSS_GPIO_Port, &GPIO_InitStruct);
 
+    /* SPI2 DMA Init */
+    /* SPI2_RX Init */
+    hdma_spi2_rx.Instance = DMA1_Stream4;
+    hdma_spi2_rx.Init.Request = DMA_REQUEST_SPI2_RX;
+    hdma_spi2_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_spi2_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_spi2_rx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_spi2_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_spi2_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_spi2_rx.Init.Mode = DMA_CIRCULAR;
+    hdma_spi2_rx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_spi2_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_spi2_rx) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(hspi,hdmarx,hdma_spi2_rx);
+
+    /* SPI2_TX Init */
+    hdma_spi2_tx.Instance = DMA1_Stream5;
+    hdma_spi2_tx.Init.Request = DMA_REQUEST_SPI2_TX;
+    hdma_spi2_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_spi2_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_spi2_tx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_spi2_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    hdma_spi2_tx.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_spi2_tx.Init.Mode = DMA_CIRCULAR;
+    hdma_spi2_tx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_spi2_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_spi2_tx) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(hspi,hdmatx,hdma_spi2_tx);
+
+    /* SPI2 interrupt Init */
+    HAL_NVIC_SetPriority(SPI2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(SPI2_IRQn);
     /* USER CODE BEGIN SPI2_MspInit 1 */
 
     /* USER CODE END SPI2_MspInit 1 */
@@ -848,6 +941,46 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+    /* SPI3 DMA Init */
+    /* SPI3_RX Init */
+    hdma_spi3_rx.Instance = DMA1_Stream2;
+    hdma_spi3_rx.Init.Request = DMA_REQUEST_SPI3_RX;
+    hdma_spi3_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_spi3_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_spi3_rx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_spi3_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    hdma_spi3_rx.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_spi3_rx.Init.Mode = DMA_CIRCULAR;
+    hdma_spi3_rx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_spi3_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_spi3_rx) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(hspi,hdmarx,hdma_spi3_rx);
+
+    /* SPI3_TX Init */
+    hdma_spi3_tx.Instance = DMA1_Stream3;
+    hdma_spi3_tx.Init.Request = DMA_REQUEST_SPI3_TX;
+    hdma_spi3_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_spi3_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_spi3_tx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_spi3_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    hdma_spi3_tx.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_spi3_tx.Init.Mode = DMA_CIRCULAR;
+    hdma_spi3_tx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_spi3_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_spi3_tx) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(hspi,hdmatx,hdma_spi3_tx);
+
+    /* SPI3 interrupt Init */
+    HAL_NVIC_SetPriority(SPI3_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(SPI3_IRQn);
     /* USER CODE BEGIN SPI3_MspInit 1 */
 
     /* USER CODE END SPI3_MspInit 1 */
@@ -907,6 +1040,12 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
 
     HAL_GPIO_DeInit(ENC_NSS_GPIO_Port, ENC_NSS_Pin);
 
+    /* SPI2 DMA DeInit */
+    HAL_DMA_DeInit(hspi->hdmarx);
+    HAL_DMA_DeInit(hspi->hdmatx);
+
+    /* SPI2 interrupt DeInit */
+    HAL_NVIC_DisableIRQ(SPI2_IRQn);
     /* USER CODE BEGIN SPI2_MspDeInit 1 */
 
     /* USER CODE END SPI2_MspDeInit 1 */
@@ -929,6 +1068,12 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
 
     HAL_GPIO_DeInit(GPIOC, EXT_SCK_Pin|EXT_MISO_Pin|EXT_MOSI_Pin);
 
+    /* SPI3 DMA DeInit */
+    HAL_DMA_DeInit(hspi->hdmarx);
+    HAL_DMA_DeInit(hspi->hdmatx);
+
+    /* SPI3 interrupt DeInit */
+    HAL_NVIC_DisableIRQ(SPI3_IRQn);
     /* USER CODE BEGIN SPI3_MspDeInit 1 */
 
     /* USER CODE END SPI3_MspDeInit 1 */

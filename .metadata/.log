@@ -859,3 +859,6 @@ java.io.IOException: Unable to resolve plug-in "com.st.stm32cube.common.mx".
 
 !ENTRY com.st.stm32cube.ide.mpu.remote.serial 1 1 2026-01-01 21:25:25.536
 !MESSAGE port: 
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-01-01 23:45:46.505
+!MESSAGE Indexed 'FRW3_0' (41 sources, 223 headers) in 13.5 sec: 29,577 declarations; 204,427 references; 3 unresolved inclusions; 46 syntax errors; 1,198 unresolved names (0.51%)
