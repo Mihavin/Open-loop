@@ -21,6 +21,7 @@
 #include <gui/common/FrontendHeap.hpp>
 
 #include "stm32h7xx.h"
+#include "stm32h7xx_hal_ltdc.h"
 
 using namespace touchgfx;
 
@@ -29,6 +30,8 @@ namespace
 // Use the section "TouchGFX_Framebuffer" in the linker script to specify the placement of the buffer
 LOCATION_PRAGMA_NOLOAD("TouchGFX_Framebuffer")
 uint32_t frameBuf[480 * 272 * 2] LOCATION_ATTRIBUTE_NOLOAD("TouchGFX_Framebuffer");
+static uint16_t lcd_int_active_line;
+static uint16_t lcd_int_porch_line;
 }
 
 void TouchGFXGeneratedHAL::initialize()
@@ -44,20 +47,30 @@ void TouchGFXGeneratedHAL::initialize()
 void TouchGFXGeneratedHAL::configureInterrupts()
 {
     NVIC_SetPriority(DMA2D_IRQn, 9);
+    NVIC_SetPriority(LTDC_IRQn, 9);
 }
 
 void TouchGFXGeneratedHAL::enableInterrupts()
 {
     NVIC_EnableIRQ(DMA2D_IRQn);
+    NVIC_EnableIRQ(LTDC_IRQn);
 }
 
 void TouchGFXGeneratedHAL::disableInterrupts()
 {
     NVIC_DisableIRQ(DMA2D_IRQn);
+    NVIC_DisableIRQ(LTDC_IRQn);
 }
 
 void TouchGFXGeneratedHAL::enableLCDControllerInterrupt()
 {
+    lcd_int_active_line = (LTDC->BPCR & LTDC_BPCR_AVBP_Msk) - 1;
+    lcd_int_porch_line = (LTDC->AWCR & LTDC_AWCR_AAH_Msk) - 1;
+
+    /* Sets the Line Interrupt position */
+    LTDC->LIPCR = lcd_int_active_line;
+    /* Line Interrupt Enable            */
+    LTDC->IER |= LTDC_IER_LIE;
 }
 
 bool TouchGFXGeneratedHAL::beginFrame()
@@ -71,21 +84,17 @@ void TouchGFXGeneratedHAL::endFrame()
     touchgfx::OSWrappers::signalRenderingDone();
 }
 
-inline uint8_t* TouchGFXGeneratedHAL::advanceFrameBufferToRect(uint8_t* fbPtr, const touchgfx::Rect& rect) const
-{
-    //       Advance vertically                   Advance horizontally
-    fbPtr += rect.y * lcd().framebufferStride() + rect.x * 4;
-    return fbPtr;
-}
-
 uint16_t* TouchGFXGeneratedHAL::getTFTFrameBuffer() const
 {
-    return (uint16_t*)frameBuf;
+    return (uint16_t*)LTDC_Layer1->CFBAR;
 }
 
 void TouchGFXGeneratedHAL::setTFTFrameBuffer(uint16_t* adr)
 {
-    //setTFTFrameBuffer() not used for selected display interface
+    LTDC_Layer1->CFBAR = (uint32_t)adr;
+
+    /* Reload immediate */
+    LTDC->SRCR = (uint32_t)LTDC_SRCR_IMR;
 }
 
 void TouchGFXGeneratedHAL::flushFrameBuffer(const touchgfx::Rect& rect)

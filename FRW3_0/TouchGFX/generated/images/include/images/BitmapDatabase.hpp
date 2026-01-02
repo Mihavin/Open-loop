@@ -6,9 +6,7 @@
 #include <touchgfx/hal/Types.hpp>
 #include <touchgfx/Bitmap.hpp>
 
-const uint16_t BITMAP_COMPANY_LOGO_ID = 0;
-const uint16_t BITMAP_LOGO_ID = 1;
-const uint16_t BITMAP_PUZZLE_90DEG_ID = 2;
+const uint16_t BITMAP_PUZZLE_90DEG_ID = 0;
 
 namespace BitmapDatabase
 {
