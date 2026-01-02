@@ -1,0 +1,41 @@
+MCU - STM32H743IIT6 at 450MHz, 25MHz external crystal 
+FLASH - S25FL256SAGMFIG10SO3016
+SDRAM - MT48LC4M16A2P-6A
+DISPLAY - NHD-4.3-480272EF-ASXP , 2 ARGB8888 layers, double buffer, DMA2D
+BLDC DRIVER - DRV8323S
+ENCODER - AS5047P SPI or ABI modes
+
+SPI1 - MCU to DRIVER
+SPI2 - MCU to ENCODER
+SPI3 - MCU to EXTERNAL STEPPER DRIVING UNIT (not a part of the current project)
+TIM1 - 3 PHASE PWM Generator
+TIM2 - Magnetic Encoder AB sampling (Optional)
+TIM3 - UI Rotary encoder 
+TIM4 - PEADAL encoder (connected to the board via J2 connector)
+TIM5 - PWM generation, control the display brightness (KLV pin)
+TIM8 - PWM generation for BUZZER and Vibration motor
+
+Vref for current measure = 3.00v
+Rsen = 4mOhm
+VCC = 3.3V
+VM = 24V 9A max
+
+Motor BLDC N5065
+	140KVA 7 poles pairs.
+	no-load current 0.5 - 1.0A
+	voltage 24 - 36V
+	Torque 1.5-2N/m
+	Max Power 1200 - 1800W
+	Max Current 34A
+
+Expected max conditions:
+	Max speed 3000RPM
+	Max Torque 0.5N/m
+	Max Current 5A
+	Motor temp limit = 95C
+	
+Drive mode
+	full FOC
+	
+The encoder magnet mounted on the motor shaft
+
