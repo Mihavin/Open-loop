@@ -1,31 +1,48 @@
 #include "main.h"
+
+#include "gpio.h"
+#include "dma.h"
+#include "bdma.h"
+#include "adc.h"
+#include "tim.h"
+
+#include "foc.h"
+
 #include <math.h>
+#include <stdbool.h>
 
-/**
- * Simple open-loop SVPWM example for STM32H723ZGT6 + DRV8323S.
- * - PWM frequency: 25 kHz on TIM1 channel 1/2/3 driving DRV8323S inputs.
- * - Current sampling through SOA/SOB/SOC with ADC1 (BMDA) triggered by TIM1 update.
- * - No encoder feedback; electrical angle advances with a fixed frequency.
- * - LED0 (PC15), LED1 (PG14), LED3 (PC8) toggle for basic sanity checks.
- */
+// ==============================
+// User settings
+// ==============================
 
-#define PWM_TIMER_FREQUENCY_HZ   25000U
-#define VBUS_mV                 24000U
-#define OPEN_LOOP_FREQ_HZ       5000.0f
-#define MAX_MODULATION_INDEX    0.03f   // Limit voltage amplitude to roughly 25% to curb current draw
-#define TWO_PI                  6.28318530718f
+#define CONTROL_LOOP_HZ          20000U    // must match foc.c CONTROL_HZ
 
-static TIM_HandleTypeDef htim1;
-static ADC_HandleTypeDef hadc1;
-static DMA_HandleTypeDef hdma_adc1;
-
-static uint16_t adc_buffer[3];
+// Current offset calibration (motor stopped, PWM outputs disabled)
+#define OFFSET_CAL_SAMPLES       300U
+#define OFFSET_CAL_DELAY_MS      1U
 
 static void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_TIM1_Init(void);
-static void MX_ADC1_Init(void);
-static void RunOpenLoopSVPWM(void);
+
+static void TIM6_SetFrequency(uint32_t control_hz)
+{
+    // Configure TIM6 to generate update IRQ at control_hz.
+    // Use a 1 MHz timer tick for easy division.
+    uint32_t tim_clk = HAL_RCC_GetPCLK1Freq();
+    // On STM32H7, if APB prescaler != 1 then TIMxCLK = 2*PCLK
+    // Cube typically sets APB1 prescaler to /2, so multiplier applies.
+    tim_clk *= 2U;
+
+    const uint32_t tick_hz = 1000000U;
+    uint32_t psc = (tim_clk / tick_hz) - 1U;
+    uint32_t arr = (tick_hz / control_hz) - 1U;
+
+    __HAL_TIM_DISABLE(&htim6);
+    __HAL_TIM_SET_PRESCALER(&htim6, psc);
+    __HAL_TIM_SET_AUTORELOAD(&htim6, arr);
+    __HAL_TIM_SET_COUNTER(&htim6, 0U);
+    __HAL_TIM_CLEAR_FLAG(&htim6, TIM_FLAG_UPDATE);
+    __HAL_TIM_ENABLE(&htim6);
+}
 
 int main(void)
 {
@@ -33,13 +50,18 @@ int main(void)
     SystemClock_Config();
 
     MX_GPIO_Init();
+    MX_DMA_Init();
+    MX_BDMA_Init();
+
+    MX_ADC1_Init();
+    MX_ADC2_Init();
+    MX_ADC3_Init();
+
     MX_TIM1_Init();
-//    MX_ADC1_Init();
+    MX_TIM2_Init();
+    MX_TIM6_Init();
 
-
-
- //   HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED);
- //   HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_buffer, 3);
+    // ---------------- Driver enable / CAL sequence (kept from your previous code) ----------------
     HAL_Delay(10);
     HAL_GPIO_WritePin(EN_DRV_GPIO_Port, EN_DRV_Pin, GPIO_PIN_SET);
     HAL_Delay(10);
@@ -47,136 +69,111 @@ int main(void)
     HAL_Delay(1);
     HAL_GPIO_WritePin(EN_DRV_GPIO_Port, EN_DRV_Pin, GPIO_PIN_SET);
     HAL_Delay(10);
-    HAL_GPIO_WritePin(CAL_GPIO_Port, CAL_Pin, GPIO_PIN_RESET);
-    HAL_Delay(1);
-    HAL_GPIO_WritePin(CAL_GPIO_Port, CAL_Pin, GPIO_PIN_SET);
-    HAL_Delay(1);
-    HAL_GPIO_WritePin(CAL_GPIO_Port, CAL_Pin, GPIO_PIN_RESET);
-    HAL_Delay(10);
+
+    // ---------------- ADC calibration ----------------
+    // NOTE: If this hangs, it means ADC kernel clock isn't configured.
+    HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED);
+    HAL_ADCEx_Calibration_Start(&hadc2, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED);
+    HAL_ADCEx_Calibration_Start(&hadc3, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED);
+
+    // Start injected conversions (triggered by TIM1 TRGO2 UPDATE)
+    HAL_ADCEx_InjectedStart(&hadc1);
+    HAL_ADCEx_InjectedStart(&hadc2);
+    HAL_ADCEx_InjectedStart(&hadc3);
+
+    // ---------------- Encoder start (TIM2) ----------------
+    HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
+    __HAL_TIM_SET_COUNTER(&htim2, 0U);
+
+    // ---------------- PWM start (TIM1) ----------------
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+
     HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
     HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
     HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
+
+    // Ensure TIM1 counter is running (needed for TRGO2 -> ADC injected trigger)
+    HAL_TIM_Base_Start(&htim1);
+
+    // Keep outputs disabled during offset calibration
+    __HAL_TIM_MOE_DISABLE(&htim1);
+
+    FOC_Init();
+
+    // TIM1 must be running so TRGO2 keeps updating injected conversions.
+    // With MOE disabled, the gate outputs remain off.
+    FOC_CalibrateCurrentOffsets(OFFSET_CAL_SAMPLES, OFFSET_CAL_DELAY_MS);
+
+    // Enable outputs and start control loop
     __HAL_TIM_MOE_ENABLE(&htim1);
+
+    // TIM6 IRQ enable (CubeMX project didn't enable it)
+    HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
+
+    TIM6_SetFrequency(CONTROL_LOOP_HZ);
+    HAL_TIM_Base_Start_IT(&htim6);
+
+    uint32_t last_hb = HAL_GetTick();
 
     while (1)
     {
-        RunOpenLoopSVPWM();
+        if (FOC_IsTripped())
+        {
+            // Hard trip latched: blink LED0 fast
+            __HAL_TIM_MOE_DISABLE(&htim1);
+            HAL_GPIO_WritePin(EN_DRV_GPIO_Port, EN_DRV_Pin, GPIO_PIN_RESET);
+
+            while (1)
+            {
+                HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_15);
+                HAL_Delay(100);
+            }
+        }
+
+        // Heartbeat
+        uint32_t now = HAL_GetTick();
+        if ((now - last_hb) >= 250U)
+        {
+            last_hb = now;
+            HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_15 | GPIO_PIN_8);
+            HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
+        }
+
+        __WFI();
     }
 }
 
-static void RunOpenLoopSVPWM(void)
+// TIM6 period callback used by HAL_TIM_IRQHandler
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    static float electrical_angle = 0.0f;
-
-    typedef enum
+    if (htim->Instance == TIM6)
     {
-        PROFILE_RAMP_UP,
-        PROFILE_HOLD,
-        PROFILE_RAMP_DOWN
-    } OpenLoopProfileState;
-
-    static OpenLoopProfileState state = PROFILE_RAMP_UP;
-    static uint32_t last_tick_ms = 0U;
-    static uint32_t state_start_ms = 0U;
-
-    const float target_rpm = 2000.0f;
-    const uint32_t ramp_duration_ms = 10000U;
-    const uint32_t hold_duration_ms = 5000U;
-
-    uint32_t now_ms = HAL_GetTick();
-    if (last_tick_ms == 0U)
-    {
-        last_tick_ms = now_ms;
-        state_start_ms = now_ms;
+        FOC_ControlStep();
     }
-
-    float dt_s = (now_ms - last_tick_ms) / 1000.0f;
-    last_tick_ms = now_ms;
-
-    float current_rpm = 0.0f;
-    switch (state)
-    {
-    case PROFILE_RAMP_UP:
-        current_rpm = target_rpm * fminf(1.0f, (now_ms - state_start_ms) / (float)ramp_duration_ms);
-        if ((now_ms - state_start_ms) >= ramp_duration_ms)
-        {
-            state = PROFILE_HOLD;
-            state_start_ms = now_ms;
-        }
-        break;
-
-    case PROFILE_HOLD:
-        current_rpm = target_rpm;
-        if ((now_ms - state_start_ms) >= hold_duration_ms)
-        {
-            state = PROFILE_RAMP_DOWN;
-            state_start_ms = now_ms;
-        }
-        break;
-
-    case PROFILE_RAMP_DOWN:
-        current_rpm = target_rpm * fmaxf(0.0f, 1.0f - (now_ms - state_start_ms) / (float)ramp_duration_ms);
-        if ((now_ms - state_start_ms) >= ramp_duration_ms)
-        {
-            state = PROFILE_RAMP_UP;
-            state_start_ms = now_ms;
-        }
-        break;
-    }
-
-    float electrical_speed_rps = current_rpm / 60.0f;
-    float angle_step = TWO_PI * electrical_speed_rps * dt_s;
-
-    // Advance angle for open-loop rotation
-    electrical_angle += angle_step;
-    while (electrical_angle > TWO_PI)
-    {
-        electrical_angle -= TWO_PI;
-    }
-
-    // Compute SVPWM duty cycles (normalized 0.0f-1.0f)
-    float sin_a = sinf(electrical_angle);
-    float sin_b = sinf(electrical_angle - TWO_PI / 3.0f);
-    float sin_c = sinf(electrical_angle + TWO_PI / 3.0f);
-
-    float duty_a = 0.5f + 0.5f * MAX_MODULATION_INDEX * sin_a;
-    float duty_b = 0.5f + 0.5f * MAX_MODULATION_INDEX * sin_b;
-    float duty_c = 0.5f + 0.5f * MAX_MODULATION_INDEX * sin_c;
-
-    uint32_t period = htim1.Instance->ARR + 1U;
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, (uint32_t)(duty_a * period));
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (uint32_t)(duty_b * period));
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, (uint32_t)(duty_c * period));
-
-    // Toggle LEDs for a quick heartbeat/debug indicator
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_15 | GPIO_PIN_8);
-    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
-
-    // Pace the open-loop advance to roughly 1 kHz for predictable electrical speed
-    HAL_Delay(1);
 }
+
+// =========================
+// Clock config
+// =========================
+
+#include "stm32h7xx_hal_rcc_ex.h"
 
 static void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Supply configuration update enable
-  */
+  // Supply configuration update enable
   HAL_PWREx_ConfigSupply(PWR_LDO_SUPPLY);
 
-  /** Configure the main internal regulator output voltage
-  */
+  // Configure the main internal regulator output voltage
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE0);
-
   while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
 
-  /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+  // PLL1 (CPU)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_DIV1;
   RCC_OscInitStruct.HSICalibrationValue = 64;
@@ -184,20 +181,19 @@ static void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = 4;
   RCC_OscInitStruct.PLL.PLLN = 30;
-  /* Use a valid integer divider for PLL1P so the PLL can lock */
   RCC_OscInitStruct.PLL.PLLP = 2;
   RCC_OscInitStruct.PLL.PLLQ = 5;
   RCC_OscInitStruct.PLL.PLLR = 2;
   RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_3;
   RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
   RCC_OscInitStruct.PLL.PLLFRACN = 0;
+
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
   }
 
-  /** Initializes the CPU, AHB and APB buses clocks
-  */
+  // Bus clocks
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2
                               |RCC_CLOCKTYPE_D3PCLK1|RCC_CLOCKTYPE_D1PCLK1;
@@ -213,192 +209,33 @@ static void SystemClock_Config(void)
   {
     Error_Handler();
   }
-}
 
-static void MX_GPIO_Init(void)
-{
-    __HAL_RCC_GPIOC_CLK_ENABLE();
-    __HAL_RCC_GPIOG_CLK_ENABLE();
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOE_CLK_ENABLE();
-    __HAL_RCC_GPIOB_CLK_ENABLE();
+  // IMPORTANT: ADC kernel clock. Without this, ADC calibration may hang.
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC;
 
-    // TIM1 channel outputs routed to DRV8323S PWM inputs
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
+  PeriphClkInitStruct.PLL2.PLL2M = 4;
+  PeriphClkInitStruct.PLL2.PLL2N = 60;
+  PeriphClkInitStruct.PLL2.PLL2P = 2;
+  PeriphClkInitStruct.PLL2.PLL2Q = 2;
+  PeriphClkInitStruct.PLL2.PLL2R = 2;
+  PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_3;
+  PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
+  PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
 
-    // INHA -> TIM1_CH1 on PE9
-    GPIO_InitStruct.Pin = INHA_Pin;
-    HAL_GPIO_Init(INHA_GPIO_Port, &GPIO_InitStruct);
+  PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
 
-    // INHB -> TIM1_CH2 on PA9
-    GPIO_InitStruct.Pin = INHB_Pin;
-    HAL_GPIO_Init(INHB_GPIO_Port, &GPIO_InitStruct);
-
-    // INHC -> TIM1_CH3 on PA10
-    GPIO_InitStruct.Pin = INHC_Pin;
-    HAL_GPIO_Init(INHC_GPIO_Port, &GPIO_InitStruct);
-
-    // INLA/INLB/INLC -> TIM1 complementary outputs (x6 PWM default on DRV8323S)
-    GPIO_InitStruct.Pin = INLA_Pin;
-    HAL_GPIO_Init(INLA_GPIO_Port, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = INLB_Pin;
-    HAL_GPIO_Init(INLB_GPIO_Port, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = INLC_Pin;
-    HAL_GPIO_Init(INLC_GPIO_Port, &GPIO_InitStruct);
-
-    // LED pins
-
-    GPIO_InitStruct.Pin = GPIO_PIN_15 | GPIO_PIN_8;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_14;
-    HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
-
-    // SOA/SOB/SOC current sense inputs on ADC1_INP1/2/3 (PA0/PA1/PA2)
-    GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2;
-    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = CAL_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(CAL_GPIO_Port, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = EN_DRV_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(EN_DRV_GPIO_Port, &GPIO_InitStruct);
-
-
-}
-
-static void MX_TIM1_Init(void)
-{
-    __HAL_RCC_TIM1_CLK_ENABLE();
-
-    TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-    TIM_MasterConfigTypeDef sMasterConfig = {0};
-    TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
-    TIM_OC_InitTypeDef sConfigOC = {0};
-
-    uint32_t timer_clock_hz = HAL_RCC_GetPCLK2Freq() * 2U; // TIM1 on APB2 with multiplier
-    uint32_t prescaler = 0;
-    uint32_t period = (timer_clock_hz / PWM_TIMER_FREQUENCY_HZ) - 1U;
-
-    htim1.Instance = TIM1;
-    htim1.Init.Prescaler = prescaler;
-    htim1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
-    htim1.Init.Period = period;
-    htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-    htim1.Init.RepetitionCounter = 0;
-    htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
-    HAL_TIM_Base_Init(&htim1);
-
-    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-    HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig);
-
-    HAL_TIM_PWM_Init(&htim1);
-
-    sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-    sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
-    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-    HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig);
-
-    sConfigOC.OCMode = TIM_OCMODE_PWM1;
-    sConfigOC.Pulse = period / 2U;
-    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-    sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
-    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-    sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
-    sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-
-    HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_1);
-    HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_2);
-    HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_3);
-
-    sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
-    sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
-    sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
-    sBreakDeadTimeConfig.DeadTime = 32; // ~64 ns at 500 MHz clock (adjust for your gate driver)
-    sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
-    sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
-    sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_ENABLE;
-    HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig);
-}
-
-static void MX_ADC1_Init(void)
-{
-    __HAL_RCC_ADC12_CLK_ENABLE();
-    __HAL_RCC_DMA1_CLK_ENABLE();
-
-    hadc1.Instance = ADC1;
-    hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV4;
-    hadc1.Init.Resolution = ADC_RESOLUTION_16B;
-    hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
-    hadc1.Init.EOCSelection = ADC_EOC_SEQ_CONV;
-    hadc1.Init.LowPowerAutoWait = DISABLE;
-    hadc1.Init.ContinuousConvMode = DISABLE;
-    hadc1.Init.NbrOfConversion = 3;
-    hadc1.Init.DiscontinuousConvMode = DISABLE;
-    hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIG_T1_TRGO;
-    hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_RISING;
-    hadc1.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DMA_ONESHOT;
-    hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
-    HAL_ADC_Init(&hadc1);
-
-    ADC_ChannelConfTypeDef sConfig = {0};
-
-    sConfig.SamplingTime = ADC_SAMPLETIME_32CYCLES_5;
-    sConfig.SingleDiff = ADC_SINGLE_ENDED;
-    sConfig.OffsetNumber = ADC_OFFSET_NONE;
-    sConfig.Offset = 0;
-
-    // SOA -> Channel 1
-    sConfig.Channel = ADC_CHANNEL_1;
-    sConfig.Rank = ADC_REGULAR_RANK_1;
-    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
-
-    // SOB -> Channel 2
-    sConfig.Channel = ADC_CHANNEL_2;
-    sConfig.Rank = ADC_REGULAR_RANK_2;
-    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
-
-    // SOC -> Channel 3
-    sConfig.Channel = ADC_CHANNEL_3;
-    sConfig.Rank = ADC_REGULAR_RANK_3;
-    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
-
-    hdma_adc1.Instance = DMA1_Stream0;
-    hdma_adc1.Init.Request = DMA_REQUEST_ADC1;
-    hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    hdma_adc1.Init.Mode = DMA_CIRCULAR;
-    hdma_adc1.Init.Priority = DMA_PRIORITY_HIGH;
-    hdma_adc1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    HAL_DMA_Init(&hdma_adc1);
-
-    __HAL_LINKDMA(&hadc1, DMA_Handle, hdma_adc1);
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
 }
 
 void Error_Handler(void)
 {
-    __disable_irq();
-    while (1)
-    {
-    }
+  __disable_irq();
+  while (1)
+  {
+  }
 }
+

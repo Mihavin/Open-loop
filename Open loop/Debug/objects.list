@@ -4,6 +4,7 @@
 "./Core/Src/crc.o"
 "./Core/Src/dma.o"
 "./Core/Src/fmac.o"
+"./Core/Src/foc.o"
 "./Core/Src/gpio.o"
 "./Core/Src/main.o"
 "./Core/Src/spi.o"

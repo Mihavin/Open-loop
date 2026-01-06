@@ -69,19 +69,27 @@ void MX_TIM1_Init(void)
     Error_Handler();
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
+  // Use TRGO2 on UPDATE to trigger ADC injected conversions (adc.c uses T1_TRGO2)
+  sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_UPDATE;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
   {
     Error_Handler();
   }
-  sBreakInputConfig.Source = TIM_BREAKINPUTSOURCE_BKIN;
-  sBreakInputConfig.Enable = TIM_BREAKINPUTSOURCE_ENABLE;
-  sBreakInputConfig.Polarity = TIM_BREAKINPUTSOURCE_POLARITY_HIGH;
-  if (HAL_TIMEx_ConfigBreakInput(&htim1, TIM_BREAKINPUT_BRK, &sBreakInputConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
+  /*
+   * IMPORTANT (bring-up): Disable BKIN/Break.
+   *
+   * In the current CubeMX configuration PB12 is wired/configured as TIM1_BKIN
+   * (it appears to share the NFAULT net). With Break polarity set to HIGH,
+   * the timer output can be permanently disabled if that pin is high or floating.
+   *
+   * For initial FOC bring-up we disable Break entirely here. Once everything
+   * works, you can re-enable Break with the correct polarity and a defined pull.
+   */
+  sBreakInputConfig.Source   = TIM_BREAKINPUTSOURCE_BKIN;
+  sBreakInputConfig.Enable   = TIM_BREAKINPUTSOURCE_DISABLE;
+  sBreakInputConfig.Polarity = TIM_BREAKINPUTSOURCE_POLARITY_LOW;
+  (void)sBreakInputConfig;
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
   sConfigOC.Pulse = 2400;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
@@ -105,13 +113,13 @@ void MX_TIM1_Init(void)
   sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
   sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
   sBreakDeadTimeConfig.DeadTime = 80;
-  sBreakDeadTimeConfig.BreakState = TIM_BREAK_ENABLE;
-  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
+  sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
+  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_LOW;
   sBreakDeadTimeConfig.BreakFilter = 0;
   sBreakDeadTimeConfig.Break2State = TIM_BREAK2_DISABLE;
   sBreakDeadTimeConfig.Break2Polarity = TIM_BREAK2POLARITY_HIGH;
   sBreakDeadTimeConfig.Break2Filter = 0;
-  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
+  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_ENABLE;
   if (HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig) != HAL_OK)
   {
     Error_Handler();
