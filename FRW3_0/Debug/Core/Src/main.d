@@ -45,7 +45,12 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h \
- ../TouchGFX/App/app_touchgfx.h
+ ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/crc.h ../Core/Inc/dma.h \
+ ../Core/Inc/dma2d.h ../Core/Inc/ltdc.h ../Core/Inc/quadspi.h \
+ ../Core/Inc/spi.h ../Core/Inc/tim.h ../Core/Inc/usart.h \
+ ../Core/Inc/gpio.h ../Core/Inc/fmc.h ../Core/Inc/motor_foc.h \
+ ../Core/Inc/telemetry.h ../Core/Inc/leds.h ../Core/Inc/buzzer.h \
+ ../Core/Inc/drv_spi.h
 ../Core/Inc/main.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
 ../Core/Inc/stm32h7xx_hal_conf.h:
@@ -93,4 +98,20 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h:
-../TouchGFX/App/app_touchgfx.h:
+../Core/Inc/adc.h:
+../Core/Inc/main.h:
+../Core/Inc/crc.h:
+../Core/Inc/dma.h:
+../Core/Inc/dma2d.h:
+../Core/Inc/ltdc.h:
+../Core/Inc/quadspi.h:
+../Core/Inc/spi.h:
+../Core/Inc/tim.h:
+../Core/Inc/usart.h:
+../Core/Inc/gpio.h:
+../Core/Inc/fmc.h:
+../Core/Inc/motor_foc.h:
+../Core/Inc/telemetry.h:
+../Core/Inc/leds.h:
+../Core/Inc/buzzer.h:
+../Core/Inc/drv_spi.h:

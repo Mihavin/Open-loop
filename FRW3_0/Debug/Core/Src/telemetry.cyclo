@@ -1,0 +1,12 @@
+../Core/Src/telemetry.c:201:24:fb_bytes_per_pixel	1
+../Core/Src/telemetry.c:206:21:fb_ptr_xy	1
+../Core/Src/telemetry.c:212:20:put_pixel	3
+../Core/Src/telemetry.c:219:13:fill_rect	11
+../Core/Src/telemetry.c:240:13:draw_char	7
+../Core/Src/telemetry.c:257:13:draw_text	2
+../Core/Src/telemetry.c:268:13:dcache_clean_range	4
+../Core/Src/telemetry.c:291:13:fmt_f2	4
+../Core/Src/telemetry.c:304:12:sdram_ready	1
+../Core/Src/telemetry.c:311:6:Telemetry_SetFrameBufferAddress	2
+../Core/Src/telemetry.c:321:6:Telemetry_Init	4
+../Core/Src/telemetry.c:364:6:Telemetry_Update	8

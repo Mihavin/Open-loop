@@ -1,0 +1,6 @@
+../Core/Src/buzzer.c:7:17:buzzer_get_tim8_clk_hz	48	static
+../Core/Src/buzzer.c:22:26:buzzer_apply	136	static
+../Core/Src/buzzer.c:97:6:Buzzer_Init	16	static
+../Core/Src/buzzer.c:117:19:Buzzer_ToneHz	24	static
+../Core/Src/buzzer.c:122:19:Buzzer_Stop	16	static
+../Core/Src/buzzer.c:137:19:Buzzer_Beep	32	static

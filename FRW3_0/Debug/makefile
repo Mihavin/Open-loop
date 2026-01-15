@@ -9,30 +9,6 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include TouchGFX/target/generated/subdir.mk
--include TouchGFX/target/subdir.mk
--include TouchGFX/gui/src/screen1_screen/subdir.mk
--include TouchGFX/gui/src/model/subdir.mk
--include TouchGFX/gui/src/common/subdir.mk
--include TouchGFX/generated/texts/src/subdir.mk
--include TouchGFX/generated/images/src/subdir.mk
--include TouchGFX/generated/gui_generated/src/screen1_screen/subdir.mk
--include TouchGFX/generated/gui_generated/src/common/subdir.mk
--include TouchGFX/generated/fonts/src/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/touchgfx/framework/source/platform/hal/simulator/sdl2/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/touchgfx/framework/source/platform/driver/touch/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/simulator/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/gui/src/screen1_screen/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/gui/src/model/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/gui/src/common/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/generated/texts/src/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/generated/simulator/src/video/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/generated/simulator/src/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/generated/images/src/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/generated/gui_generated/src/screen1_screen/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/generated/gui_generated/src/common/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/generated/fonts/src/subdir.mk
--include TouchGFX/App/subdir.mk
 -include Drivers/STM32H7xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
@@ -109,7 +85,7 @@ main-build: FRW3_0.elf secondary-outputs
 
 # Tool invocations
 FRW3_0.elf FRW3_0.map: $(OBJS) $(USER_OBJS) C:\GitHub\Open-loop\FRW3_0\STM32H743IITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "FRW3_0.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\GitHub\Open-loop\FRW3_0\STM32H743IITX_FLASH.ld" -Wl,-Map="FRW3_0.map" -Wl,--gc-sections -static -L"C:\GitHub\Open-loop\FRW3_0\Middlewares\ST\touchgfx\lib\core\cortex_m7\gcc" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+	arm-none-eabi-g++ -o "FRW3_0.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\GitHub\Open-loop\FRW3_0\STM32H743IITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="FRW3_0.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

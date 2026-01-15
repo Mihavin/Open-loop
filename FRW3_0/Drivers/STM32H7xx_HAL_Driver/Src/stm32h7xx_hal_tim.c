@@ -186,6 +186,7 @@ all interrupt callbacks are set to the corresponding weak functions:
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h7xx_hal.h"
 
+
 /** @addtogroup STM32H7xx_HAL_Driver
   * @{
   */
@@ -5803,7 +5804,6 @@ uint32_t HAL_TIM_ReadCapturedValue(const TIM_HandleTypeDef *htim, uint32_t Chann
   */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM1) {
-        // TIM1 update event – execute FOC current loop
 
     }
 }
