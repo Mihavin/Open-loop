@@ -267,5 +267,15 @@ SECTIONS
     *(.framebuffer*)
     . = ALIGN(32);
   } >SDRAM
-
+  
+/* TouchGFX framebuffer in SDRAM */
+.TouchGFX_Framebuffer (NOLOAD) :
+{
+  . = ALIGN(32);
+  *(.TouchGFX_Framebuffer)
+  *(.TouchGFX_Framebuffer.*)
+  *(TouchGFX_Framebuffer)
+  *(TouchGFX_Framebuffer.*)
+  . = ALIGN(32);
+} >SDRAM
 }

@@ -29,6 +29,7 @@
 #include "usart.h"
 #include "gpio.h"
 #include "fmc.h"
+#include "app_touchgfx.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -132,9 +133,11 @@ int main(void)
   MX_ADC1_Init();
   MX_ADC2_Init();
   MX_ADC3_Init();
-  MX_DMA2D_Init();
+   MX_QUADSPI_Init();
+  MX_FMC_Init();
+
   MX_LTDC_Init();
-  MX_QUADSPI_Init();
+  MX_DMA2D_Init();
   MX_SPI1_Init();
   MX_SPI2_Init();
   MX_SPI3_Init();
@@ -143,12 +146,13 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM4_Init();
   MX_TIM8_Init();
-  MX_FMC_Init();
+
   MX_TIM5_Init();
   MX_USART3_UART_Init();
   MX_CRC_Init();
   MX_TIM6_Init();
   MX_TIM7_Init();
+  MX_TouchGFX_Init();
   /* USER CODE BEGIN 2 */
 
   drv8323_cfg_t cfg;
@@ -205,6 +209,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
+  MX_TouchGFX_Process();
     /* USER CODE BEGIN 3 */
 
 	  HAL_Delay(200);

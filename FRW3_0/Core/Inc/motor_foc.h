@@ -68,7 +68,7 @@ typedef enum
 #endif
 
 #ifndef MOTOR_FOC_ADC_VREF
-#define MOTOR_FOC_ADC_VREF            (3.0f)       /* ADC reference voltage */
+#define MOTOR_FOC_ADC_VREF            (3.3f)       /* ADC reference voltage */
 #endif
 
 #ifndef MOTOR_FOC_ADC_FULL_SCALE
@@ -82,7 +82,7 @@ typedef enum
 
 /* Control rates */
 #ifndef MOTOR_FOC_PWM_HZ
-#define MOTOR_FOC_PWM_HZ              (40000.0f)   /* should match TIM1 PWM frequency */
+#define MOTOR_FOC_PWM_HZ              (25000.0f)   /* should match TIM1 PWM frequency */
 #endif
 
 #ifndef MOTOR_FOC_SPEED_HZ

@@ -1,6 +1,6 @@
-../Core/Src/main.c:92:5:main	40	static,ignoring_inline_asm
-../Core/Src/main.c:221:6:SystemClock_Config	120	static
-../Core/Src/main.c:284:6:PeriphCommonClock_Config	200	static
-../Core/Src/main.c:315:6:MPU_Config	24	static
-../Core/Src/main.c:385:6:Error_Handler	4	static,ignoring_inline_asm
-../Core/Src/main.c:403:6:assert_failed	16	static
+../Core/Src/main.c:93:5:main	40	static,ignoring_inline_asm
+../Core/Src/main.c:226:6:SystemClock_Config	120	static
+../Core/Src/main.c:289:6:PeriphCommonClock_Config	200	static
+../Core/Src/main.c:320:6:MPU_Config	24	static
+../Core/Src/main.c:390:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:408:6:assert_failed	16	static
