@@ -22,6 +22,10 @@
 #include "stm32h7xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "tgfx_vsync.h"
+#include "ltdc.h"
+
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -31,7 +35,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+extern LTDC_HandleTypeDef hltdc;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -51,6 +55,13 @@
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_LTDC_LineEventCallback(LTDC_HandleTypeDef *hltdc)
+{
+    TGFX_SignalVSync();
+
+    uint32_t activeLine = (LTDC->BPCR & LTDC_BPCR_AVBP_Msk) - 1;
+    HAL_LTDC_ProgramLineEvent(hltdc, activeLine);
+}
 
 /* USER CODE END 0 */
 

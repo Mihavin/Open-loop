@@ -31,6 +31,7 @@
 #include "leds.h"
 #include "buzzer.h"
 #include "drv_spi.h"
+#include "app_touchgfx.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -202,14 +203,24 @@ void StartMotorTask(void *argument)
 {
   /* USER CODE BEGIN StartMotorTask */
   /* Infinite loop */
-	   MotorFOC_Init();
-	   MotorFOC_Start();
-	   MotorFOC_Arm();
-  for(;;)
-  {
-	  MotorFOC();
-    osDelay(1);
-  }
+
+    MotorFOC_Init();
+    MotorFOC_Start();
+    while (MotorFOC_GetState() == MOTOR_FOC_STATE_CALIB)
+    {
+        osDelay(1);
+    }
+   // MotorFOC_Arm();
+    MotorFOC_SetMode(MOTOR_FOC_MODE_SPEED);
+  //  MotorFOC_SetSpeedRPM(1500);
+
+   // bool armed = false;
+
+    for (;;)
+    {
+        MotorFOC();      // runs alignment timing + speed loop
+        osDelay(1);
+    }
   /* USER CODE END StartMotorTask */
 }
 
@@ -224,6 +235,7 @@ void StartGUITask(void *argument)
 {
   /* USER CODE BEGIN StartGUITask */
   /* Infinite loop */
+	 MX_TouchGFX_Process();
   for(;;)
   {
 	  Telemetry_Update();
@@ -247,7 +259,8 @@ void StartHIDTask(void *argument)
   {
   	  float sp = (float)__HAL_TIM_GET_COUNTER(&htim3);
   	  MotorFOC_SetSpeedRPM(sp);
-    osDelay(1);
+  	MotorFOC_SetMode(MOTOR_FOC_MODE_SPEED);
+    osDelay(100);
   }
   /* USER CODE END StartHIDTask */
 }

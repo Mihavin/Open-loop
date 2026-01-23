@@ -138,7 +138,7 @@ typedef enum
  *  - If 1: after offset calibration it performs alignment and enters RUN automatically.
  */
 #ifndef MOTOR_FOC_AUTOSTART
-#define MOTOR_FOC_AUTOSTART           (0)
+#define MOTOR_FOC_AUTOSTART           (1)
 #endif
 /* -------------------------------------------------------------------------- */
 

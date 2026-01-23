@@ -10,6 +10,8 @@ public:
     
     virtual ~ModelListener() {}
 
+    virtual void tick() {}
+
     void bind(Model* m)
     {
         model = m;

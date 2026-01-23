@@ -22,7 +22,58 @@
 #include "fmc.h"
 
 /* USER CODE BEGIN 0 */
+/* USER CODE BEGIN 0 */
+#include "main.h"
 
+static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram)
+{
+  FMC_SDRAM_CommandTypeDef cmd;
+
+  // Step 1: Clock enable
+  cmd.CommandMode            = FMC_SDRAM_CMD_CLK_ENABLE;
+  cmd.CommandTarget          = FMC_SDRAM_CMD_TARGET_BANK1;
+  cmd.AutoRefreshNumber      = 1;
+  cmd.ModeRegisterDefinition = 0;
+  HAL_SDRAM_SendCommand(hsdram, &cmd, 0x1000);
+
+  HAL_Delay(1);
+
+  // Step 2: Precharge all
+  cmd.CommandMode = FMC_SDRAM_CMD_PALL;
+  cmd.AutoRefreshNumber = 1;
+  HAL_SDRAM_SendCommand(hsdram, &cmd, 0x1000);
+
+  // Step 3: Auto-refresh (usually 8 is safe)
+  cmd.CommandMode = FMC_SDRAM_CMD_AUTOREFRESH_MODE;
+  cmd.AutoRefreshNumber = 8;
+  HAL_SDRAM_SendCommand(hsdram, &cmd, 0x1000);
+
+  // Step 4: Load Mode Register
+  // For MT48LC4M16A2 / similar:
+  // Burst Length = 1 (or 2/4), Burst Type = Sequential
+  // CAS = 3, Operating = Standard, Write Burst = Single
+  uint32_t mode =
+      (0x0 << 0)  |   // BL = 1
+      (0x0 << 3)  |   // BT = Sequential
+      (0x3 << 4)  |   // CAS = 3
+      (0x0 << 7)  |   // Standard operation
+      (0x1 << 9);     // Write burst = Single
+
+  cmd.CommandMode            = FMC_SDRAM_CMD_LOAD_MODE;
+  cmd.AutoRefreshNumber      = 1;
+  cmd.ModeRegisterDefinition = mode;
+  HAL_SDRAM_SendCommand(hsdram, &cmd, 0x1000);
+
+  // Step 5: Set the refresh rate
+  // Refresh period = 64ms, rows = 4096 => 15.625us per row
+  // RefreshCount = (SDCLK_Hz * 15.625us) - 20
+  // IMPORTANT: SDCLK = FMC kernel clock / 2 when SDClockPeriod = 2
+  uint32_t fmc_ker_hz = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FMC);
+  uint32_t sdclk_hz   = fmc_ker_hz / 2;
+  uint32_t refresh    = (uint32_t)((sdclk_hz * 15.625e-6f) - 20.0f);
+
+  HAL_SDRAM_ProgramRefreshRate(hsdram, refresh);
+}
 /* USER CODE END 0 */
 
 SDRAM_HandleTypeDef hsdram1;
@@ -69,7 +120,7 @@ void MX_FMC_Init(void)
   }
 
   /* USER CODE BEGIN FMC_Init 2 */
-
+  SDRAM_Initialization_Sequence(&hsdram1);
   /* USER CODE END FMC_Init 2 */
 }
 

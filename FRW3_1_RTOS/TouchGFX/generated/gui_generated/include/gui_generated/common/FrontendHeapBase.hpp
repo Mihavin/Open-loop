@@ -12,8 +12,8 @@
 #include <gui/common/FrontendApplication.hpp>
 #include <gui/model/Model.hpp>
 
-#include <gui/screen1_screen/Screen1View.hpp>
-#include <gui/screen1_screen/Screen1Presenter.hpp>
+#include <gui/diagnostic_screen/DiagnosticView.hpp>
+#include <gui/diagnostic_screen/DiagnosticPresenter.hpp>
 
 
 /**
@@ -36,7 +36,7 @@ public:
      * A list of all view types. Must end with meta::Nil.
      * @note All view types used in the application MUST be added to this list!
      */
-    typedef touchgfx::meta::TypeList< Screen1View,
+    typedef touchgfx::meta::TypeList< DiagnosticView,
             touchgfx::meta::Nil
             > GeneratedViewTypes;
 
@@ -49,7 +49,7 @@ public:
      * A list of all presenter types. Must end with meta::Nil.
      * @note All presenter types used in the application MUST be added to this list!
      */
-    typedef touchgfx::meta::TypeList< Screen1Presenter,
+    typedef touchgfx::meta::TypeList< DiagnosticPresenter,
             touchgfx::meta::Nil
             > GeneratedPresenterTypes;
 
@@ -73,7 +73,7 @@ public:
 
     virtual void gotoStartScreen(FrontendApplication& app)
     {
-        app.gotoScreen1ScreenNoTransition();
+        app.gotoDiagnosticScreenNoTransition();
     }
 protected:
     FrontendHeapBase(touchgfx::AbstractPartition& presenters, touchgfx::AbstractPartition& views, touchgfx::AbstractPartition& transitions, FrontendApplication& app)

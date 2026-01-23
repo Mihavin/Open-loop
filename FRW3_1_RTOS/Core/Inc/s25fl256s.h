@@ -41,7 +41,7 @@ extern "C" {
  * If your QSPI clock is higher, keep this disabled (0) or lower the QSPI prescaler.
  */
 #ifndef S25FL256S_USE_QUAD_PROGRAM
-#define S25FL256S_USE_QUAD_PROGRAM      1
+#define S25FL256S_USE_QUAD_PROGRAM      0
 #endif
 
 /* Timeouts (ms) */

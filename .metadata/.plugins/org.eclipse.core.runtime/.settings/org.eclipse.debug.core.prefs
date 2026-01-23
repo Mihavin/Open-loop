@@ -5,4 +5,4 @@
 //org.eclipse.debug.core.PREFERRED_DELEGATES/org.eclipse.cdt.launch.remoteApplicationLaunchType=org.eclipse.rse.remotecdt.dsf.debug,debug,;
 eclipse.preferences.version=1
 org.eclipse.debug.core.USE_STEP_FILTERS=true
-prefWatchExpressions=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\r\n<watchExpressions>\r\n    <expression enabled\="true" text\="cfsr"/>\r\n    <expression enabled\="true" text\="mmfar"/>\r\n    <expression enabled\="true" text\="hfsr"/>\r\n    <expression enabled\="true" text\="pc"/>\r\n    <expression enabled\="true" text\="lr"/>\r\n    <expression enabled\="true" text\="bfar"/>\r\n</watchExpressions>\r\n
+prefWatchExpressions=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\r\n<watchExpressions>\r\n    <expression enabled\="true" text\="cfsr"/>\r\n    <expression enabled\="true" text\="mmfar"/>\r\n    <expression enabled\="true" text\="hfsr"/>\r\n    <expression enabled\="true" text\="pc"/>\r\n    <expression enabled\="true" text\="lr"/>\r\n    <expression enabled\="true" text\="bfar"/>\r\n    <expression enabled\="true" text\="fb_addr"/>\r\n</watchExpressions>\r\n

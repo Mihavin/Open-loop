@@ -2,7 +2,7 @@
   "Application": {
     "Screens": [
       {
-        "Name": "Screen1",
+        "Name": "Diagnostic",
         "Components": [
           {
             "Type": "Image",
@@ -10,6 +10,133 @@
             "Width": 272,
             "Height": 480,
             "RelativeFilename": "__generated\\alternate_theme_images_backgrounds_480x272_puzzle-90deg.png"
+          },
+          {
+            "Type": "TextArea",
+            "Name": "txtState",
+            "X": 4,
+            "Y": 240,
+            "Width": 207,
+            "Height": 48,
+            "TextId": "__SingleUse_1KB4",
+            "TextRotation": "0",
+            "AutoSize": true,
+            "Wildcard1": {
+              "TextId": "txtAngleBuffer",
+              "UseBuffer": true,
+              "BufferSize": 10
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "txtIc",
+            "X": 21,
+            "Y": 119,
+            "Width": 114,
+            "Height": 20,
+            "TextId": "__SingleUse_D5R0",
+            "TextRotation": "0",
+            "AutoSize": true,
+            "Wildcard1": {
+              "TextId": "txtIcBuffer",
+              "UseBuffer": true,
+              "BufferSize": 10
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "txtIq",
+            "Y": 159,
+            "Width": 272,
+            "Height": 48,
+            "TextId": "__SingleUse_TSJS",
+            "TextRotation": "0",
+            "AutoSize": true,
+            "Wildcard1": {
+              "TextId": "txtIqBuffer",
+              "UseBuffer": true,
+              "BufferSize": 10
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "txtMode",
+            "X": 4,
+            "Y": 200,
+            "Width": 203,
+            "Height": 48,
+            "TextId": "__SingleUse_J3FV",
+            "TextRotation": "0",
+            "AutoSize": true,
+            "Wildcard1": {
+              "TextId": "txtModeBuffer",
+              "UseBuffer": true,
+              "BufferSize": 10
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "txtIsum",
+            "X": 44,
+            "Y": 139,
+            "Width": 146,
+            "Height": 20,
+            "TextId": "__SingleUse_GH3M",
+            "TextRotation": "0",
+            "AutoSize": true,
+            "Wildcard1": {
+              "TextId": "txtIsumBuffer",
+              "UseBuffer": true,
+              "BufferSize": 10
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "txtRpm",
+            "X": 4,
+            "Y": 14,
+            "Width": 218,
+            "Height": 48,
+            "TextId": "__SingleUse_DU8R",
+            "TextRotation": "0",
+            "AutoSize": true,
+            "Wildcard1": {
+              "TextId": "txtRpmBuffer",
+              "UseBuffer": true,
+              "BufferSize": 40
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "txtIa",
+            "X": 21,
+            "Y": 79,
+            "Width": 116,
+            "Height": 20,
+            "TextId": "__SingleUse_17ST",
+            "TextRotation": "0",
+            "AutoSize": true,
+            "Wildcard1": {
+              "TextId": "txtIaBuffer",
+              "UseBuffer": true,
+              "BufferSize": 10
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "txtIb",
+            "X": 20,
+            "Y": 99,
+            "Width": 116,
+            "Height": 20,
+            "TextId": "__SingleUse_3RDP",
+            "TextRotation": "0",
+            "AutoSize": true,
+            "Wildcard1": {
+              "TextId": "txtIbBuffer",
+              "UseBuffer": true,
+              "BufferSize": 10
+            }
           }
         ],
         "Interactions": []
@@ -22,7 +149,7 @@
       "Height": 272
     },
     "SelectedColorDepth": 32,
-    "StartupScreenName": "Screen1",
+    "StartupScreenName": "Diagnostic",
     "SelectedStartupLanguage": "GB",
     "TouchGfxPath": "../Middlewares/ST/touchgfx",
     "UIPath": ".",

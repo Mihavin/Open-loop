@@ -23,6 +23,6 @@
 ../Core/Src/motor_foc.c:408:7:MotorFOC_GetId	4	static
 ../Core/Src/motor_foc.c:409:7:MotorFOC_GetIq	4	static
 ../Core/Src/motor_foc.c:410:7:MotorFOC_GetSpeedRPM	4	static
-../Core/Src/motor_foc.c:414:6:HAL_ADCEx_InjectedConvCpltCallback	176	static
-../Core/Src/motor_foc.c:545:6:MotorFOC	48	static
-../Core/Src/motor_foc.c:606:6:Motor_OpenLoopStep_20kHz	64	static
+../Core/Src/motor_foc.c:415:6:HAL_ADCEx_InjectedConvCpltCallback	176	static
+../Core/Src/motor_foc.c:546:6:MotorFOC	48	static
+../Core/Src/motor_foc.c:607:6:Motor_OpenLoopStep_20kHz	64	static

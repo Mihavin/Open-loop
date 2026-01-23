@@ -408,6 +408,7 @@ float MotorFOC_GetIc(void) { return g_foc.ic; }
 float MotorFOC_GetId(void) { return g_foc.id; }
 float MotorFOC_GetIq(void) { return g_foc.iq; }
 float MotorFOC_GetSpeedRPM(void) { return g_foc.speed_rpm; }
+//float MotorFOC_GetAngle(void ) { return g_foc.enc_prev; }
 
 /* ----------- ISR callbacks ----------- */
 /* This callback is called from HAL_ADC_IRQHandler() when injected conversion finishes */

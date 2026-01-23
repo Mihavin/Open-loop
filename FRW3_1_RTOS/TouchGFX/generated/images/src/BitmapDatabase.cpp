@@ -7,7 +7,7 @@
 extern const unsigned char image_alternate_theme_images_backgrounds_480x272_puzzle_90deg[]; // BITMAP_ALTERNATE_THEME_IMAGES_BACKGROUNDS_480X272_PUZZLE_90DEG_ID = 0, Size: 272x480 pixels
 
 const touchgfx::Bitmap::BitmapData bitmap_database[] = {
-    { image_alternate_theme_images_backgrounds_480x272_puzzle_90deg, 0, 272, 480, 0, 0, 272, ((uint8_t)touchgfx::Bitmap::RGB565) >> 3, 480, ((uint8_t)touchgfx::Bitmap::RGB565) & 0x7 }
+    { image_alternate_theme_images_backgrounds_480x272_puzzle_90deg, 0, 272, 480, 0, 0, 272, ((uint8_t)touchgfx::Bitmap::RGB888) >> 3, 480, ((uint8_t)touchgfx::Bitmap::RGB888) & 0x7 }
 };
 
 namespace BitmapDatabase

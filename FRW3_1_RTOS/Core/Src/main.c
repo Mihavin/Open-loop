@@ -130,9 +130,10 @@ int main(void)
   MX_ADC1_Init();
   MX_ADC2_Init();
   MX_ADC3_Init();
-  MX_DMA2D_Init();
-  MX_LTDC_Init();
   MX_QUADSPI_Init();
+  MX_FMC_Init();
+  MX_LTDC_Init();
+  MX_DMA2D_Init();
   MX_SPI1_Init();
   MX_SPI2_Init();
   MX_SPI3_Init();
@@ -141,13 +142,10 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM4_Init();
   MX_TIM8_Init();
-  MX_FMC_Init();
   MX_TIM5_Init();
   MX_USART3_UART_Init();
   MX_CRC_Init();
-  MX_TouchGFX_Init();
-  /* Call PreOsInit function */
-  MX_TouchGFX_PreOSInit();
+
   /* USER CODE BEGIN 2 */
 
 	drv8323_cfg_t cfg;
@@ -163,13 +161,18 @@ int main(void)
 	HAL_Delay(100);
 	HAL_GPIO_WritePin(LTDC_STNDB_GPIO_Port, LTDC_STNDB_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(VREF_EN_GPIO_Port, VREF_EN_Pin, GPIO_PIN_SET);
-	Telemetry_Init();
+	//Telemetry_Init();
 	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, 25);
 	HAL_Delay(5000);
 	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
 	HAL_GPIO_WritePin(VIB_GPIO_Port, VIB_Pin, GPIO_PIN_SET);
 	HAL_Delay(50);
 	HAL_GPIO_WritePin(VIB_GPIO_Port, VIB_Pin, GPIO_PIN_RESET);
+
+	   MotorFOC_Init();
+	   MotorFOC_Start();
+	   MotorFOC_Arm();
+
 //   MotorFOC_Arm();        // FORCE it for now (ignore AUTOSTART)
 	//  MotorFOC_SetMode(MOTOR_FOC_MODE_TORQUE);
 	//  MotorFOC_SetTorqueCurrentA(1.8f);
@@ -192,6 +195,9 @@ int main(void)
 
   /* Init scheduler */
   osKernelInitialize();  /* Call init function for freertos objects (in cmsis_os2.c) */
+  MX_TouchGFX_Init();
+  /* Call PreOsInit function */
+  MX_TouchGFX_PreOSInit();
   MX_FREERTOS_Init();
 
   /* Start scheduler */
@@ -364,7 +370,6 @@ void MPU_Config(void)
   MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
   MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
   MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
-  MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
   MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
