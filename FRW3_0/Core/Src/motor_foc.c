@@ -297,7 +297,7 @@ void MotorFOC_Start(void)
  __HAL_TIM_MOE_ENABLE(&htim1);
   /* Start speed loop timer */
   (void)HAL_TIM_Base_Start_IT(&htim7);
-  HAL_TIM_Base_Start_IT(&htim6);
+ // HAL_TIM_Base_Start_IT(&htim6);
 
   /* Reset calibration accumulators */
   g_foc.calib_samples = 0;

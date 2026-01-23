@@ -5801,8 +5801,8 @@ uint32_t HAL_TIM_ReadCapturedValue(const TIM_HandleTypeDef *htim, uint32_t Chann
   * @brief  Period elapsed callback in non-blocking mode
   * @param  htim TIM handle
   * @retval None
-  */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+*/
+__weak void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM1) {
 
     }

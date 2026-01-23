@@ -133,11 +133,12 @@ int main(void)
   MX_ADC1_Init();
   MX_ADC2_Init();
   MX_ADC3_Init();
-   MX_QUADSPI_Init();
-  MX_FMC_Init();
+   MX_FMC_Init();
 
-  MX_LTDC_Init();
+  MX_QUADSPI_Init();
+    MX_LTDC_Init();
   MX_DMA2D_Init();
+
   MX_SPI1_Init();
   MX_SPI2_Init();
   MX_SPI3_Init();
@@ -161,12 +162,16 @@ int main(void)
   bool pass = false;
   drv8323_comm_test(&g_drv8323, &pass);
 
+ // HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_RESET);
+
   Buzzer_Init(&buzzer, &htim8);
   Buzzer_Beep(&buzzer, 2000, 80, 50);
 
   HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
   HAL_TIMEx_PWMN_Start(&htim5, TIM_CHANNEL_1);
   __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, 0);
+//  HAL_TIM_Base_Start(&htim7);
+
   HAL_Delay(100);
 
    HAL_GPIO_WritePin(LTDC_STNDB_GPIO_Port, LTDC_STNDB_Pin, GPIO_PIN_SET);
@@ -174,19 +179,23 @@ int main(void)
    Telemetry_Init();
 
    __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, 25);
-
+HAL_Delay(5000);
    MotorFOC_Init();
    MotorFOC_Start();
 
+
    HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
+  // HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
 
    HAL_GPIO_WritePin(VIB_GPIO_Port, VIB_Pin, GPIO_PIN_SET);
    HAL_Delay(50);
    HAL_GPIO_WritePin(VIB_GPIO_Port, VIB_Pin, GPIO_PIN_RESET);
 
-   MotorFOC_Arm();        // FORCE it for now (ignore AUTOSTART)
-   MotorFOC_SetMode(MOTOR_FOC_MODE_SPEED);
-   MotorFOC_SetSpeedRPM(1500.0f);
+//   MotorFOC_Arm();        // FORCE it for now (ignore AUTOSTART)
+ //  MotorFOC_SetMode(MOTOR_FOC_MODE_TORQUE);
+ //  MotorFOC_SetTorqueCurrentA(1.8f);
+  // MotorFOC_SetMode(MOTOR_FOC_MODE_SPEED);
+ //  MotorFOC_SetSpeedRPM(100.0f);
 
    /* Example: arm motor control (enable driver + alignment) */
  #if MOTOR_FOC_AUTOSTART
@@ -194,10 +203,10 @@ int main(void)
  #else
    /* call MotorFOC_Arm() when you are ready to energize the inverter */
    MotorFOC_Arm();
-   MotorFOC_SetMode(MOTOR_FOC_MODE_TORQUE);
-   MotorFOC_SetTorqueCurrentA(1.8f);
+//  MotorFOC_SetMode(MOTOR_FOC_MODE_TORQUE);
+ //  MotorFOC_SetTorqueCurrentA(1.8f);
    MotorFOC_SetMode(MOTOR_FOC_MODE_SPEED);
-   MotorFOC_SetSpeedRPM(500.0f);
+ //  MotorFOC_SetSpeedRPM(2500.0f);
 
  #endif
 
@@ -211,8 +220,9 @@ int main(void)
 
   MX_TouchGFX_Process();
     /* USER CODE BEGIN 3 */
-
-	  HAL_Delay(200);
+  	  float sp = (float)__HAL_TIM_GET_COUNTER(&htim3);
+  	  MotorFOC_SetSpeedRPM(sp);
+	  HAL_Delay(20);
 	  HAL_GPIO_TogglePin(LED0_GPIO_Port, LED0_Pin);
 	  Telemetry_Update();
   }

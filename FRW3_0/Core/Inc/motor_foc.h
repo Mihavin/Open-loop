@@ -68,7 +68,7 @@ typedef enum
 #endif
 
 #ifndef MOTOR_FOC_ADC_VREF
-#define MOTOR_FOC_ADC_VREF            (3.3f)       /* ADC reference voltage */
+#define MOTOR_FOC_ADC_VREF            (3.35f)       /* ADC reference voltage */
 #endif
 
 #ifndef MOTOR_FOC_ADC_FULL_SCALE
@@ -82,7 +82,7 @@ typedef enum
 
 /* Control rates */
 #ifndef MOTOR_FOC_PWM_HZ
-#define MOTOR_FOC_PWM_HZ              (25000.0f)   /* should match TIM1 PWM frequency */
+#define MOTOR_FOC_PWM_HZ              (40000.0f)   /* should match TIM1 PWM frequency */
 #endif
 
 #ifndef MOTOR_FOC_SPEED_HZ
@@ -91,11 +91,11 @@ typedef enum
 
 /* Limits */
 #ifndef MOTOR_FOC_ID_MAX_A
-#define MOTOR_FOC_ID_MAX_A            (1.2f)
+#define MOTOR_FOC_ID_MAX_A            (3.5f)
 #endif
 
 #ifndef MOTOR_FOC_IQ_MAX_A
-#define MOTOR_FOC_IQ_MAX_A            (1.2f)
+#define MOTOR_FOC_IQ_MAX_A            (3.5f)
 #endif
 
 #ifndef MOTOR_FOC_SPEED_MAX_RPM
@@ -108,7 +108,7 @@ typedef enum
 #endif
 
 #ifndef MOTOR_FOC_ALIGN_ID_A
-#define MOTOR_FOC_ALIGN_ID_A          (2.0f)       /* d-axis current during alignment (A) */
+#define MOTOR_FOC_ALIGN_ID_A          (1.5f)       /* d-axis current during alignment (A) */
 #endif
 
 /* PI gains (start small!) */
@@ -116,21 +116,21 @@ typedef enum
 #define MOTOR_FOC_KP_ID               (0.15f)
 #endif
 #ifndef MOTOR_FOC_KI_ID
-#define MOTOR_FOC_KI_ID               (15.0f)
+#define MOTOR_FOC_KI_ID               (3.7f)
 #endif
 
 #ifndef MOTOR_FOC_KP_IQ
 #define MOTOR_FOC_KP_IQ               (0.15f)
 #endif
 #ifndef MOTOR_FOC_KI_IQ
-#define MOTOR_FOC_KI_IQ               (15.0f)
+#define MOTOR_FOC_KI_IQ               (3.7f)
 #endif
 
 #ifndef MOTOR_FOC_KP_SPEED
-#define MOTOR_FOC_KP_SPEED            (0.002f)
+#define MOTOR_FOC_KP_SPEED            (0.015f)
 #endif
 #ifndef MOTOR_FOC_KI_SPEED
-#define MOTOR_FOC_KI_SPEED            (0.02f)
+#define MOTOR_FOC_KI_SPEED            (0.07f)
 #endif
 
 /* Autostart behaviour:
@@ -138,7 +138,7 @@ typedef enum
  *  - If 1: after offset calibration it performs alignment and enters RUN automatically.
  */
 #ifndef MOTOR_FOC_AUTOSTART
-#define MOTOR_FOC_AUTOSTART           (1)
+#define MOTOR_FOC_AUTOSTART           (0)
 #endif
 /* -------------------------------------------------------------------------- */
 
