@@ -24,6 +24,9 @@
     <ClCompile Include="..\..\gui\src\diagnostic_screen\DiagnosticPresenter.cpp"/>
     <ClCompile Include="..\..\gui\src\diagnostic_screen\DiagnosticView.cpp"/>
     <ClCompile Include="..\..\generated\gui_generated\src\diagnostic_screen\DiagnosticViewBase.cpp"/>
+    <ClCompile Include="..\..\gui\src\screen1_screen\Screen1Presenter.cpp"/>
+    <ClCompile Include="..\..\gui\src\screen1_screen\Screen1View.cpp"/>
+    <ClCompile Include="..\..\generated\gui_generated\src\screen1_screen\Screen1ViewBase.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(ApplicationRoot)\assets\texts\texts.xml"/>
@@ -177,6 +180,9 @@
     <ClInclude Include="..\..\gui\include\gui\diagnostic_screen\DiagnosticPresenter.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\diagnostic_screen\DiagnosticView.hpp"/>
     <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\diagnostic_screen\DiagnosticViewBase.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\screen1_screen\Screen1Presenter.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\screen1_screen\Screen1View.hpp"/>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screen1_screen\Screen1ViewBase.hpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(ApplicationRoot)\generated\simulator\touchgfx.rc"/>

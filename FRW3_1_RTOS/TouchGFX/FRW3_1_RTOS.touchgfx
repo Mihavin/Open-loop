@@ -16,7 +16,7 @@
             "Name": "txtState",
             "X": 4,
             "Y": 240,
-            "Width": 207,
+            "Width": 265,
             "Height": 48,
             "TextId": "__SingleUse_1KB4",
             "TextRotation": "0",
@@ -24,7 +24,7 @@
             "Wildcard1": {
               "TextId": "txtAngleBuffer",
               "UseBuffer": true,
-              "BufferSize": 10
+              "BufferSize": 20
             }
           },
           {
@@ -32,7 +32,7 @@
             "Name": "txtIc",
             "X": 21,
             "Y": 119,
-            "Width": 114,
+            "Width": 107,
             "Height": 20,
             "TextId": "__SingleUse_D5R0",
             "TextRotation": "0",
@@ -47,7 +47,7 @@
             "Type": "TextArea",
             "Name": "txtIq",
             "Y": 159,
-            "Width": 272,
+            "Width": 258,
             "Height": 48,
             "TextId": "__SingleUse_TSJS",
             "TextRotation": "0",
@@ -63,7 +63,7 @@
             "Name": "txtMode",
             "X": 4,
             "Y": 200,
-            "Width": 203,
+            "Width": 261,
             "Height": 48,
             "TextId": "__SingleUse_J3FV",
             "TextRotation": "0",
@@ -71,7 +71,7 @@
             "Wildcard1": {
               "TextId": "txtModeBuffer",
               "UseBuffer": true,
-              "BufferSize": 10
+              "BufferSize": 20
             }
           },
           {
@@ -79,7 +79,7 @@
             "Name": "txtIsum",
             "X": 44,
             "Y": 139,
-            "Width": 146,
+            "Width": 139,
             "Height": 20,
             "TextId": "__SingleUse_GH3M",
             "TextRotation": "0",
@@ -111,7 +111,7 @@
             "Name": "txtIa",
             "X": 21,
             "Y": 79,
-            "Width": 116,
+            "Width": 109,
             "Height": 20,
             "TextId": "__SingleUse_17ST",
             "TextRotation": "0",
@@ -127,7 +127,7 @@
             "Name": "txtIb",
             "X": 20,
             "Y": 99,
-            "Width": 116,
+            "Width": 109,
             "Height": 20,
             "TextId": "__SingleUse_3RDP",
             "TextRotation": "0",
@@ -137,6 +137,148 @@
               "UseBuffer": true,
               "BufferSize": 10
             }
+          }
+        ],
+        "Interactions": []
+      },
+      {
+        "Name": "Screen1",
+        "CanvasBufferSize": 4080,
+        "Components": [
+          {
+            "Type": "Image",
+            "Name": "image1",
+            "Width": 272,
+            "Height": 480,
+            "RelativeFilename": "__generated\\alternate_theme_images_backgrounds_480x272_puzzle-90deg.png"
+          },
+          {
+            "Type": "Gauge",
+            "Name": "gauge1",
+            "X": 16,
+            "Y": 197,
+            "Width": 120,
+            "Height": 120,
+            "Preset": "alternate_theme\\presets\\gauges\\tiny\\active_filled.json",
+            "FileNameBackground": "__generated\\alternate_theme_images_widgets_gauge_tiny_backgrounds_active_filled.png",
+            "RotationCenterX": 60.0,
+            "RotationCenterY": 60.0,
+            "StartAngle": -119.0,
+            "EndAngle": 122.0,
+            "RangeMax": 100.0,
+            "InitialValue": 50.0,
+            "Easing": "Linear",
+            "EasingOption": "In",
+            "FileNameNeedle": "__generated\\alternate_theme_images_widgets_gauge_tiny_needles_rough.png",
+            "NeedleRotationCenterX": 5.0,
+            "NeedleRotationCenterY": 33.0,
+            "NeedleMovingRenderingAlgorithm": "Bilinear Interpolation",
+            "NeedleSteadyRenderingAlgorithm": "Bilinear Interpolation",
+            "UseArc": true,
+            "FileNameArc": "__generated\\alternate_theme_images_widgets_gauge_tiny_fillers_swoop.png",
+            "ArcColor": {
+              "Red": 20,
+              "Green": 151,
+              "Blue": 197
+            },
+            "SetArcPosition": true,
+            "ArcX": 12.0,
+            "ArcY": 12.0,
+            "ArcWidth": 95.0,
+            "ArcHeight": 71.0,
+            "ArcRadius": 50.0,
+            "ArcLineWidth": 49.0,
+            "ArcCapStyle": "Butt"
+          },
+          {
+            "Type": "Gauge",
+            "Name": "gauge1_1",
+            "X": 16,
+            "Y": 331,
+            "Width": 120,
+            "Height": 120,
+            "Preset": "alternate_theme\\presets\\gauges\\tiny\\active_filled.json",
+            "FileNameBackground": "__generated\\alternate_theme_images_widgets_gauge_tiny_backgrounds_active_filled.png",
+            "RotationCenterX": 60.0,
+            "RotationCenterY": 60.0,
+            "StartAngle": -119.0,
+            "EndAngle": 122.0,
+            "RangeMax": 100.0,
+            "InitialValue": 50.0,
+            "Easing": "Linear",
+            "EasingOption": "In",
+            "FileNameNeedle": "__generated\\alternate_theme_images_widgets_gauge_tiny_needles_rough.png",
+            "NeedleRotationCenterX": 5.0,
+            "NeedleRotationCenterY": 33.0,
+            "NeedleMovingRenderingAlgorithm": "Bilinear Interpolation",
+            "NeedleSteadyRenderingAlgorithm": "Bilinear Interpolation",
+            "UseArc": true,
+            "FileNameArc": "__generated\\alternate_theme_images_widgets_gauge_tiny_fillers_swoop.png",
+            "ArcColor": {
+              "Red": 20,
+              "Green": 151,
+              "Blue": 197
+            },
+            "SetArcPosition": true,
+            "ArcX": 12.0,
+            "ArcY": 12.0,
+            "ArcWidth": 95.0,
+            "ArcHeight": 71.0,
+            "ArcRadius": 50.0,
+            "ArcLineWidth": 49.0,
+            "ArcCapStyle": "Butt"
+          },
+          {
+            "Type": "TextArea",
+            "Name": "textArea1",
+            "X": 137,
+            "Y": 403,
+            "Width": 235,
+            "Height": 48,
+            "TextId": "__SingleUse_W702",
+            "TextRotation": "0",
+            "AutoSize": true
+          },
+          {
+            "Type": "TextArea",
+            "Name": "textArea1_1",
+            "X": 136,
+            "Y": 269,
+            "Width": 236,
+            "Height": 48,
+            "TextId": "__SingleUse_FD53",
+            "TextRotation": "0",
+            "AutoSize": true
+          },
+          {
+            "Type": "TextArea",
+            "Name": "textArea1_1_1",
+            "X": 136,
+            "Y": 140,
+            "Width": 143,
+            "Height": 48,
+            "TextId": "__SingleUse_7XMI",
+            "TextRotation": "0",
+            "AutoSize": true
+          },
+          {
+            "Type": "BoxProgress",
+            "Name": "boxProgress1",
+            "X": 16,
+            "Y": 164,
+            "Width": 100,
+            "Height": 18,
+            "Color": {
+              "Red": 254,
+              "Green": 189,
+              "Blue": 23
+            },
+            "Direction": "Up",
+            "FileNameBackground": "__generated\\alternate_theme_images_widgets_boxprogress_thick_tiny.png",
+            "IndicatorPositionWidth": 100,
+            "IndicatorPositionHeight": 18,
+            "ProgressRangeMax": 100,
+            "ProgressInitialValue": 60
           }
         ],
         "Interactions": []

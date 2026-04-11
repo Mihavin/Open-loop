@@ -91,13 +91,13 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : SIDE_BUTTON_Pin */
   GPIO_InitStruct.Pin = SIDE_BUTTON_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(SIDE_BUTTON_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : BACK_BUTTON_Pin LIMIT_BUTTON_Pin UI_ENC_BUTTON_Pin */
   GPIO_InitStruct.Pin = BACK_BUTTON_Pin|LIMIT_BUTTON_Pin|UI_ENC_BUTTON_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
@@ -130,7 +130,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : FAN_FAULT_Pin */
   GPIO_InitStruct.Pin = FAN_FAULT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(FAN_FAULT_GPIO_Port, &GPIO_InitStruct);
 
@@ -205,6 +205,13 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(TEST_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 

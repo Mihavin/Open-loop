@@ -46,6 +46,7 @@ typedef enum
 {
   MOTOR_FOC_MODE_TORQUE = 0,
   MOTOR_FOC_MODE_SPEED,
+  MOTOR_FOC_MODE_POSITION,
 } MotorFOC_Mode_t;
 
 /* --------------------------- User tuning section --------------------------- */
@@ -91,11 +92,11 @@ typedef enum
 
 /* Limits */
 #ifndef MOTOR_FOC_ID_MAX_A
-#define MOTOR_FOC_ID_MAX_A            (0.5f)
+#define MOTOR_FOC_ID_MAX_A            (1.6f)
 #endif
 
 #ifndef MOTOR_FOC_IQ_MAX_A
-#define MOTOR_FOC_IQ_MAX_A            (0.5f)
+#define MOTOR_FOC_IQ_MAX_A            (1.6f)
 #endif
 
 #ifndef MOTOR_FOC_SPEED_MAX_RPM
@@ -108,29 +109,48 @@ typedef enum
 #endif
 
 #ifndef MOTOR_FOC_ALIGN_ID_A
-#define MOTOR_FOC_ALIGN_ID_A          (0.5f)       /* d-axis current during alignment (A) */
+#define MOTOR_FOC_ALIGN_ID_A          (1.5f)       /* d-axis current during alignment (A) */
 #endif
 
 /* PI gains (start small!) */
 #ifndef MOTOR_FOC_KP_ID
-#define MOTOR_FOC_KP_ID               (0.15f)
+#define MOTOR_FOC_KP_ID               (0.05f)
 #endif
 #ifndef MOTOR_FOC_KI_ID
-#define MOTOR_FOC_KI_ID               (0.7f)
+#define MOTOR_FOC_KI_ID               (30.0f)
 #endif
 
 #ifndef MOTOR_FOC_KP_IQ
-#define MOTOR_FOC_KP_IQ               (0.15f)
+#define MOTOR_FOC_KP_IQ               (0.05f)
 #endif
 #ifndef MOTOR_FOC_KI_IQ
-#define MOTOR_FOC_KI_IQ               (0.7f)
+#define MOTOR_FOC_KI_IQ               (30.0f)
 #endif
 
 #ifndef MOTOR_FOC_KP_SPEED
-#define MOTOR_FOC_KP_SPEED            (0.005f)
+#define MOTOR_FOC_KP_SPEED            (0.025f)
 #endif
 #ifndef MOTOR_FOC_KI_SPEED
-#define MOTOR_FOC_KI_SPEED            (0.03f)
+#define MOTOR_FOC_KI_SPEED            (1.60f)
+#endif
+
+/* Position loop gains (outer-most loop).
+ *
+ * Position mode uses a cascaded control structure:
+ *   position PI  -> speed_ref_rpm
+ *   speed PI      -> iq_ref (torque current)
+ *   current PI    -> voltage (SVPWM)
+ *
+ * The position controller error is expressed in mechanical revolutions.
+ * Therefore:
+ *   - MOTOR_FOC_KP_POS units: RPM / rev
+ *   - MOTOR_FOC_KI_POS units: RPM / (rev*s)
+ */
+#ifndef MOTOR_FOC_KP_POS
+#define MOTOR_FOC_KP_POS              (300.0f)
+#endif
+#ifndef MOTOR_FOC_KI_POS
+#define MOTOR_FOC_KI_POS              (0.0015f)
 #endif
 
 /* Autostart behaviour:
@@ -160,6 +180,19 @@ void MotorFOC(void);
 void MotorFOC_SetSpeedRPM(float rpm);
 void MotorFOC_SetTorqueCurrentA(float iq_A);
 
+/* Position mode setpoint.
+ *
+ * NOTE: Position is expressed in encoder counts of TIM2 (quadrature counts).
+ * This is an absolute count (multi-turn) as provided by TIM2. If you want a
+ * 0..CPR-1 angle, wrap externally before calling.
+ */
+void MotorFOC_SetPositionCounts(int32_t pos_counts);
+
+/* Convenience helper: set an absolute mechanical position in revolutions.
+ * revolutions * MOTOR_FOC_ENCODER_CPR -> encoder counts.
+ */
+void MotorFOC_SetPositionRevolutions(float revolutions);
+
 MotorFOC_State_t MotorFOC_GetState(void);
 MotorFOC_Mode_t  MotorFOC_GetMode(void);
 
@@ -170,6 +203,7 @@ float MotorFOC_GetIc(void);
 float MotorFOC_GetId(void);
 float MotorFOC_GetIq(void);
 float MotorFOC_GetSpeedRPM(void);
+int32_t MotorFOC_GetPositionCounts(void);
 void Motor_OpenLoopStep_20kHz(void);
 
 #ifdef __cplusplus

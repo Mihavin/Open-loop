@@ -8,7 +8,13 @@ extern "C" {
 
 static const char* modeToStr(MotorFOC_Mode_t m)
 {
-    return (m == MOTOR_FOC_MODE_SPEED) ? "SPEED" : "TORQUE";
+    switch (m)
+    {
+    case MOTOR_FOC_MODE_TORQUE:    return "TORQUE";
+    case MOTOR_FOC_MODE_SPEED:     return "SPEED";
+    case MOTOR_FOC_MODE_POSITION:  return "POSITION";
+    default:                       return "?";
+    }
 }
 
 static const char* stateToStr(MotorFOC_State_t s)
@@ -39,8 +45,12 @@ void DiagnosticView::updateMotorDiag(float rpm,
     touchgfx::Unicode::snprintfFloat(txtIqBuffer,   TXTIQ_SIZE,   "%+.2f", iq);
 
     // Strings: use snprintf (char* format is fine)
-    touchgfx::Unicode::snprintf(txtModeBuffer,  TXTMODE_SIZE,  "%s", modeToStr(mode));
-    touchgfx::Unicode::snprintf(txtStateBuffer, TXTSTATE_SIZE, "%s", stateToStr(state));
+    touchgfx::Unicode::strncpy(txtModeBuffer,  modeToStr(mode),  TXTMODE_SIZE);
+    txtModeBuffer[TXTMODE_SIZE - 1] = 0;
+
+    touchgfx::Unicode::strncpy(txtStateBuffer, stateToStr(state), TXTSTATE_SIZE);
+    txtStateBuffer[TXTSTATE_SIZE - 1] = 0;
+
 
     // Force redraw of updated widgets
     txtRpm.invalidate();

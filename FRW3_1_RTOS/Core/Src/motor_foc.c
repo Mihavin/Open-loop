@@ -96,6 +96,10 @@ typedef struct
   volatile float iq_ref;
   volatile float speed_ref_rpm;
 
+  /* Position reference / feedback (encoder counts, multi-turn) */
+  volatile int32_t pos_ref_counts;
+  volatile int32_t pos_counts;
+
   /* Speed estimate */
   volatile float speed_rpm;
   int32_t enc_prev;
@@ -107,6 +111,8 @@ typedef struct
   PI_t pi_id;
   PI_t pi_iq;
   PI_t pi_speed;
+  PI_t pi_pos;
+//  PI_t pi_pos;
 
   /* Calibration */
   uint32_t calib_samples;
@@ -223,6 +229,10 @@ void MotorFOC_Init(void)
   g_foc.speed_ref_rpm = 0.0f;
   g_foc.speed_rpm = 0.0f;
 
+  /* Position reference defaults to the current encoder count */
+  g_foc.pos_counts = (int32_t)__HAL_TIM_GET_COUNTER(&htim2);
+  g_foc.pos_ref_counts = g_foc.pos_counts;
+
   g_foc.elec_offset = 0.0f;
 
   g_foc.dt_i = 1.0f / MOTOR_FOC_PWM_HZ;
@@ -237,6 +247,14 @@ void MotorFOC_Init(void)
 
   /* Speed PI output = iq_ref (A) */
   PI_Init(&g_foc.pi_speed, MOTOR_FOC_KP_SPEED, MOTOR_FOC_KI_SPEED, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
+
+  /* Position PI output = speed_ref (RPM) */
+  PI_Init(&g_foc.pi_pos, MOTOR_FOC_KP_POS, MOTOR_FOC_KI_POS,
+          -MOTOR_FOC_SPEED_MAX_RPM, MOTOR_FOC_SPEED_MAX_RPM);
+
+  /* Position PI output = speed_ref_rpm */
+  PI_Init(&g_foc.pi_pos, MOTOR_FOC_KP_POS, MOTOR_FOC_KI_POS,
+          -MOTOR_FOC_SPEED_MAX_RPM, MOTOR_FOC_SPEED_MAX_RPM);
 
   /* Calibration settings */
   g_foc.calib_samples = 0;
@@ -255,7 +273,6 @@ void MotorFOC_Init(void)
 
 void MotorFOC_Start(void)
 {
-  /* Keep driver disabled initially */
   HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_SET);
   HAL_Delay(10);
   HAL_GPIO_WritePin(DRV_CAL_GPIO_Port, DRV_CAL_Pin, GPIO_PIN_SET);
@@ -377,6 +394,12 @@ void MotorFOC_Disarm(void)
 
 void MotorFOC_SetMode(MotorFOC_Mode_t mode)
 {
+  if (mode != g_foc.mode)
+  {
+    /* Reset outer-loop integrators to avoid step transients when switching modes */
+    g_foc.pi_speed.integrator = 0.0f;
+    g_foc.pi_pos.integrator   = 0.0f;
+  }
   g_foc.mode = mode;
 }
 
@@ -390,6 +413,19 @@ void MotorFOC_SetTorqueCurrentA(float iq_A)
 {
   iq_A = clamp_f(iq_A, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
   g_foc.iq_ref = iq_A;
+}
+
+void MotorFOC_SetPositionCounts(int32_t pos_counts)
+{
+  g_foc.pos_ref_counts = pos_counts;
+}
+
+void MotorFOC_SetPositionRevolutions(float revolutions)
+{
+  const float counts_f = revolutions * (float)MOTOR_FOC_ENCODER_CPR;
+  /* Round to nearest count (avoid lroundf portability issues on some embedded libcs) */
+  const int32_t counts = (int32_t)((counts_f >= 0.0f) ? (counts_f + 0.5f) : (counts_f - 0.5f));
+  g_foc.pos_ref_counts = counts;
 }
 
 MotorFOC_State_t MotorFOC_GetState(void)
@@ -408,6 +444,7 @@ float MotorFOC_GetIc(void) { return g_foc.ic; }
 float MotorFOC_GetId(void) { return g_foc.id; }
 float MotorFOC_GetIq(void) { return g_foc.iq; }
 float MotorFOC_GetSpeedRPM(void) { return g_foc.speed_rpm; }
+int32_t MotorFOC_GetPositionCounts(void) { return g_foc.pos_counts; }
 //float MotorFOC_GetAngle(void ) { return g_foc.enc_prev; }
 
 /* ----------- ISR callbacks ----------- */
@@ -566,6 +603,9 @@ void MotorFOC(void)
       /* Enter RUN */
       g_foc.enc_prev = enc;
       g_foc.pi_speed.integrator = 0.0f;
+      g_foc.pi_pos.integrator   = 0.0f;
+      g_foc.pos_counts          = enc;
+      g_foc.pos_ref_counts      = enc;
       g_foc.state = MOTOR_FOC_STATE_RUN;
     }
     return;
@@ -576,6 +616,7 @@ void MotorFOC(void)
 
   /* Speed estimate from encoder delta */
   const int32_t enc_now = (int32_t)__HAL_TIM_GET_COUNTER(&htim2);
+  g_foc.pos_counts = enc_now;
   int32_t delta = enc_now - g_foc.enc_prev;
   g_foc.enc_prev = enc_now;
 
@@ -590,6 +631,24 @@ void MotorFOC(void)
     /* Speed PI -> iq_ref */
     const float err = g_foc.speed_ref_rpm - rpm;
     float iq_cmd = PI_Run(&g_foc.pi_speed, err, g_foc.dt_w);
+    iq_cmd = clamp_f(iq_cmd, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
+    g_foc.iq_ref = iq_cmd;
+    g_foc.id_ref = 0.0f;
+  }
+  else if (g_foc.mode == MOTOR_FOC_MODE_POSITION)
+  {
+    /* Position PI (rev) -> speed_ref (RPM) -> Speed PI -> iq_ref */
+    const int32_t err_counts = (int32_t)(g_foc.pos_ref_counts - enc_now);
+    const float err_rev = (float)err_counts / (float)MOTOR_FOC_ENCODER_CPR;
+
+    /* outer loop */
+    float speed_ref = PI_Run(&g_foc.pi_pos, err_rev, g_foc.dt_w);
+    speed_ref = clamp_f(speed_ref, -MOTOR_FOC_SPEED_MAX_RPM, MOTOR_FOC_SPEED_MAX_RPM);
+    g_foc.speed_ref_rpm = speed_ref;
+
+    /* inner loop (speed) */
+    const float err_speed = speed_ref - rpm;
+    float iq_cmd = PI_Run(&g_foc.pi_speed, err_speed, g_foc.dt_w);
     iq_cmd = clamp_f(iq_cmd, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
     g_foc.iq_ref = iq_cmd;
     g_foc.id_ref = 0.0f;

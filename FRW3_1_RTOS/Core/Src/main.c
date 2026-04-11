@@ -162,8 +162,9 @@ int main(void)
 	HAL_GPIO_WritePin(LTDC_STNDB_GPIO_Port, LTDC_STNDB_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(VREF_EN_GPIO_Port, VREF_EN_Pin, GPIO_PIN_SET);
 	//Telemetry_Init();
-	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, 25);
-	HAL_Delay(5000);
+//	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, 25);
+//	HAL_Delay(5000);
+	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
 	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
 	HAL_GPIO_WritePin(VIB_GPIO_Port, VIB_Pin, GPIO_PIN_SET);
 	HAL_Delay(50);

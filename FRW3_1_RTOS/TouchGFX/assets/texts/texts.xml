@@ -6,6 +6,15 @@
   <Texts>
     <TextGroup Id="Group1" />
     <TextGroup Id="Unsorted">
+      <Text Id="__SingleUse_7XMI" Alignment="Left" TypographyId="Large">
+        <Translation Language="GB">36/100</Translation>
+      </Text>
+      <Text Id="__SingleUse_FD53" Alignment="Left" TypographyId="Large">
+        <Translation Language="GB">Speed = 10</Translation>
+      </Text>
+      <Text Id="__SingleUse_W702" Alignment="Left" TypographyId="Large">
+        <Translation Language="GB">TRQ = 0.85</Translation>
+      </Text>
       <Text Id="__SingleUse_1KB4" Alignment="Left" TypographyId="Large">
         <Translation Language="GB">STATE: &lt;value&gt;</Translation>
       </Text>
@@ -13,10 +22,10 @@
         <Translation Language="GB">0000</Translation>
       </Text>
       <Text Id="txtAngleBuffer" Alignment="Left" TypographyId="Large">
-        <Translation Language="GB">10</Translation>
+        <Translation Language="GB">AAAA</Translation>
       </Text>
       <Text Id="txtModeBuffer" Alignment="Left" TypographyId="Large">
-        <Translation Language="GB">10</Translation>
+        <Translation Language="GB">AAAA</Translation>
       </Text>
       <Text Id="__SingleUse_J3FV" Alignment="Left" TypographyId="Large">
         <Translation Language="GB">MODE: &lt;value&gt;</Translation>
@@ -25,31 +34,31 @@
         <Translation Language="GB">0.000</Translation>
       </Text>
       <Text Id="__SingleUse_D5R0" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">Ic: &lt;value&gt; A</Translation>
+        <Translation Language="GB">Ic: &lt;value&gt;A</Translation>
       </Text>
       <Text Id="txtIsumBuffer" Alignment="Left" TypographyId="Default">
         <Translation Language="GB">0.000</Translation>
       </Text>
       <Text Id="__SingleUse_GH3M" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">Isum: &lt;value&gt; A</Translation>
+        <Translation Language="GB">Isum: &lt;value&gt;A</Translation>
       </Text>
       <Text Id="txtIqBuffer" Alignment="Left" TypographyId="Large">
         <Translation Language="GB">0.000</Translation>
       </Text>
       <Text Id="__SingleUse_TSJS" Alignment="Left" TypographyId="Large">
-        <Translation Language="GB">TRQ: &lt;value&gt; A</Translation>
+        <Translation Language="GB">TRQ: &lt;value&gt;A</Translation>
       </Text>
       <Text Id="txtIbBuffer" Alignment="Left" TypographyId="Default">
         <Translation Language="GB">0.000</Translation>
       </Text>
       <Text Id="__SingleUse_3RDP" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">Ib: &lt;value&gt; A</Translation>
+        <Translation Language="GB">Ib: &lt;value&gt;A</Translation>
       </Text>
       <Text Id="txtIaBuffer" Alignment="Left" TypographyId="Default">
         <Translation Language="GB">0.000</Translation>
       </Text>
       <Text Id="__SingleUse_17ST" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">Ia: &lt;value&gt; A</Translation>
+        <Translation Language="GB">Ia: &lt;value&gt;A</Translation>
       </Text>
       <Text Id="__SingleUse_DU8R" Alignment="Left" TypographyId="Large">
         <Translation Language="GB">RPM: &lt;value&gt;</Translation>
@@ -58,7 +67,7 @@
   </Texts>
   <Typographies>
     <Typography Id="Default" Font="verdana.ttf" Size="20" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacters="1234567890. +-" />
-    <Typography Id="Large" Font="verdana.ttf" Size="40" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacters="1234567890. +-" />
+    <Typography Id="Large" Font="verdana.ttf" Size="40" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacters="QWERTYUIOPASDFGHJKLMNBVCXZ1234567890. +-" />
     <Typography Id="Small" Font="verdana.ttf" Size="10" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacters="1234567890. +-" />
   </Typographies>
 </TextDatabase>

@@ -11,6 +11,8 @@
 #include <platform/driver/lcd/LCD32bpp.hpp>
 #include <gui/diagnostic_screen/DiagnosticView.hpp>
 #include <gui/diagnostic_screen/DiagnosticPresenter.hpp>
+#include <gui/screen1_screen/Screen1View.hpp>
+#include <gui/screen1_screen/Screen1Presenter.hpp>
 
 using namespace touchgfx;
 

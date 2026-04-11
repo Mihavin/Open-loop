@@ -21,6 +21,7 @@ void DiagnosticPresenter::tick()
     div = 0;
 
     const float rpm  = MotorFOC_GetSpeedRPM();
+
     const float ia   = MotorFOC_GetIa();
     const float ib   = MotorFOC_GetIb();
     const float ic   = MotorFOC_GetIc();

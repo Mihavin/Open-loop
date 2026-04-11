@@ -5,13 +5,25 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.cpp 
+../TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.cpp \
+../TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_boxprogress_thick_tiny.cpp \
+../TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_backgrounds_active_filled.cpp \
+../TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_fillers_swoop.cpp \
+../TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_needles_rough.cpp 
 
 OBJS += \
-./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.o 
+./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.o \
+./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_boxprogress_thick_tiny.o \
+./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_backgrounds_active_filled.o \
+./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_fillers_swoop.o \
+./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_needles_rough.o 
 
 CPP_DEPS += \
-./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.d 
+./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.d \
+./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_boxprogress_thick_tiny.d \
+./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_backgrounds_active_filled.d \
+./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_fillers_swoop.d \
+./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_needles_rough.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -21,7 +33,7 @@ TouchGFX/generated/images/src/__generated/%.o TouchGFX/generated/images/src/__ge
 clean: clean-TouchGFX-2f-generated-2f-images-2f-src-2f-__generated
 
 clean-TouchGFX-2f-generated-2f-images-2f-src-2f-__generated:
-	-$(RM) ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.cyclo ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.d ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.o ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.su
+	-$(RM) ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.cyclo ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.d ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.o ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_backgrounds_480x272_puzzle-90deg.su ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_boxprogress_thick_tiny.cyclo ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_boxprogress_thick_tiny.d ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_boxprogress_thick_tiny.o ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_boxprogress_thick_tiny.su ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_backgrounds_active_filled.cyclo ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_backgrounds_active_filled.d ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_backgrounds_active_filled.o ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_backgrounds_active_filled.su ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_fillers_swoop.cyclo ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_fillers_swoop.d ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_fillers_swoop.o ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_fillers_swoop.su ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_needles_rough.cyclo ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_needles_rough.d ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_needles_rough.o ./TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_gauge_tiny_needles_rough.su
 
 .PHONY: clean-TouchGFX-2f-generated-2f-images-2f-src-2f-__generated
 

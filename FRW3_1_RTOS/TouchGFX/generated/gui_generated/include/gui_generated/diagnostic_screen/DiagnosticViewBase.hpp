@@ -40,13 +40,13 @@ protected:
     /*
      * Wildcard Buffers
      */
-    static const uint16_t TXTSTATE_SIZE = 10;
+    static const uint16_t TXTSTATE_SIZE = 20;
     touchgfx::Unicode::UnicodeChar txtStateBuffer[TXTSTATE_SIZE];
     static const uint16_t TXTIC_SIZE = 10;
     touchgfx::Unicode::UnicodeChar txtIcBuffer[TXTIC_SIZE];
     static const uint16_t TXTIQ_SIZE = 10;
     touchgfx::Unicode::UnicodeChar txtIqBuffer[TXTIQ_SIZE];
-    static const uint16_t TXTMODE_SIZE = 10;
+    static const uint16_t TXTMODE_SIZE = 20;
     touchgfx::Unicode::UnicodeChar txtModeBuffer[TXTMODE_SIZE];
     static const uint16_t TXTISUM_SIZE = 10;
     touchgfx::Unicode::UnicodeChar txtIsumBuffer[TXTISUM_SIZE];
