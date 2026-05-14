@@ -369,7 +369,7 @@ void StartEXTITask(void *argument)
     uint32_t events;
 
     // per-input debounce timestamps
-    TickType_t t_limit = 0, t_side = 0, t_back = 0, t_fan = 0, t_ui = 0, t_enc_I = 0;
+    TickType_t t_limit = 0, t_side = 0, t_back = 0, t_fan = 0, t_ui = 0, t_enc_I = 0, t_frw = 0, t_rev = 0;
     const TickType_t db = pdMS_TO_TICKS(20); // 20ms debounce (buttons/switches)
 
   /* Infinite loop */
@@ -425,7 +425,19 @@ void StartEXTITask(void *argument)
       if ((events & EVT_ENC_I) && (now - t_enc_I) > db)
       {
           t_enc_I = now;
-          // Handle fan failure
+          // Handle encoder index pulse
+      }
+
+      if ((events & EVT_FRW) && (now - t_frw) > db)
+      {
+          t_frw = now;
+          // Handle forward button
+      }
+
+      if ((events & EVT_REV) && (now - t_rev) > db)
+      {
+          t_rev = now;
+          // Handle reverse button
       }
 
     osDelay(50);
@@ -451,6 +463,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     if (GPIO_Pin == UI_ENC_BUTTON_Pin) bits |= EVT_UI;
 
     if (GPIO_Pin == I_ENC_Pin) bits |= EVT_ENC_I;
+
+    if (GPIO_Pin == FRW_BUT_Pin) bits |= EVT_FRW;
+
+    if (GPIO_Pin == REV_BUT_Pin) bits |= EVT_REV;
 
     if (bits && EXTITaskHandle)
     {
