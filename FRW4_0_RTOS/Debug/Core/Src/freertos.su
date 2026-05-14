@@ -7,4 +7,4 @@
 ../Core/Src/freertos.c:329:6:StartCommTask	16	static
 ../Core/Src/freertos.c:347:6:StartStorageTask	16	static
 ../Core/Src/freertos.c:365:6:StartEXTITask	72	static
-../Core/Src/freertos.c:450:6:HAL_GPIO_EXTI_Callback	32	static,ignoring_inline_asm
+../Core/Src/freertos.c:449:6:HAL_GPIO_EXTI_Callback	32	static,ignoring_inline_asm
