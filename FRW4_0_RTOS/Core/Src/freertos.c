@@ -416,10 +416,9 @@ void StartEXTITask(void *argument)
           MotorFOC_SetMode(ui_button_click_count); //toggle modes
           __HAL_TIM_SET_COUNTER(&htim3, 0);
 
-          MotorFOC_Disarm();
-
-          __HAL_TIM_SET_COUNTER(&htim2, 0);
-          MotorFOC_Arm();
+          MotorFOC_RequestDisarm();
+          MotorFOC_RequestZeroEncoder();
+          MotorFOC_RequestArm();
       }
 
       if ((events & EVT_ENC_I) && (now - t_enc_I) > db)

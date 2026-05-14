@@ -135,12 +135,22 @@ typedef struct
 
 static MotorFOC_t g_foc;
 
+typedef enum
+{
+  MOTOR_FOC_REQ_NONE           = 0u,
+  MOTOR_FOC_REQ_ARM            = 1u << 0,
+  MOTOR_FOC_REQ_DISARM         = 1u << 1,
+  MOTOR_FOC_REQ_EMERGENCY_STOP = 1u << 2,
+  MOTOR_FOC_REQ_ZERO_ENCODER   = 1u << 3,
+} MotorFOC_RequestBits_t;
+
 typedef struct
 {
   MotorFOC_Mode_t mode;
   float speed_ref_rpm;
   float torque_iq_ref_a;
   int32_t position_ref_counts;
+  uint32_t requests;
   uint32_t seq;
 } MotorFOC_Command_t;
 
@@ -163,15 +173,26 @@ static inline void foc_irq_unlock(uint32_t primask)
   __set_PRIMASK(primask);
 }
 
-static MotorFOC_Command_t foc_cmd_snapshot(void)
+static MotorFOC_Command_t foc_cmd_snapshot_and_clear_requests(void)
 {
   MotorFOC_Command_t cmd;
 
   uint32_t primask = foc_irq_lock();
   cmd = g_cmd;
+  g_cmd.requests = MOTOR_FOC_REQ_NONE;
   foc_irq_unlock(primask);
 
   return cmd;
+}
+
+static void foc_request(uint32_t req)
+{
+  uint32_t primask = foc_irq_lock();
+
+  g_cmd.requests |= req;
+  g_cmd.seq++;
+
+  foc_irq_unlock(primask);
 }
 
 static void foc_cmd_init(int32_t initial_pos_counts)
@@ -182,6 +203,7 @@ static void foc_cmd_init(int32_t initial_pos_counts)
   g_cmd.speed_ref_rpm = 0.0f;
   g_cmd.torque_iq_ref_a = 0.0f;
   g_cmd.position_ref_counts = initial_pos_counts;
+  g_cmd.requests = MOTOR_FOC_REQ_NONE;
   g_cmd.seq = 0u;
 
   foc_irq_unlock(primask);
@@ -388,9 +410,66 @@ void MotorFOC_Start(void)
 #endif
 }
 
+static void foc_apply_disarm(void)
+{
+  /* Disable driver outputs */
+  HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_RESET);
+
+  /* Force zero voltage vector (50% duty) */
+  pwm_set_duty_abc(0.5f, 0.5f, 0.5f);
+
+  g_foc.id_ref = 0.0f;
+  g_foc.iq_ref = 0.0f;
+  g_foc.state  = MOTOR_FOC_STATE_IDLE;
+}
+
+static void foc_apply_emergency_stop(void)
+{
+  HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_RESET);
+  pwm_set_duty_abc(0.5f, 0.5f, 0.5f);
+
+  g_foc.id_ref = 0.0f;
+  g_foc.iq_ref = 0.0f;
+  g_foc.state = MOTOR_FOC_STATE_FAULT;
+}
+
+static void foc_apply_zero_encoder(void)
+{
+  __HAL_TIM_SET_COUNTER(&htim2, 0);
+  g_foc.enc_prev = 0;
+  g_foc.pos_counts = 0;
+  g_foc.pos_ref_counts = 0;
+}
+
+static void foc_apply_arm(void)
+{
+  LED1_On();
+
+  if (g_foc.state == MOTOR_FOC_STATE_FAULT)
+    return;
+
+  /* Only allow arming after calibration finished */
+  if (g_foc.state == MOTOR_FOC_STATE_CALIB)
+    return;
+
+  /* Enable gate driver */
+  HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_SET);
+
+  /* Enter alignment stage to determine encoder electrical offset */
+  g_foc.align_ticks = 0;
+  g_foc.id_ref = MOTOR_FOC_ALIGN_ID_A;
+  g_foc.iq_ref = 0.0f;
+
+  /* Reset current PI integrators */
+  g_foc.pi_id.integrator = 0.0f;
+  g_foc.pi_iq.integrator = 0.0f;
+
+  g_foc.state = MOTOR_FOC_STATE_ALIGN;
+}
+
 void MotorFOC_Stop(void)
 {
-  MotorFOC_Disarm();
+  foc_apply_disarm();
 
 //  (void)HAL_TIM_Base_Stop_IT(&htim7);
 
@@ -416,40 +495,38 @@ void MotorFOC_Stop(void)
 
 void MotorFOC_Arm(void)
 {
-	LED1_On();
-  if (g_foc.state == MOTOR_FOC_STATE_FAULT)
-    return;
-
-  /* Only allow arming after calibration finished */
-  if (g_foc.state == MOTOR_FOC_STATE_CALIB)
-    return;
-
-  /* Enable gate driver */
-  HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_SET);
-
-  /* Enter alignment stage to determine encoder electrical offset */
-  g_foc.align_ticks = 0;
-  g_foc.id_ref = MOTOR_FOC_ALIGN_ID_A;
-  g_foc.iq_ref = 0.0f;
-
-  /* Reset current PI integrators */
-  g_foc.pi_id.integrator = 0.0f;
-  g_foc.pi_iq.integrator = 0.0f;
-
-  g_foc.state = MOTOR_FOC_STATE_ALIGN;
+  MotorFOC_RequestArm();
 }
 
 void MotorFOC_Disarm(void)
 {
-  /* Disable driver outputs */
-  HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_RESET);
+  MotorFOC_RequestDisarm();
+}
 
-  /* Force zero voltage vector (50% duty) */
-  pwm_set_duty_abc(0.5f, 0.5f, 0.5f);
+void MotorFOC_RequestArm(void)
+{
+  foc_request(MOTOR_FOC_REQ_ARM);
+}
 
-  g_foc.id_ref = 0.0f;
-  g_foc.iq_ref = 0.0f;
-  g_foc.state  = MOTOR_FOC_STATE_IDLE;
+void MotorFOC_RequestDisarm(void)
+{
+  foc_request(MOTOR_FOC_REQ_DISARM);
+}
+
+void MotorFOC_RequestEmergencyStop(void)
+{
+  foc_request(MOTOR_FOC_REQ_EMERGENCY_STOP);
+}
+
+void MotorFOC_RequestZeroEncoder(void)
+{
+  uint32_t primask = foc_irq_lock();
+
+  g_cmd.position_ref_counts = 0;
+  g_cmd.requests |= MOTOR_FOC_REQ_ZERO_ENCODER;
+  g_cmd.seq++;
+
+  foc_irq_unlock(primask);
 }
 
 void MotorFOC_SetMode(MotorFOC_Mode_t mode)
@@ -639,7 +716,7 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
       g_foc.state = MOTOR_FOC_STATE_IDLE;
 
 #if MOTOR_FOC_AUTOSTART
-      MotorFOC_Arm();
+      foc_request(MOTOR_FOC_REQ_ARM);
 #endif
     }
     return;
@@ -740,7 +817,28 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 /* TIM7 period callback for speed loop + alignment timing */
 void MotorFOC(void)
 {
-  MotorFOC_Command_t cmd = foc_cmd_snapshot();
+  MotorFOC_Command_t cmd = foc_cmd_snapshot_and_clear_requests();
+
+  if (cmd.requests & MOTOR_FOC_REQ_EMERGENCY_STOP)
+  {
+    foc_apply_emergency_stop();
+    return;
+  }
+
+  if (cmd.requests & MOTOR_FOC_REQ_DISARM)
+  {
+    foc_apply_disarm();
+  }
+
+  if (cmd.requests & MOTOR_FOC_REQ_ZERO_ENCODER)
+  {
+    foc_apply_zero_encoder();
+  }
+
+  if (cmd.requests & MOTOR_FOC_REQ_ARM)
+  {
+    foc_apply_arm();
+  }
 
   if (cmd.mode != g_foc.mode)
   {
