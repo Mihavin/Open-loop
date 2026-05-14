@@ -1,0 +1,15 @@
+../Core/Src/s25fl256s.c:52:19:S25FL256S_Abort	16	static
+../Core/Src/s25fl256s.c:61:19:S25FL256S_Reset	80	static
+../Core/Src/s25fl256s.c:114:19:S25FL256S_ReadJEDECID	80	static
+../Core/Src/s25fl256s.c:152:19:S25FL256S_Init	24	static
+../Core/Src/s25fl256s.c:209:19:S25FL256S_Read	80	static
+../Core/Src/s25fl256s.c:255:19:S25FL256S_Write	104	static
+../Core/Src/s25fl256s.c:336:19:S25FL256S_Erase4K	72	static
+../Core/Src/s25fl256s.c:372:19:S25FL256S_Erase64K	72	static
+../Core/Src/s25fl256s.c:408:19:S25FL256S_EraseChip	72	static
+../Core/Src/s25fl256s.c:441:19:S25FL256S_EnableMemoryMappedMode	80	static
+../Core/Src/s25fl256s.c:482:26:s25fl256s_read_reg	80	static
+../Core/Src/s25fl256s.c:510:26:s25fl256s_clear_status	72	static
+../Core/Src/s25fl256s.c:527:26:s25fl256s_write_enable	96	static
+../Core/Src/s25fl256s.c:568:26:s25fl256s_wait_ready	104	static
+../Core/Src/s25fl256s.c:613:26:s25fl256s_write_sr1_cr1	80	static

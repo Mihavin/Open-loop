@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (13.3.rel1)
+# Toolchain: GNU Tools for STM32 (14.3.rel1)
 ################################################################################
 
 -include ../makefile.init
@@ -9,25 +9,6 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include TouchGFX/target/generated/subdir.mk
--include TouchGFX/target/subdir.mk
--include TouchGFX/gui/src/screen1_screen/subdir.mk
--include TouchGFX/gui/src/model/subdir.mk
--include TouchGFX/gui/src/diagnostic_screen/subdir.mk
--include TouchGFX/gui/src/common/subdir.mk
--include TouchGFX/generated/texts/src/subdir.mk
--include TouchGFX/generated/images/src/__generated/subdir.mk
--include TouchGFX/generated/images/src/subdir.mk
--include TouchGFX/generated/gui_generated/src/screen1_screen/subdir.mk
--include TouchGFX/generated/gui_generated/src/diagnostic_screen/subdir.mk
--include TouchGFX/generated/gui_generated/src/common/subdir.mk
--include TouchGFX/generated/fonts/src/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/gui/src/screen1_screen/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/gui/src/model/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/gui/src/common/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/generated/gui_generated/src/screen1_screen/subdir.mk
--include TouchGFX/build/MINGW32_NT-6.2/generated/gui_generated/src/diagnostic_screen/subdir.mk
--include TouchGFX/App/subdir.mk
 -include Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/subdir.mk
 -include Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/subdir.mk
 -include Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/subdir.mk
@@ -81,34 +62,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := FRW3_1_RTOS
+BUILD_ARTIFACT_NAME := FRW4_0_RTOS
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-FRW3_1_RTOS.elf \
+FRW4_0_RTOS.elf \
 
 MAP_FILES += \
-FRW3_1_RTOS.map \
+FRW4_0_RTOS.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-FRW3_1_RTOS.list \
+FRW4_0_RTOS.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: FRW3_1_RTOS.elf secondary-outputs
+main-build: FRW4_0_RTOS.elf secondary-outputs
 
 # Tool invocations
-FRW3_1_RTOS.elf FRW3_1_RTOS.map: $(OBJS) $(USER_OBJS) C:\GitHub\Open-loop\FRW3_1_RTOS\STM32H743IITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "FRW3_1_RTOS.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\GitHub\Open-loop\FRW3_1_RTOS\STM32H743IITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="FRW3_1_RTOS.map" -Wl,--gc-sections -static -L"C:\GitHub\Open-loop\FRW3_1_RTOS\Middlewares\ST\touchgfx\lib\core\cortex_m7\gcc" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+FRW4_0_RTOS.elf FRW4_0_RTOS.map: $(OBJS) $(USER_OBJS) C:\GitHub\Open-loop\FRW4_0_RTOS\STM32H743IITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "FRW4_0_RTOS.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\GitHub\Open-loop\FRW4_0_RTOS\STM32H743IITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="FRW4_0_RTOS.map" -Wl,--gc-sections -static -L"C:\GitHub\Open-loop\FRW3_1_RTOS\Middlewares\ST\touchgfx\lib\core\cortex_m7\gcc" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -117,14 +98,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-FRW3_1_RTOS.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "FRW3_1_RTOS.list"
+FRW4_0_RTOS.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "FRW4_0_RTOS.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) FRW3_1_RTOS.elf FRW3_1_RTOS.list FRW3_1_RTOS.map default.size.stdout
+	-$(RM) FRW4_0_RTOS.elf FRW4_0_RTOS.list FRW4_0_RTOS.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
