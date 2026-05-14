@@ -169,7 +169,7 @@ int main(void)
 //	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, 25);
 //	HAL_Delay(5000);
 	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
-	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
+
 	HAL_GPIO_WritePin(VIB_GPIO_Port, VIB_Pin, GPIO_PIN_SET);
 	HAL_Delay(50);
 	HAL_GPIO_WritePin(VIB_GPIO_Port, VIB_Pin, GPIO_PIN_RESET);

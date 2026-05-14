@@ -9,9 +9,9 @@
   *          TIM1 CH2/CH2N = Phase B (INHB/INLB)
   *          TIM1 CH3/CH3N = Phase C (INHC/INLC)
   *   - Current sense (injected ADC, triggered by TIM1 TRGO2):
-  *          SOA -> PF10 -> ADC3_INP6  (Phase A current)
-  *          SOB -> PC5  -> ADC2_INP8  (Phase B current)
-  *          SOC -> PA7  -> ADC1_INP7  (Phase C current)
+  *          SOA -> PC4  -> ADC1  (Phase A current)
+  *          SOB -> PA6  -> ADC2  (Phase B current)
+  *          SOC -> PF7  -> ADC3  (Phase C current)
   *   - Encoder: TIM2 CH1/CH2 on PA0/PA1
   *   - Driver enable: EN_DRV pin (GPIOC, PC14)
   *
