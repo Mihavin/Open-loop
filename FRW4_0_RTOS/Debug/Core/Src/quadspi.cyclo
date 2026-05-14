@@ -1,3 +1,0 @@
-../Core/Src/quadspi.c:30:6:MX_QUADSPI_Init	2
-../Core/Src/quadspi.c:65:6:HAL_QSPI_MspInit	2
-../Core/Src/quadspi.c:130:6:HAL_QSPI_MspDeInit	2

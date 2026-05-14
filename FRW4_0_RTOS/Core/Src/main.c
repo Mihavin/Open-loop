@@ -160,7 +160,7 @@ int main(void)
 	Buzzer_Init(&buzzer, &htim8);
 	Buzzer_Beep(&buzzer, 2000, 80, 50);
 	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
-	HAL_TIMEx_PWMN_Start(&htim5, TIM_CHANNEL_1);
+//	HAL_TIMEx_PWMN_Start(&htim5, TIM_CHANNEL_1);
 	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, 0);
 	HAL_Delay(100);
 	HAL_GPIO_WritePin(LTDC_STNDB_GPIO_Port, LTDC_STNDB_Pin, GPIO_PIN_SET);
@@ -174,9 +174,9 @@ int main(void)
 	HAL_Delay(50);
 	HAL_GPIO_WritePin(VIB_GPIO_Port, VIB_Pin, GPIO_PIN_RESET);
 
-	   MotorFOC_Init();
-	   MotorFOC_Start();
-	   MotorFOC_Arm();
+//	   MotorFOC_Init();
+//	   MotorFOC_Start();
+//	   MotorFOC_Arm();
 
 //   MotorFOC_Arm();        // FORCE it for now (ignore AUTOSTART)
 	//  MotorFOC_SetMode(MOTOR_FOC_MODE_TORQUE);

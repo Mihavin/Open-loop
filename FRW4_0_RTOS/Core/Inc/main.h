@@ -99,6 +99,7 @@ void Error_Handler(void);
 #define DRV_CAL_GPIO_Port GPIOC
 #define I_ENC_Pin GPIO_PIN_1
 #define I_ENC_GPIO_Port GPIOB
+#define I_ENC_EXTI_IRQn EXTI1_IRQn
 #define FAN_FAULT_Pin GPIO_PIN_6
 #define FAN_FAULT_GPIO_Port GPIOH
 #define FAN_FAULT_EXTI_IRQn EXTI9_5_IRQn
@@ -152,8 +153,10 @@ void Error_Handler(void);
 #define EXT_MOSI_GPIO_Port GPIOC
 #define FRW_BUT_Pin GPIO_PIN_2
 #define FRW_BUT_GPIO_Port GPIOD
+#define FRW_BUT_EXTI_IRQn EXTI2_IRQn
 #define REV_BUT_Pin GPIO_PIN_3
 #define REV_BUT_GPIO_Port GPIOD
+#define REV_BUT_EXTI_IRQn EXTI3_IRQn
 #define LED2_Pin GPIO_PIN_4
 #define LED2_GPIO_Port GPIOD
 #define LED1_Pin GPIO_PIN_5

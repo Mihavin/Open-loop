@@ -53,6 +53,8 @@ extern TIM_HandleTypeDef htim5;
 #define EVT_FAN	    (1u << 3)
 #define EVT_UI		(1u << 4)
 #define EVT_ENC_I	(1u << 5)
+#define EVT_FRW     (1u << 6)
+#define EVT_REV     (1u << 7)
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
