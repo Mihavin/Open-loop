@@ -3906,7 +3906,7 @@ void HAL_SDRAM_MspInit(SDRAM_HandleTypeDef* sdramHandle){
  8001de6:	bd80      	pop	{r7, pc}
 
 08001de8 <UIEncoder_GetCounts>:
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName);
+void vApplicationStackOverflowHook(xTaskHandle xTask, char *pcTaskName);
 void vApplicationMallocFailedHook(void);
 
 /* USER CODE BEGIN 4 */
@@ -10957,9 +10957,9 @@ void MX_SPI3_Init(void)
  8004d9e:	4b24      	ldr	r3, [pc, #144]	@ (8004e30 <MX_SPI3_Init+0xa4>)
  8004da0:	2200      	movs	r2, #0
  8004da2:	609a      	str	r2, [r3, #8]
-  hspi3.Init.DataSize = SPI_DATASIZE_4BIT;
+  hspi3.Init.DataSize = SPI_DATASIZE_8BIT;
  8004da4:	4b22      	ldr	r3, [pc, #136]	@ (8004e30 <MX_SPI3_Init+0xa4>)
- 8004da6:	2203      	movs	r2, #3
+ 8004da6:	2207      	movs	r2, #7
  8004da8:	60da      	str	r2, [r3, #12]
   hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
  8004daa:	4b21      	ldr	r3, [pc, #132]	@ (8004e30 <MX_SPI3_Init+0xa4>)
