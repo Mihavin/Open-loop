@@ -1,7 +1,7 @@
 ../Core/Src/freertos.c:136:6:vApplicationStackOverflowHook	24	static,ignoring_inline_asm
 ../Core/Src/freertos.c:149:6:vApplicationMallocFailedHook	4	static
 ../Core/Src/freertos.c:169:6:MX_FREERTOS_Init	8	static
-../Core/Src/freertos.c:230:6:StartMotorTask	16	static
+../Core/Src/freertos.c:230:6:StartMotorTask	24	static
 ../Core/Src/freertos.c:262:6:StartGUITask	16	static
 ../Core/Src/freertos.c:283:6:StartHIDTask	16	static
 ../Core/Src/freertos.c:329:6:StartCommTask	16	static

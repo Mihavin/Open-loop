@@ -241,13 +241,13 @@ void StartMotorTask(void *argument)
    // MotorFOC_Arm();
     MotorFOC_SetMode(MOTOR_FOC_MODE_SPEED);
   //  MotorFOC_SetSpeedRPM(1500);
-
+    TickType_t last = xTaskGetTickCount();
    // bool armed = false;
 
     for (;;)
     {
         MotorFOC();      // runs alignment timing + speed loop
-        osDelay(1);
+        vTaskDelayUntil(&last, pdMS_TO_TICKS(1));
     }
   /* USER CODE END StartMotorTask */
 }
