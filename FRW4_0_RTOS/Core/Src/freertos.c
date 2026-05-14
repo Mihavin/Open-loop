@@ -116,7 +116,8 @@ const osMessageQueueAttr_t HIDQ_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-
+static float UIEncoder_GetCounts(void);
+static void UIEncoder_Reset(void);
 /* USER CODE END FunctionPrototypes */
 
 void StartMotorTask(void *argument);
@@ -133,6 +134,16 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName);
 void vApplicationMallocFailedHook(void);
 
 /* USER CODE BEGIN 4 */
+static float UIEncoder_GetCounts(void)
+{
+    return (float)__HAL_TIM_GET_COUNTER(&htim3);
+}
+
+static void UIEncoder_Reset(void)
+{
+    __HAL_TIM_SET_COUNTER(&htim3, 0);
+}
+
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
     (void)xTask;
@@ -289,28 +300,28 @@ void StartHIDTask(void *argument)
 
 
 	  //	float ped_enc = (float)__HAL_TIM_GET_COUNTER(&htim4);
-	  	ped_enc  = (float) __HAL_TIM_GET_COUNTER(&htim3);
+		ped_enc = UIEncoder_GetCounts();
 	  /*
-	  	if (UI_enc != bight)
-	  	{
-	  		__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, UI_enc);
-	  		bight = UI_enc;
-	  	}
+		if (UI_enc != bight)
+		{
+			__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, UI_enc);
+			bight = UI_enc;
+		}
 	  */
-	  	if (MotorFOC_GetMode() == MOTOR_FOC_MODE_POSITION)
-	  	{
-	  		MotorFOC_SetPositionRevolutions(ped_enc * 0.1f);
-	  	}
+		const MotorFOC_Mode_t requested_mode = MotorFOC_GetRequestedMode();
 
-	  	if (MotorFOC_GetMode()  == MOTOR_FOC_MODE_SPEED)
-	  	{
-	  		MotorFOC_SetSpeedRPM(ped_enc);
-	  	}
-
-	  	if (MotorFOC_GetMode()  == MOTOR_FOC_MODE_TORQUE)
-	  	{
-	  		MotorFOC_SetTorqueCurrentA(ped_enc * 0.01f);
-	  	}
+		if (requested_mode == MOTOR_FOC_MODE_POSITION)
+		{
+			MotorFOC_SetPositionRevolutions(ped_enc * 0.1f);
+		}
+		else if (requested_mode == MOTOR_FOC_MODE_SPEED)
+		{
+			MotorFOC_SetSpeedRPM(ped_enc);
+		}
+		else if (requested_mode == MOTOR_FOC_MODE_TORQUE)
+		{
+			MotorFOC_SetTorqueCurrentA(ped_enc * 0.01f);
+		}
 
 
     osDelay(100);
@@ -409,12 +420,22 @@ void StartEXTITask(void *argument)
       if ((events & EVT_UI) && (now - t_ui) > db)
       {
           t_ui = now;
-          ped_enc = 0 ;
-          while(MotorFOC_GetSpeedRPM() > 10){}
+          ped_enc = 0;
+          TickType_t wait_start = xTaskGetTickCount();
+          while (MotorFOC_GetSpeedRPM() > 10.0f)
+          {
+              if ((xTaskGetTickCount() - wait_start) > pdMS_TO_TICKS(2000))
+              {
+                  break;
+              }
+
+              osDelay(5);
+          }
+
           ui_button_click_count++;
           if (ui_button_click_count > 2) {ui_button_click_count = 0;}
           MotorFOC_SetMode(ui_button_click_count); //toggle modes
-          __HAL_TIM_SET_COUNTER(&htim3, 0);
+          UIEncoder_Reset();
 
           MotorFOC_RequestDisarm();
           MotorFOC_RequestZeroEncoder();
