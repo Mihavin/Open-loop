@@ -42,6 +42,7 @@
 #include "buzzer.h"
 #include "drv_spi.h"
 #include "s25fl256s.h"
+#include "tmc2130.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -64,7 +65,7 @@ extern SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
 static Buzzer_Handle_t buzzer;
-
+static TMC2130_Handle_t stepper;
 static drv8323_spi_t g_drv8323 = { .hspi = &hspi1,
 		.ncs_port = DRV_NSS_GPIO_Port, .ncs_pin = DRV_NSS_Pin, .en_port =
 				DRV_EN_GPIO_Port, .en_pin = DRV_EN_Pin, .spi_timeout_ms = 5, };
@@ -310,7 +311,25 @@ void PeriphCommonClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void Stepper_Init(void)
+{
+    TMC2130_Config_t cfg;
+    TMC2130_ConfigDefaults(&cfg);
 
+    cfg.microsteps = 16;
+    cfg.interpolate_256 = true;
+    cfg.ihold = 8;
+    cfg.irun = 16;
+    cfg.ihold_delay = 6;
+
+    /* Uses SPI3 hardware NSS and TIM12_CH2 STEP. */
+    if (TMC2130_Init(&stepper, &hspi3, &htim12, TIM_CHANNEL_2, &cfg) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    TMC2130_Enable(&stepper, true);
+}
 /* USER CODE END 4 */
 
  /* MPU Configuration */

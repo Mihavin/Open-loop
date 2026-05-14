@@ -34,6 +34,7 @@
 #include "drv_spi.h"
 #include "app_touchgfx.h"
 #include "main.h"
+#include "tmc2130.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
