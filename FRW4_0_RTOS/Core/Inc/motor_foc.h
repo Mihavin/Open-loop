@@ -164,6 +164,8 @@ typedef enum
 
 void MotorFOC_Init(void);
 void MotorFOC_Start(void);
+
+/* Queue a controlled peripheral shutdown; applied by the MotorFOC() owner loop. */
 void MotorFOC_Stop(void);
 
 /* Queue driver enable and alignment; applied by the MotorFOC() slow loop. */
@@ -176,6 +178,7 @@ void MotorFOC_RequestArm(void);
 void MotorFOC_RequestDisarm(void);
 void MotorFOC_RequestEmergencyStop(void);
 void MotorFOC_RequestZeroEncoder(void);
+void MotorFOC_RequestStop(void);
 
 void MotorFOC_SetMode(MotorFOC_Mode_t mode);
 void MotorFOC_SetCommand(MotorFOC_Mode_t mode,
@@ -203,6 +206,7 @@ void MotorFOC_SetPositionRevolutions(float revolutions);
 
 MotorFOC_State_t MotorFOC_GetState(void);
 MotorFOC_Mode_t  MotorFOC_GetMode(void);
+MotorFOC_Mode_t  MotorFOC_GetRequestedMode(void);
 
 /* Optional debug getters (updated in ISR) */
 float MotorFOC_GetIa(void);

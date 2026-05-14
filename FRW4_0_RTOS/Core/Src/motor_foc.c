@@ -142,6 +142,7 @@ typedef enum
   MOTOR_FOC_REQ_DISARM         = 1u << 1,
   MOTOR_FOC_REQ_EMERGENCY_STOP = 1u << 2,
   MOTOR_FOC_REQ_ZERO_ENCODER   = 1u << 3,
+  MOTOR_FOC_REQ_STOP           = 1u << 4,
 } MotorFOC_RequestBits_t;
 
 typedef struct
@@ -441,6 +442,32 @@ static void foc_apply_zero_encoder(void)
   g_foc.pos_ref_counts = 0;
 }
 
+static void foc_apply_stop(void)
+{
+  foc_apply_disarm();
+
+//  (void)HAL_TIM_Base_Stop_IT(&htim7);
+
+  (void)HAL_ADCEx_InjectedStop_IT(&hadc1);
+  (void)HAL_ADCEx_InjectedStop(&hadc2);
+  (void)HAL_ADCEx_InjectedStop(&hadc3);
+
+  (void)HAL_TIM_OC_Stop(&htim1, TIM_CHANNEL_4);
+
+  (void)HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
+  (void)HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
+
+  (void)HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
+  (void)HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_2);
+
+  (void)HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_3);
+  (void)HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_3);
+
+  (void)HAL_TIM_Encoder_Stop(&htim2, TIM_CHANNEL_ALL);
+
+  g_foc.state = MOTOR_FOC_STATE_IDLE;
+}
+
 static void foc_apply_arm(void)
 {
   LED1_On();
@@ -469,28 +496,7 @@ static void foc_apply_arm(void)
 
 void MotorFOC_Stop(void)
 {
-  foc_apply_disarm();
-
-//  (void)HAL_TIM_Base_Stop_IT(&htim7);
-
-  (void)HAL_ADCEx_InjectedStop_IT(&hadc1);
-  (void)HAL_ADCEx_InjectedStop(&hadc2);
-  (void)HAL_ADCEx_InjectedStop(&hadc3);
-
-  (void)HAL_TIM_OC_Stop(&htim1, TIM_CHANNEL_4);
-
-  (void)HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
-  (void)HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
-
-  (void)HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
-  (void)HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_2);
-
-  (void)HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_3);
-  (void)HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_3);
-
-  (void)HAL_TIM_Encoder_Stop(&htim2, TIM_CHANNEL_ALL);
-
-  g_foc.state = MOTOR_FOC_STATE_IDLE;
+  MotorFOC_RequestStop();
 }
 
 void MotorFOC_Arm(void)
@@ -527,6 +533,11 @@ void MotorFOC_RequestZeroEncoder(void)
   g_cmd.seq++;
 
   foc_irq_unlock(primask);
+}
+
+void MotorFOC_RequestStop(void)
+{
+  foc_request(MOTOR_FOC_REQ_STOP);
 }
 
 void MotorFOC_SetMode(MotorFOC_Mode_t mode)
@@ -621,6 +632,14 @@ MotorFOC_Mode_t MotorFOC_GetMode(void)
 {
   uint32_t primask = foc_irq_lock();
   MotorFOC_Mode_t m = g_foc.mode;
+  foc_irq_unlock(primask);
+  return m;
+}
+
+MotorFOC_Mode_t MotorFOC_GetRequestedMode(void)
+{
+  uint32_t primask = foc_irq_lock();
+  MotorFOC_Mode_t m = g_cmd.mode;
   foc_irq_unlock(primask);
   return m;
 }
@@ -822,6 +841,12 @@ void MotorFOC(void)
   if (cmd.requests & MOTOR_FOC_REQ_EMERGENCY_STOP)
   {
     foc_apply_emergency_stop();
+    return;
+  }
+
+  if (cmd.requests & MOTOR_FOC_REQ_STOP)
+  {
+    foc_apply_stop();
     return;
   }
 
