@@ -166,11 +166,16 @@ void MotorFOC_Init(void);
 void MotorFOC_Start(void);
 void MotorFOC_Stop(void);
 
-/* Enable driver and run alignment -> RUN state */
+/* Queue driver enable and alignment; applied by the MotorFOC() slow loop. */
 void MotorFOC_Arm(void);
 
-/* Disable driver outputs and go to IDLE (keeps timers/ADCs running) */
+/* Queue driver disable; applied by the MotorFOC() slow loop. */
 void MotorFOC_Disarm(void);
+
+void MotorFOC_RequestArm(void);
+void MotorFOC_RequestDisarm(void);
+void MotorFOC_RequestEmergencyStop(void);
+void MotorFOC_RequestZeroEncoder(void);
 
 void MotorFOC_SetMode(MotorFOC_Mode_t mode);
 void MotorFOC_SetCommand(MotorFOC_Mode_t mode,
