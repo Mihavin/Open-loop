@@ -173,7 +173,10 @@ void MotorFOC_Arm(void);
 void MotorFOC_Disarm(void);
 
 void MotorFOC_SetMode(MotorFOC_Mode_t mode);
-
+void MotorFOC_SetCommand(MotorFOC_Mode_t mode,
+                         float speed_rpm,
+                         float torque_iq_A,
+                         int32_t position_counts);
 
 void MotorFOC(void);
 
