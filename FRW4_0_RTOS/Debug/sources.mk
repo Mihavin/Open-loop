@@ -43,6 +43,18 @@ Core/Startup \
 Drivers/STM32H7xx_HAL_Driver/Src \
 Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 \
 Middlewares/Third_Party/FreeRTOS/Source \
+Middlewares/Third_Party/FreeRTOS/Source/portable/Common \
 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F \
 Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang \
+TouchGFX/App \
+TouchGFX/generated/fonts/src \
+TouchGFX/generated/gui_generated/src/common \
+TouchGFX/generated/gui_generated/src/screen_screen \
+TouchGFX/generated/images/src \
+TouchGFX/generated/texts/src \
+TouchGFX/gui/src/common \
+TouchGFX/gui/src/model \
+TouchGFX/gui/src/screen_screen \
+TouchGFX/target \
+TouchGFX/target/generated \
 

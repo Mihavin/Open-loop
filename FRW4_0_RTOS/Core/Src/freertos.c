@@ -21,7 +21,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "main.h"
-#include "cmsis_os.h"
+#include "FreeRTOS.h"
+#include "cmsis_os2.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -126,15 +127,19 @@ void StartEXTITask(void *argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* Hook prototypes */
-void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
+void vApplicationStackOverflowHook(xTaskHandle xTask, char *pcTaskName);
 void vApplicationMallocFailedHook(void);
 
 /* USER CODE BEGIN 4 */
-void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
-   /* Run time stack overflow checking is performed if
-   configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
-   called if a stack overflow is detected. */
+    (void)xTask;
+    (void)pcTaskName;
+
+    taskDISABLE_INTERRUPTS();
+    for (;;)
+    {
+    }
 }
 /* USER CODE END 4 */
 

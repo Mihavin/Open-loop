@@ -1,0 +1,10 @@
+../Core/Src/freertos.c:134:6:vApplicationStackOverflowHook	24	static,ignoring_inline_asm
+../Core/Src/freertos.c:147:6:vApplicationMallocFailedHook	4	static
+../Core/Src/freertos.c:167:6:MX_FREERTOS_Init	8	static
+../Core/Src/freertos.c:228:6:StartMotorTask	16	static
+../Core/Src/freertos.c:260:6:StartGUITask	16	static
+../Core/Src/freertos.c:281:6:StartHIDTask	16	static
+../Core/Src/freertos.c:327:6:StartCommTask	16	static
+../Core/Src/freertos.c:345:6:StartStorageTask	16	static
+../Core/Src/freertos.c:363:6:StartEXTITask	64	static
+../Core/Src/freertos.c:436:6:HAL_GPIO_EXTI_Callback	32	static,ignoring_inline_asm

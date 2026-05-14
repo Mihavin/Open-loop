@@ -18,7 +18,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
+#include "FreeRTOS.h"
+#include "cmsis_os2.h"
 #include "adc.h"
 #include "crc.h"
 #include "dma.h"
@@ -145,7 +146,10 @@ int main(void)
   MX_TIM5_Init();
   MX_USART3_UART_Init();
   MX_CRC_Init();
-
+  MX_TIM12_Init();
+  MX_TouchGFX_Init();
+  /* Call PreOsInit function */
+  MX_TouchGFX_PreOSInit();
   /* USER CODE BEGIN 2 */
 
 	drv8323_cfg_t cfg;
@@ -196,9 +200,6 @@ int main(void)
 
   /* Init scheduler */
   osKernelInitialize();  /* Call init function for freertos objects (in cmsis_os2.c) */
-  MX_TouchGFX_Init();
-  /* Call PreOsInit function */
-  MX_TouchGFX_PreOSInit();
   MX_FREERTOS_Init();
 
   /* Start scheduler */
