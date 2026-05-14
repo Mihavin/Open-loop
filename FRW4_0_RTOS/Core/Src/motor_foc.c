@@ -135,6 +135,68 @@ typedef struct
 
 static MotorFOC_t g_foc;
 
+typedef struct
+{
+  MotorFOC_Mode_t mode;
+  float speed_ref_rpm;
+  float torque_iq_ref_a;
+  int32_t position_ref_counts;
+  uint32_t seq;
+} MotorFOC_Command_t;
+
+static MotorFOC_Command_t g_cmd;
+
+/* Short critical section usable before/after scheduler start.
+ * Do not use mutexes here: ADC ISR participates in the control path.
+ */
+static inline uint32_t foc_irq_lock(void)
+{
+  uint32_t primask = __get_PRIMASK();
+  __disable_irq();
+  __DMB();
+  return primask;
+}
+
+static inline void foc_irq_unlock(uint32_t primask)
+{
+  __DMB();
+  __set_PRIMASK(primask);
+}
+
+static MotorFOC_Command_t foc_cmd_snapshot(void)
+{
+  MotorFOC_Command_t cmd;
+
+  uint32_t primask = foc_irq_lock();
+  cmd = g_cmd;
+  foc_irq_unlock(primask);
+
+  return cmd;
+}
+
+static void foc_cmd_init(int32_t initial_pos_counts)
+{
+  uint32_t primask = foc_irq_lock();
+
+  g_cmd.mode = MOTOR_FOC_MODE_SPEED;
+  g_cmd.speed_ref_rpm = 0.0f;
+  g_cmd.torque_iq_ref_a = 0.0f;
+  g_cmd.position_ref_counts = initial_pos_counts;
+  g_cmd.seq = 0u;
+
+  foc_irq_unlock(primask);
+}
+
+static void foc_set_current_refs(float id_ref, float iq_ref)
+{
+  uint32_t primask = foc_irq_lock();
+
+  g_foc.id_ref = id_ref;
+  g_foc.iq_ref = iq_ref;
+
+  foc_irq_unlock(primask);
+}
+
 /* Current scale: ADC counts -> amps */
 static float adc_counts_to_amps(float adc_counts)
 {
@@ -233,6 +295,8 @@ void MotorFOC_Init(void)
   g_foc.pos_counts = (int32_t)__HAL_TIM_GET_COUNTER(&htim2);
   g_foc.pos_ref_counts = g_foc.pos_counts;
 
+  foc_cmd_init(g_foc.pos_counts);
+
   g_foc.elec_offset = 0.0f;
 
   g_foc.dt_i = 1.0f / MOTOR_FOC_PWM_HZ;
@@ -249,10 +313,6 @@ void MotorFOC_Init(void)
   PI_Init(&g_foc.pi_speed, MOTOR_FOC_KP_SPEED, MOTOR_FOC_KI_SPEED, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
 
   /* Position PI output = speed_ref (RPM) */
-  PI_Init(&g_foc.pi_pos, MOTOR_FOC_KP_POS, MOTOR_FOC_KI_POS,
-          -MOTOR_FOC_SPEED_MAX_RPM, MOTOR_FOC_SPEED_MAX_RPM);
-
-  /* Position PI output = speed_ref_rpm */
   PI_Init(&g_foc.pi_pos, MOTOR_FOC_KP_POS, MOTOR_FOC_KI_POS,
           -MOTOR_FOC_SPEED_MAX_RPM, MOTOR_FOC_SPEED_MAX_RPM);
 
@@ -394,57 +454,155 @@ void MotorFOC_Disarm(void)
 
 void MotorFOC_SetMode(MotorFOC_Mode_t mode)
 {
-  if (mode != g_foc.mode)
+  if (mode > MOTOR_FOC_MODE_POSITION)
+    return;
+
+  uint32_t primask = foc_irq_lock();
+
+  if (g_cmd.mode != mode)
   {
-    /* Reset outer-loop integrators to avoid step transients when switching modes */
-    g_foc.pi_speed.integrator = 0.0f;
-    g_foc.pi_pos.integrator   = 0.0f;
+    g_cmd.mode = mode;
+    g_cmd.seq++;
   }
-  g_foc.mode = mode;
+
+  foc_irq_unlock(primask);
+}
+
+void MotorFOC_SetCommand(MotorFOC_Mode_t mode,
+                         float speed_rpm,
+                         float torque_iq_A,
+                         int32_t position_counts)
+{
+  if (mode > MOTOR_FOC_MODE_POSITION)
+    return;
+
+  speed_rpm = clamp_f(speed_rpm, -MOTOR_FOC_SPEED_MAX_RPM, MOTOR_FOC_SPEED_MAX_RPM);
+  torque_iq_A = clamp_f(torque_iq_A, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
+
+  uint32_t primask = foc_irq_lock();
+
+  g_cmd.mode = mode;
+  g_cmd.speed_ref_rpm = speed_rpm;
+  g_cmd.torque_iq_ref_a = torque_iq_A;
+  g_cmd.position_ref_counts = position_counts;
+  g_cmd.seq++;
+
+  foc_irq_unlock(primask);
 }
 
 void MotorFOC_SetSpeedRPM(float rpm)
 {
   rpm = clamp_f(rpm, -MOTOR_FOC_SPEED_MAX_RPM, MOTOR_FOC_SPEED_MAX_RPM);
-  g_foc.speed_ref_rpm = rpm;
+
+  uint32_t primask = foc_irq_lock();
+
+  g_cmd.speed_ref_rpm = rpm;
+  g_cmd.seq++;
+
+  foc_irq_unlock(primask);
 }
 
 void MotorFOC_SetTorqueCurrentA(float iq_A)
 {
   iq_A = clamp_f(iq_A, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
-  g_foc.iq_ref = iq_A;
+
+  uint32_t primask = foc_irq_lock();
+
+  g_cmd.torque_iq_ref_a = iq_A;
+  g_cmd.seq++;
+
+  foc_irq_unlock(primask);
 }
 
 void MotorFOC_SetPositionCounts(int32_t pos_counts)
 {
-  g_foc.pos_ref_counts = pos_counts;
+  uint32_t primask = foc_irq_lock();
+
+  g_cmd.position_ref_counts = pos_counts;
+  g_cmd.seq++;
+
+  foc_irq_unlock(primask);
 }
 
 void MotorFOC_SetPositionRevolutions(float revolutions)
 {
   const float counts_f = revolutions * (float)MOTOR_FOC_ENCODER_CPR;
-  /* Round to nearest count (avoid lroundf portability issues on some embedded libcs) */
   const int32_t counts = (int32_t)((counts_f >= 0.0f) ? (counts_f + 0.5f) : (counts_f - 0.5f));
-  g_foc.pos_ref_counts = counts;
+
+  MotorFOC_SetPositionCounts(counts);
 }
 
 MotorFOC_State_t MotorFOC_GetState(void)
 {
-  return g_foc.state;
+  uint32_t primask = foc_irq_lock();
+  MotorFOC_State_t s = g_foc.state;
+  foc_irq_unlock(primask);
+  return s;
 }
 
 MotorFOC_Mode_t MotorFOC_GetMode(void)
 {
-  return g_foc.mode;
+  uint32_t primask = foc_irq_lock();
+  MotorFOC_Mode_t m = g_foc.mode;
+  foc_irq_unlock(primask);
+  return m;
 }
 
-float MotorFOC_GetIa(void) { return g_foc.ia; }
-float MotorFOC_GetIb(void) { return g_foc.ib; }
-float MotorFOC_GetIc(void) { return g_foc.ic; }
-float MotorFOC_GetId(void) { return g_foc.id; }
-float MotorFOC_GetIq(void) { return g_foc.iq; }
-float MotorFOC_GetSpeedRPM(void) { return g_foc.speed_rpm; }
-int32_t MotorFOC_GetPositionCounts(void) { return g_foc.pos_counts; }
+float MotorFOC_GetIa(void)
+{
+  uint32_t primask = foc_irq_lock();
+  float v = g_foc.ia;
+  foc_irq_unlock(primask);
+  return v;
+}
+
+float MotorFOC_GetIb(void)
+{
+  uint32_t primask = foc_irq_lock();
+  float v = g_foc.ib;
+  foc_irq_unlock(primask);
+  return v;
+}
+
+float MotorFOC_GetIc(void)
+{
+  uint32_t primask = foc_irq_lock();
+  float v = g_foc.ic;
+  foc_irq_unlock(primask);
+  return v;
+}
+
+float MotorFOC_GetId(void)
+{
+  uint32_t primask = foc_irq_lock();
+  float v = g_foc.id;
+  foc_irq_unlock(primask);
+  return v;
+}
+
+float MotorFOC_GetIq(void)
+{
+  uint32_t primask = foc_irq_lock();
+  float v = g_foc.iq;
+  foc_irq_unlock(primask);
+  return v;
+}
+
+float MotorFOC_GetSpeedRPM(void)
+{
+  uint32_t primask = foc_irq_lock();
+  float v = g_foc.speed_rpm;
+  foc_irq_unlock(primask);
+  return v;
+}
+
+int32_t MotorFOC_GetPositionCounts(void)
+{
+  uint32_t primask = foc_irq_lock();
+  int32_t v = g_foc.pos_counts;
+  foc_irq_unlock(primask);
+  return v;
+}
 //float MotorFOC_GetAngle(void ) { return g_foc.enc_prev; }
 
 /* ----------- ISR callbacks ----------- */
@@ -582,6 +740,15 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 /* TIM7 period callback for speed loop + alignment timing */
 void MotorFOC(void)
 {
+  MotorFOC_Command_t cmd = foc_cmd_snapshot();
+
+  if (cmd.mode != g_foc.mode)
+  {
+    g_foc.pi_speed.integrator = 0.0f;
+    g_foc.pi_pos.integrator = 0.0f;
+    g_foc.mode = cmd.mode;
+  }
+
   if (g_foc.state == MOTOR_FOC_STATE_ALIGN)
   {
     g_foc.align_ticks++;
@@ -597,8 +764,7 @@ void MotorFOC(void)
       g_foc.elec_offset = wrap_0_2pi(g_foc.elec_offset);
 
       /* Clear alignment current */
-      g_foc.id_ref = 0.0f;
-      g_foc.iq_ref = 0.0f;
+      foc_set_current_refs(0.0f, 0.0f);
 
       /* Enter RUN */
       g_foc.enc_prev = enc;
@@ -628,38 +794,37 @@ void MotorFOC(void)
 
   if (g_foc.mode == MOTOR_FOC_MODE_SPEED)
   {
-    /* Speed PI -> iq_ref */
-    const float err = g_foc.speed_ref_rpm - rpm;
+    const float err = cmd.speed_ref_rpm - rpm;
+
     float iq_cmd = PI_Run(&g_foc.pi_speed, err, g_foc.dt_w);
     iq_cmd = clamp_f(iq_cmd, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
-    g_foc.iq_ref = iq_cmd;
-    g_foc.id_ref = 0.0f;
+
+    g_foc.speed_ref_rpm = cmd.speed_ref_rpm;   /* debug/telemetry copy */
+    foc_set_current_refs(0.0f, iq_cmd);
   }
   else if (g_foc.mode == MOTOR_FOC_MODE_POSITION)
   {
-    /* Position PI (rev) -> speed_ref (RPM) -> Speed PI -> iq_ref */
-    const int32_t err_counts = (int32_t)(g_foc.pos_ref_counts - enc_now);
+    const int32_t err_counts = (int32_t)(cmd.position_ref_counts - enc_now);
     const float err_rev = (float)err_counts / (float)MOTOR_FOC_ENCODER_CPR;
 
-    /* outer loop */
     float speed_ref = PI_Run(&g_foc.pi_pos, err_rev, g_foc.dt_w);
     speed_ref = clamp_f(speed_ref, -MOTOR_FOC_SPEED_MAX_RPM, MOTOR_FOC_SPEED_MAX_RPM);
-    g_foc.speed_ref_rpm = speed_ref;
 
-    /* inner loop (speed) */
     const float err_speed = speed_ref - rpm;
+
     float iq_cmd = PI_Run(&g_foc.pi_speed, err_speed, g_foc.dt_w);
     iq_cmd = clamp_f(iq_cmd, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
-    g_foc.iq_ref = iq_cmd;
-    g_foc.id_ref = 0.0f;
+
+    g_foc.speed_ref_rpm = speed_ref;           /* debug/telemetry copy */
+    g_foc.pos_ref_counts = cmd.position_ref_counts;
+    foc_set_current_refs(0.0f, iq_cmd);
   }
   else
   {
-    /* Torque mode: iq_ref already set by user; keep id_ref=0 */
-    g_foc.id_ref = 0.0f;
+    float iq_cmd = clamp_f(cmd.torque_iq_ref_a, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
+    foc_set_current_refs(0.0f, iq_cmd);
   }
 }
-
 
 static float theta = 0.0f;
 
