@@ -4132,11 +4132,15 @@ Discarded input sections
  .text.TMC2130_SetDirection
                 0x00000000       0x2c ./Core/Src/tmc2130.o
  .text.TMC2130_SetStepFrequency
-                0x00000000      0x254 ./Core/Src/tmc2130.o
+                0x00000000      0x27c ./Core/Src/tmc2130.o
  .text.TMC2130_StartStepClock
                 0x00000000       0x46 ./Core/Src/tmc2130.o
  .text.TMC2130_StopStepClock
                 0x00000000       0xae ./Core/Src/tmc2130.o
+ .text.TMC2130_IsStepClockRunning
+                0x00000000       0x2e ./Core/Src/tmc2130.o
+ .text.TMC2130_GetStepFrequencyHz
+                0x00000000       0x22 ./Core/Src/tmc2130.o
  .text.TMC2130_MoveBlocking
                 0x00000000      0x158 ./Core/Src/tmc2130.o
  .text.TMC2130_ReadGSTAT
@@ -4151,12 +4155,12 @@ Discarded input sections
                 0x00000000       0x24 ./Core/Src/tmc2130.o
  .text.TMC2130_ReadDcIn
                 0x00000000       0x20 ./Core/Src/tmc2130.o
- .debug_info    0x00000000     0x16c9 ./Core/Src/tmc2130.o
- .debug_abbrev  0x00000000      0x332 ./Core/Src/tmc2130.o
+ .debug_info    0x00000000     0x1737 ./Core/Src/tmc2130.o
+ .debug_abbrev  0x00000000      0x350 ./Core/Src/tmc2130.o
  .debug_aranges
-                0x00000000       0xe8 ./Core/Src/tmc2130.o
+                0x00000000       0xf8 ./Core/Src/tmc2130.o
  .debug_rnglists
-                0x00000000       0xb0 ./Core/Src/tmc2130.o
+                0x00000000       0xbc ./Core/Src/tmc2130.o
  .debug_macro   0x00000000      0x3fd ./Core/Src/tmc2130.o
  .debug_macro   0x00000000      0xaf6 ./Core/Src/tmc2130.o
  .debug_macro   0x00000000       0x22 ./Core/Src/tmc2130.o
@@ -4239,12 +4243,232 @@ Discarded input sections
  .debug_macro   0x00000000       0x16 ./Core/Src/tmc2130.o
  .debug_macro   0x00000000       0x3c ./Core/Src/tmc2130.o
  .debug_macro   0x00000000       0x20 ./Core/Src/tmc2130.o
- .debug_line    0x00000000     0x114d ./Core/Src/tmc2130.o
- .debug_str     0x00000000   0x17ea26 ./Core/Src/tmc2130.o
+ .debug_line    0x00000000     0x11c8 ./Core/Src/tmc2130.o
+ .debug_str     0x00000000   0x17ea68 ./Core/Src/tmc2130.o
  .comment       0x00000000       0x44 ./Core/Src/tmc2130.o
- .debug_frame   0x00000000      0x3bc ./Core/Src/tmc2130.o
+ .debug_frame   0x00000000      0x404 ./Core/Src/tmc2130.o
  .ARM.attributes
                 0x00000000       0x32 ./Core/Src/tmc2130.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .group         0x00000000        0xc ./Core/Src/tmc2130_motion.o
+ .text          0x00000000        0x0 ./Core/Src/tmc2130_motion.o
+ .data          0x00000000        0x0 ./Core/Src/tmc2130_motion.o
+ .bss           0x00000000        0x0 ./Core/Src/tmc2130_motion.o
+ .text.motion_absf
+                0x00000000       0x34 ./Core/Src/tmc2130_motion.o
+ .text.motion_signf
+                0x00000000       0x38 ./Core/Src/tmc2130_motion.o
+ .text.motion_clampf
+                0x00000000       0x52 ./Core/Src/tmc2130_motion.o
+ .text.motion_frequency_from_speed
+                0x00000000       0x64 ./Core/Src/tmc2130_motion.o
+ .text.motion_crossed_target
+                0x00000000       0x5e ./Core/Src/tmc2130_motion.o
+ .text.motion_stop_output
+                0x00000000       0x28 ./Core/Src/tmc2130_motion.o
+ .text.motion_apply_output
+                0x00000000       0x7a ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_DefaultLimits
+                0x00000000       0x44 ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_Init
+                0x00000000       0xc8 ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_Enable
+                0x00000000       0x5e ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_MoveTo
+                0x00000000       0x50 ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_MoveBy
+                0x00000000       0x38 ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_Stop
+                0x00000000       0x3e ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_EmergencyStop
+                0x00000000       0x48 ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_Task
+                0x00000000      0x388 ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_EnableBldcSync
+                0x00000000       0x5a ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_DisableBldcSync
+                0x00000000       0x32 ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_GetState
+                0x00000000       0x22 ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_GetPositionSteps
+                0x00000000       0x2a ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_GetTargetSteps
+                0x00000000       0x2a ./Core/Src/tmc2130_motion.o
+ .text.TMC2130Motion_GetVelocityStepsS
+                0x00000000       0x2a ./Core/Src/tmc2130_motion.o
+ .debug_info    0x00000000     0x1364 ./Core/Src/tmc2130_motion.o
+ .debug_abbrev  0x00000000      0x2cf ./Core/Src/tmc2130_motion.o
+ .debug_aranges
+                0x00000000       0xc0 ./Core/Src/tmc2130_motion.o
+ .debug_rnglists
+                0x00000000       0x8d ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x3d5 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0xaf6 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x22 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x22 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x8e ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x51 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x103 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x6a ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x1df ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x269 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x2e ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x3b ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x1c ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x22 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0xfb ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000     0x1313 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x11f ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x22 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000    0x25bb3 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x6d ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000     0x3d79 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x190 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x61 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x29 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x43 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x34 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x364 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x16 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x4a ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x34 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x10 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x58 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x8e ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x1c ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x17e ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x19b ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x5d ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000     0x2382 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000     0x102c ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x154 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x114 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x3b6 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0xac ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x72d ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x228 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x66 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x3bb ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x28d ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x3e4 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x275 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000     0x1044 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x6cc ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x383 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0xc7 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x4c ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x3ca ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x408 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x51 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x4a ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x22c ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x67 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0xa5 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x198 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0xd6 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x1c4 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x25e ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x35 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x16 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x2e3 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x512 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x5e4 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0xc1 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0xafa ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x29f ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x693 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0xa6 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000      0x5ac ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x10 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x99 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x16 ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x3c ./Core/Src/tmc2130_motion.o
+ .debug_macro   0x00000000       0x20 ./Core/Src/tmc2130_motion.o
+ .debug_line    0x00000000     0x103b ./Core/Src/tmc2130_motion.o
+ .debug_str     0x00000000   0x17df96 ./Core/Src/tmc2130_motion.o
+ .comment       0x00000000       0x44 ./Core/Src/tmc2130_motion.o
+ .debug_frame   0x00000000      0x31c ./Core/Src/tmc2130_motion.o
+ .ARM.attributes
+                0x00000000       0x32 ./Core/Src/tmc2130_motion.o
  .group         0x00000000        0xc ./Core/Src/usart.o
  .group         0x00000000        0xc ./Core/Src/usart.o
  .group         0x00000000        0xc ./Core/Src/usart.o
@@ -18449,6 +18673,7 @@ LOAD ./Core/Src/telemetry.o
 LOAD ./Core/Src/tgfx_vsync.o
 LOAD ./Core/Src/tim.o
 LOAD ./Core/Src/tmc2130.o
+LOAD ./Core/Src/tmc2130_motion.o
 LOAD ./Core/Src/usart.o
 LOAD ./Core/Startup/startup_stm32h743iitx.o
 LOAD ./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.o
