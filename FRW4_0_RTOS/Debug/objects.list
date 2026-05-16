@@ -26,6 +26,7 @@
 "./Core/Src/tgfx_vsync.o"
 "./Core/Src/tim.o"
 "./Core/Src/tmc2130.o"
+"./Core/Src/tmc2130_motion.o"
 "./Core/Src/usart.o"
 "./Core/Startup/startup_stm32h743iitx.o"
 "./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.o"

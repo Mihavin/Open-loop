@@ -13,7 +13,7 @@ extern "C" {
  * TMC2130 driver for FRW4.0 schematic U10 = TMC2130-TAE.
  *
  * Schematic / FRW4_0_RTOS mapping:
- *   SPI3:  CSN  = EXT_NSS  = PA4 / SPI3_NSS
+ *   SPI3:  CSN  = EXT_NSS  = PA4 / GPIO software CS
  *          SCK  = EXT_SCK  = PC10 / SPI3_SCK
  *          SDO  = EXT_MISO = PC11 / SPI3_MISO
  *          SDI  = EXT_MOSI = PC12 / SPI3_MOSI
@@ -28,8 +28,8 @@ extern "C" {
  *
  * IMPORTANT:
  *   TMC2130 SPI transfers are 40-bit frames. Configure SPI3 as 8-bit data.
- *   The current CubeMX generated SPI3 setup in FRW4_0_RTOS is 4-bit and must
- *   be changed before this driver can communicate with U10.
+ *   SPI3 must remain configured as 8-bit data with software NSS; EXT_NSS is
+ *   driven explicitly as an active-low GPIO chip select.
  */
 
 #ifndef TMC2130_SPI_TIMEOUT_MS
@@ -73,9 +73,8 @@ typedef struct
 {
     SPI_HandleTypeDef *hspi;
 
-    /* Optional software chip select. Leave cs_port = NULL when using SPI3
-     * hardware NSS as configured by CubeMX. If using software CS, reconfigure
-     * EXT_NSS as GPIO output, not SPI3_NSS AF.
+    /* Optional software chip select. TMC2130_Init() defaults this to
+     * EXT_NSS (PA4) as an active-low GPIO software CS for SPI3.
      */
     GPIO_TypeDef *cs_port;
     uint16_t cs_pin;
@@ -138,6 +137,8 @@ void TMC2130_SetDirection(TMC2130_Direction_t dir);
 HAL_StatusTypeDef TMC2130_SetStepFrequency(TMC2130_Handle_t *dev, uint32_t frequency_hz);
 HAL_StatusTypeDef TMC2130_StartStepClock(TMC2130_Handle_t *dev, uint32_t frequency_hz);
 HAL_StatusTypeDef TMC2130_StopStepClock(TMC2130_Handle_t *dev);
+bool TMC2130_IsStepClockRunning(const TMC2130_Handle_t *dev);
+uint32_t TMC2130_GetStepFrequencyHz(const TMC2130_Handle_t *dev);
 
 HAL_StatusTypeDef TMC2130_MoveBlocking(TMC2130_Handle_t *dev,
                                       int32_t steps,
