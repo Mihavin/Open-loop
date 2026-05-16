@@ -68,7 +68,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOH, VREF_EN_Pin|DIR_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(EXT_NSS_GPIO_Port, EXT_NSS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(EXT_NSS_GPIO_Port, EXT_NSS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(DRV_CAL_GPIO_Port, DRV_CAL_Pin, GPIO_PIN_RESET);
@@ -77,10 +77,16 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOD, DC_EN_Pin|LED2_Pin|LED1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, DRV_ENN_Pin|DRV_NSS_Pin|QSPI_RST_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOG, DRV_ENN_Pin|QSPI_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOI, ENC_NSS_Pin|DCO_Pin|SPI_MODE_Pin|VIB_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(ENC_NSS_GPIO_Port, ENC_NSS_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOI, DCO_Pin|SPI_MODE_Pin|VIB_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(DRV_NSS_GPIO_Port, DRV_NSS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LTDC_STNDB_GPIO_Port, LTDC_STNDB_Pin, GPIO_PIN_RESET);

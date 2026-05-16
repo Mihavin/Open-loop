@@ -204,7 +204,13 @@ HAL_StatusTypeDef TMC2130_Init(TMC2130_Handle_t *dev,
                               uint32_t step_channel,
                               const TMC2130_Config_t *cfg)
 {
-    return TMC2130_InitEx(dev, hspi, NULL, 0u, step_tim, step_channel, cfg);
+    return TMC2130_InitEx(dev,
+                          hspi,
+                          EXT_NSS_GPIO_Port,
+                          EXT_NSS_Pin,
+                          step_tim,
+                          step_channel,
+                          cfg);
 }
 
 HAL_StatusTypeDef TMC2130_InitEx(TMC2130_Handle_t *dev,

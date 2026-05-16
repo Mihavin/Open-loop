@@ -6180,3 +6180,78 @@ java.io.IOException: Unable to resolve plug-in "com.st.stm32cube.common.mx".
 
 !ENTRY com.st.stm32cube.ide.mpu.remote.serial 1 1 2026-05-14 09:02:11.455
 !MESSAGE port: 
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-05-16 19:18:18.338
+!MESSAGE Error
+!STACK 0
+java.util.ConcurrentModificationException
+	at java.base/java.util.HashMap$HashIterator.nextNode(HashMap.java:1605)
+	at java.base/java.util.HashMap$EntryIterator.next(HashMap.java:1638)
+	at java.base/java.util.HashMap$EntryIterator.next(HashMap.java:1636)
+	at java.base/java.util.HashMap.putMapEntries(HashMap.java:519)
+	at java.base/java.util.HashMap.clone(HashMap.java:1473)
+	at org.eclipse.cdt.internal.core.settings.model.CConfigurationSpecSettings.<init>(CConfigurationSpecSettings.java:193)
+	at org.eclipse.cdt.internal.core.settings.model.CConfigurationSpecSettings.<init>(CConfigurationSpecSettings.java:166)
+	at org.eclipse.cdt.internal.core.settings.model.CConfigurationDescription.getSpecSettings(CConfigurationDescription.java:411)
+	at org.eclipse.cdt.internal.core.settings.model.CConfigurationDescription.isModified(CConfigurationDescription.java:465)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescription.needsDescriptionPersistence(CProjectDescription.java:575)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescription.isModified(CProjectDescription.java:584)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.setProjectDescription(CProjectDescriptionManager.java:855)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.setProjectDescription(CProjectDescriptionManager.java:816)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.setProjectDescription(CProjectDescriptionManager.java:809)
+	at org.eclipse.cdt.internal.core.settings.model.ResourceChangeHandler$RcMoveHandler$1.run(ResourceChangeHandler.java:272)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager$5.run(CProjectDescriptionManager.java:507)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2451)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.runAtomic(CProjectDescriptionManager.java:503)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager$4.run(CProjectDescriptionManager.java:483)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-05-16 19:18:18.339
+!MESSAGE ConcurrentModificationException
+!STACK 0
+java.util.ConcurrentModificationException
+	at java.base/java.util.HashMap$HashIterator.nextNode(HashMap.java:1605)
+	at java.base/java.util.HashMap$EntryIterator.next(HashMap.java:1638)
+	at java.base/java.util.HashMap$EntryIterator.next(HashMap.java:1636)
+	at java.base/java.util.HashMap.putMapEntries(HashMap.java:519)
+	at java.base/java.util.HashMap.clone(HashMap.java:1473)
+	at org.eclipse.cdt.internal.core.settings.model.CConfigurationSpecSettings.<init>(CConfigurationSpecSettings.java:193)
+	at org.eclipse.cdt.internal.core.settings.model.CConfigurationSpecSettings.<init>(CConfigurationSpecSettings.java:166)
+	at org.eclipse.cdt.internal.core.settings.model.CConfigurationDescription.getSpecSettings(CConfigurationDescription.java:411)
+	at org.eclipse.cdt.internal.core.settings.model.CConfigurationDescription.isModified(CConfigurationDescription.java:465)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescription.needsDescriptionPersistence(CProjectDescription.java:575)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescription.isModified(CProjectDescription.java:584)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.setProjectDescription(CProjectDescriptionManager.java:855)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.setProjectDescription(CProjectDescriptionManager.java:816)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.setProjectDescription(CProjectDescriptionManager.java:809)
+	at org.eclipse.cdt.internal.core.settings.model.ResourceChangeHandler$RcMoveHandler$1.run(ResourceChangeHandler.java:272)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager$5.run(CProjectDescriptionManager.java:507)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2451)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.runAtomic(CProjectDescriptionManager.java:503)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager$4.run(CProjectDescriptionManager.java:483)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-05-16 19:18:18.343
+!MESSAGE ConcurrentModificationException
+!STACK 0
+java.util.ConcurrentModificationException
+	at java.base/java.util.HashMap$HashIterator.nextNode(HashMap.java:1605)
+	at java.base/java.util.HashMap$EntryIterator.next(HashMap.java:1638)
+	at java.base/java.util.HashMap$EntryIterator.next(HashMap.java:1636)
+	at java.base/java.util.HashMap.putMapEntries(HashMap.java:519)
+	at java.base/java.util.HashMap.clone(HashMap.java:1473)
+	at org.eclipse.cdt.internal.core.settings.model.CConfigurationSpecSettings.<init>(CConfigurationSpecSettings.java:193)
+	at org.eclipse.cdt.internal.core.settings.model.CConfigurationSpecSettings.<init>(CConfigurationSpecSettings.java:166)
+	at org.eclipse.cdt.internal.core.settings.model.CConfigurationDescription.getSpecSettings(CConfigurationDescription.java:411)
+	at org.eclipse.cdt.internal.core.settings.model.CConfigurationDescription.isModified(CConfigurationDescription.java:465)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescription.needsDescriptionPersistence(CProjectDescription.java:575)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescription.isModified(CProjectDescription.java:584)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.setProjectDescription(CProjectDescriptionManager.java:855)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.setProjectDescription(CProjectDescriptionManager.java:816)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.setProjectDescription(CProjectDescriptionManager.java:809)
+	at org.eclipse.cdt.internal.core.settings.model.ResourceChangeHandler$RcMoveHandler$1.run(ResourceChangeHandler.java:272)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager$5.run(CProjectDescriptionManager.java:507)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2451)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager.runAtomic(CProjectDescriptionManager.java:503)
+	at org.eclipse.cdt.internal.core.settings.model.CProjectDescriptionManager$4.run(CProjectDescriptionManager.java:483)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
