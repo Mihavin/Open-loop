@@ -337,7 +337,10 @@ HAL_StatusTypeDef TMC2130_SetStepFrequency(TMC2130_Handle_t *dev, uint32_t frequ
     uint32_t arr = (uint32_t)(arr_plus1 - 1u);
     uint32_t ccr = (arr + 1u) / 2u;
 
-    (void)HAL_TIM_PWM_Stop(dev->step_tim, dev->step_channel);
+    bool was_running = dev->step_clock_running;
+    if (was_running)
+        (void)HAL_TIM_PWM_Stop(dev->step_tim, dev->step_channel);
+
     __HAL_TIM_DISABLE(dev->step_tim);
 
     __HAL_TIM_SET_PRESCALER(dev->step_tim, psc);
@@ -346,9 +349,19 @@ HAL_StatusTypeDef TMC2130_SetStepFrequency(TMC2130_Handle_t *dev, uint32_t frequ
     __HAL_TIM_SET_COUNTER(dev->step_tim, 0u);
 
     HAL_TIM_GenerateEvent(dev->step_tim, TIM_EVENTSOURCE_UPDATE);
-    __HAL_TIM_ENABLE(dev->step_tim);
+
+    if (was_running)
+    {
+        if (HAL_TIM_PWM_Start(dev->step_tim, dev->step_channel) != HAL_OK)
+        {
+            dev->step_clock_running = false;
+            dev->step_frequency_hz = 0u;
+            return HAL_ERROR;
+        }
+    }
 
     dev->step_frequency_hz = frequency_hz;
+    dev->step_clock_running = was_running;
     return HAL_OK;
 }
 
@@ -374,6 +387,17 @@ HAL_StatusTypeDef TMC2130_StopStepClock(TMC2130_Handle_t *dev)
     dev->step_clock_running = false;
     dev->step_frequency_hz = 0u;
     return HAL_OK;
+}
+
+
+bool TMC2130_IsStepClockRunning(const TMC2130_Handle_t *dev)
+{
+    return (dev != NULL) && dev->step_clock_running;
+}
+
+uint32_t TMC2130_GetStepFrequencyHz(const TMC2130_Handle_t *dev)
+{
+    return (dev != NULL) ? dev->step_frequency_hz : 0u;
 }
 
 HAL_StatusTypeDef TMC2130_MoveBlocking(TMC2130_Handle_t *dev,
