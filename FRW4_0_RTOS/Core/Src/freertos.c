@@ -36,6 +36,9 @@
 #include "main.h"
 #include "tmc2130.h"
 #include "tmc2130_motion.h"
+#include "fault_manager.h"
+#include "spi.h"
+#include "tim.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,6 +60,10 @@ extern TIM_HandleTypeDef htim5;
 #define EVT_ENC_I	(1u << 5)
 #define EVT_FRW     (1u << 6)
 #define EVT_REV     (1u << 7)
+
+#ifndef ENABLE_DEBUG_TELEMETRY
+#define ENABLE_DEBUG_TELEMETRY 0
+#endif
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -67,6 +74,8 @@ extern TIM_HandleTypeDef htim5;
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 float ped_enc = 0;
+TMC2130_Handle_t g_tmc2130;
+TMC2130Motion_Handle_t g_stepper_motion;
 /* USER CODE END Variables */
 /* Definitions for MotorTask */
 osThreadId_t MotorTaskHandle;
@@ -140,7 +149,7 @@ void StartStepperTask(void *argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* Hook prototypes */
-void vApplicationStackOverflowHook(xTaskHandle xTask, char *pcTaskName);
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName);
 void vApplicationMallocFailedHook(void);
 
 /* USER CODE BEGIN 4 */
@@ -154,7 +163,7 @@ static void UIEncoder_Reset(void)
     __HAL_TIM_SET_COUNTER(&htim3, 0);
 }
 
-void vApplicationStackOverflowHook(xTaskHandle xTask, char *pcTaskName)
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
     (void)xTask;
     (void)pcTaskName;
@@ -235,6 +244,14 @@ void MX_FREERTOS_Init(void) {
   StepperTaskHandle = osThreadNew(StartStepperTask, NULL, &StepperTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
+  configASSERT(MotorTaskHandle != NULL);
+  configASSERT(GUITaskHandle != NULL);
+  configASSERT(HIDTaskHandle != NULL);
+  configASSERT(CommTaskHandle != NULL);
+  configASSERT(StorageTaskHandle != NULL);
+  configASSERT(EXTITaskHandle != NULL);
+  configASSERT(StepperTaskHandle != NULL);
+  configASSERT(HIDQHandle != NULL);
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
@@ -271,6 +288,10 @@ void StartMotorTask(void *argument)
     for (;;)
     {
         MotorFOC();      // runs alignment timing + speed loop
+        if (MotorFOC_GetState() == MOTOR_FOC_STATE_FAULT)
+        {
+            Fault_Report(FAULT_BLDC_DRIVER);
+        }
         vTaskDelayUntil(&last_wake, pdMS_TO_TICKS(1));
     }
   /* USER CODE END StartMotorTask */
@@ -291,7 +312,9 @@ void StartGUITask(void *argument)
 	 MX_TouchGFX_Process();
   for(;;)
   {
+#if ENABLE_DEBUG_TELEMETRY
 	  Telemetry_Update();
+#endif
     osDelay(20);
   }
   /* USER CODE END StartGUITask */
@@ -407,6 +430,7 @@ void StartEXTITask(void *argument)
       if ((events & EVT_LIMIT) && (now - t_limit) > db)
       {
           t_limit = now;
+          Fault_Report(FAULT_LIMIT);
           __HAL_TIM_SET_COUNTER(&htim4, 0); //reset pedal counter
 
       }
@@ -427,7 +451,7 @@ void StartEXTITask(void *argument)
       if ((events & EVT_FAN) && (now - t_fan) > db)
       {
           t_fan = now;
-          // Handle fan failure
+          Fault_Report(FAULT_FAN);
       }
 
       if ((events & EVT_UI) && (now - t_ui) > db)
@@ -488,11 +512,38 @@ void StartEXTITask(void *argument)
 void StartStepperTask(void *argument)
 {
   /* USER CODE BEGIN StartStepperTask */
+    (void)argument;
+
+    TMC2130_Config_t cfg;
+    TMC2130_ConfigDefaults(&cfg);
+    cfg.microsteps = 16;
+    cfg.interpolate_256 = true;
+    cfg.ihold = 8;
+    cfg.irun = 16;
+    cfg.ihold_delay = 6;
+
+    if (TMC2130_Init(&g_tmc2130, &hspi3, &htim12, TIM_CHANNEL_2, &cfg) != HAL_OK)
+    {
+        Fault_Report(FAULT_STEPPER_DRIVER | FAULT_SPI);
+    }
+
+    TMC2130Motion_Limits_t limits;
+    TMC2130Motion_DefaultLimits(&limits);
+
+    if (TMC2130Motion_Init(&g_stepper_motion, &g_tmc2130, &limits) != HAL_OK)
+    {
+        Fault_Report(FAULT_STEPPER_DRIVER);
+    }
+
+    (void)TMC2130Motion_Enable(&g_stepper_motion, false);
+
 	TickType_t last = xTaskGetTickCount();
   /* Infinite loop */
   for(;;)
+  {
       TMC2130Motion_Task(&g_stepper_motion, 0.001f);
       vTaskDelayUntil(&last, pdMS_TO_TICKS(1));
+  }
   /* USER CODE END StartStepperTask */
 }
 

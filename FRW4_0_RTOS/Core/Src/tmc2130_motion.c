@@ -1,6 +1,7 @@
 #include "tmc2130_motion.h"
 
 #include "motor_foc.h"
+#include "fault_manager.h"
 #include <string.h>
 
 #define TMC2130_MOTION_DEFAULT_MAX_SPEED_STEPS_S       2000.0f
@@ -118,7 +119,18 @@ HAL_StatusTypeDef TMC2130Motion_Enable(TMC2130Motion_Handle_t *motion, bool enab
     if ((motion == NULL) || (motion->driver == NULL))
         return HAL_ERROR;
 
+    if (enable && Fault_IsCriticalActive())
+        return HAL_ERROR;
+
     motion->enabled = enable;
+
+    if (enable && (motion->state == TMC2130_MOTION_FAULT))
+    {
+        motion->velocity_steps_s = 0.0f;
+        motion->target_steps = motion->position_steps;
+        motion->sync_enabled = false;
+        motion->state = TMC2130_MOTION_IDLE;
+    }
 
     if (!enable)
     {
@@ -132,8 +144,11 @@ HAL_StatusTypeDef TMC2130Motion_Enable(TMC2130Motion_Handle_t *motion, bool enab
 
 HAL_StatusTypeDef TMC2130Motion_MoveTo(TMC2130Motion_Handle_t *motion, float target_steps)
 {
-    if ((motion == NULL) || (motion->driver == NULL) || !motion->enabled)
+    if ((motion == NULL) || (motion->driver == NULL) || !motion->enabled ||
+        Fault_IsCriticalActive())
+    {
         return HAL_ERROR;
+    }
 
     motion->sync_enabled = false;
     motion->target_steps = target_steps;
@@ -177,6 +192,16 @@ void TMC2130Motion_Task(TMC2130Motion_Handle_t *motion, float dt_s)
 {
     if ((motion == NULL) || (motion->driver == NULL) || !motion->enabled)
         return;
+
+    if (Fault_IsCriticalActive())
+    {
+        motion->sync_enabled = false;
+        motion->velocity_steps_s = 0.0f;
+        motion->target_steps = motion->position_steps;
+        motion_stop_output(motion);
+        motion->state = TMC2130_MOTION_FAULT;
+        return;
+    }
 
     if ((motion->state == TMC2130_MOTION_FAULT) || (dt_s <= 0.0f))
         return;
@@ -275,6 +300,7 @@ void TMC2130Motion_Task(TMC2130Motion_Handle_t *motion, float dt_s)
         motion->velocity_steps_s = 0.0f;
         motion_stop_output(motion);
         motion->state = TMC2130_MOTION_FAULT;
+        Fault_Report(FAULT_STEPPER_DRIVER);
     }
 }
 
@@ -282,8 +308,11 @@ HAL_StatusTypeDef TMC2130Motion_EnableBldcSync(TMC2130Motion_Handle_t *motion,
                                                float scale_steps_per_bldc_count,
                                                float offset_steps)
 {
-    if ((motion == NULL) || (motion->driver == NULL) || !motion->enabled)
+    if ((motion == NULL) || (motion->driver == NULL) || !motion->enabled ||
+        Fault_IsCriticalActive())
+    {
         return HAL_ERROR;
+    }
 
     motion->sync_scale_steps_per_bldc_count = scale_steps_per_bldc_count;
     motion->sync_offset_steps = offset_steps;
