@@ -59,7 +59,7 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Drivers/CMSIS/RTOS2/Include/cmsis_os2.h ../Core/Inc/motor_foc.h \
  ../Core/Inc/telemetry.h ../Core/Inc/leds.h ../Core/Inc/buzzer.h \
  ../Core/Inc/drv_spi.h ../TouchGFX/App/app_touchgfx.h \
- ../Core/Inc/tmc2130.h
+ ../Core/Inc/tmc2130.h ../Core/Inc/tmc2130_motion.h ../Core/Inc/tmc2130.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
@@ -125,4 +125,6 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Core/Inc/buzzer.h:
 ../Core/Inc/drv_spi.h:
 ../TouchGFX/App/app_touchgfx.h:
+../Core/Inc/tmc2130.h:
+../Core/Inc/tmc2130_motion.h:
 ../Core/Inc/tmc2130.h:

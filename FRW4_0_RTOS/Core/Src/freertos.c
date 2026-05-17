@@ -35,6 +35,7 @@
 #include "app_touchgfx.h"
 #include "main.h"
 #include "tmc2130.h"
+#include "tmc2130_motion.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -109,6 +110,13 @@ const osThreadAttr_t EXTITask_attributes = {
   .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal4,
 };
+/* Definitions for StepperTask */
+osThreadId_t StepperTaskHandle;
+const osThreadAttr_t StepperTask_attributes = {
+  .name = "StepperTask",
+  .stack_size = 1024 * 4,
+  .priority = (osPriority_t) osPriorityAboveNormal6,
+};
 /* Definitions for HIDQ */
 osMessageQueueId_t HIDQHandle;
 const osMessageQueueAttr_t HIDQ_attributes = {
@@ -127,6 +135,7 @@ void StartHIDTask(void *argument);
 void StartCommTask(void *argument);
 void StartStorageTask(void *argument);
 void StartEXTITask(void *argument);
+void StartStepperTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -145,7 +154,7 @@ static void UIEncoder_Reset(void)
     __HAL_TIM_SET_COUNTER(&htim3, 0);
 }
 
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+void vApplicationStackOverflowHook(xTaskHandle xTask, char *pcTaskName)
 {
     (void)xTask;
     (void)pcTaskName;
@@ -221,6 +230,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of EXTITask */
   EXTITaskHandle = osThreadNew(StartEXTITask, NULL, &EXTITask_attributes);
+
+  /* creation of StepperTask */
+  StepperTaskHandle = osThreadNew(StartStepperTask, NULL, &StepperTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -464,6 +476,24 @@ void StartEXTITask(void *argument)
     osDelay(50);
   }
   /* USER CODE END StartEXTITask */
+}
+
+/* USER CODE BEGIN Header_StartStepperTask */
+/**
+* @brief Function implementing the StepperTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartStepperTask */
+void StartStepperTask(void *argument)
+{
+  /* USER CODE BEGIN StartStepperTask */
+	TickType_t last = xTaskGetTickCount();
+  /* Infinite loop */
+  for(;;)
+      TMC2130Motion_Task(&g_stepper_motion, 0.001f);
+      vTaskDelayUntil(&last, pdMS_TO_TICKS(1));
+  /* USER CODE END StartStepperTask */
 }
 
 /* Private application code --------------------------------------------------*/
