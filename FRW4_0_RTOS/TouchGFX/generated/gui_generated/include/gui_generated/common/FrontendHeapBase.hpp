@@ -12,8 +12,18 @@
 #include <gui/common/FrontendApplication.hpp>
 #include <gui/model/Model.hpp>
 
-#include <gui/screen_screen/screenView.hpp>
-#include <gui/screen_screen/screenPresenter.hpp>
+#include <gui/loadscreen_screen/LoadScreenView.hpp>
+#include <gui/loadscreen_screen/LoadScreenPresenter.hpp>
+#include <gui/screenrpm_screen/ScreenRPMView.hpp>
+#include <gui/screenrpm_screen/ScreenRPMPresenter.hpp>
+#include <gui/screentorque_screen/ScreenTorqueView.hpp>
+#include <gui/screentorque_screen/ScreenTorquePresenter.hpp>
+#include <gui/screendry_screen/ScreenDryView.hpp>
+#include <gui/screendry_screen/ScreenDryPresenter.hpp>
+#include <gui/screensettings_screen/ScreenSettingsView.hpp>
+#include <gui/screensettings_screen/ScreenSettingsPresenter.hpp>
+#include <gui/screendiagnostic_screen/ScreenDiagnosticView.hpp>
+#include <gui/screendiagnostic_screen/ScreenDiagnosticPresenter.hpp>
 
 
 /**
@@ -36,8 +46,13 @@ public:
      * A list of all view types. Must end with meta::Nil.
      * @note All view types used in the application MUST be added to this list!
      */
-    typedef touchgfx::meta::TypeList< screenView,
-            touchgfx::meta::Nil
+    typedef touchgfx::meta::TypeList< LoadScreenView,
+            touchgfx::meta::TypeList< ScreenRPMView,
+            touchgfx::meta::TypeList< ScreenTorqueView,
+            touchgfx::meta::TypeList< ScreenDryView,
+            touchgfx::meta::TypeList< ScreenSettingsView,
+            touchgfx::meta::TypeList< ScreenDiagnosticView,
+            touchgfx::meta::Nil > > > > >
             > GeneratedViewTypes;
 
     /**
@@ -49,8 +64,13 @@ public:
      * A list of all presenter types. Must end with meta::Nil.
      * @note All presenter types used in the application MUST be added to this list!
      */
-    typedef touchgfx::meta::TypeList< screenPresenter,
-            touchgfx::meta::Nil
+    typedef touchgfx::meta::TypeList< LoadScreenPresenter,
+            touchgfx::meta::TypeList< ScreenRPMPresenter,
+            touchgfx::meta::TypeList< ScreenTorquePresenter,
+            touchgfx::meta::TypeList< ScreenDryPresenter,
+            touchgfx::meta::TypeList< ScreenSettingsPresenter,
+            touchgfx::meta::TypeList< ScreenDiagnosticPresenter,
+            touchgfx::meta::Nil > > > > >
             > GeneratedPresenterTypes;
 
     /**
@@ -73,7 +93,7 @@ public:
 
     virtual void gotoStartScreen(FrontendApplication& app)
     {
-        app.gotoscreenScreenNoTransition();
+        app.gotoLoadScreenScreenNoTransition();
     }
 protected:
     FrontendHeapBase(touchgfx::AbstractPartition& presenters, touchgfx::AbstractPartition& views, touchgfx::AbstractPartition& transitions, FrontendApplication& app)

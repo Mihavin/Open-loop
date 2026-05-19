@@ -1,0 +1,13 @@
+../Core/Src/freertos.c:156:14:UIEncoder_GetCounts	1
+../Core/Src/freertos.c:161:13:UIEncoder_Reset	1
+../Core/Src/freertos.c:166:6:vApplicationStackOverflowHook	1
+../Core/Src/freertos.c:179:6:vApplicationMallocFailedHook	1
+../Core/Src/freertos.c:199:6:MX_FREERTOS_Init	9
+../Core/Src/freertos.c:271:6:StartMotorTask	3
+../Core/Src/freertos.c:307:6:StartGUITask	1
+../Core/Src/freertos.c:330:6:StartHIDTask	4
+../Core/Src/freertos.c:376:6:StartCommTask	1
+../Core/Src/freertos.c:394:6:StartStorageTask	1
+../Core/Src/freertos.c:412:6:StartEXTITask	20
+../Core/Src/freertos.c:512:6:StartStepperTask	3
+../Core/Src/freertos.c:552:6:HAL_GPIO_EXTI_Callback	12

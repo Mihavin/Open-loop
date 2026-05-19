@@ -5,6 +5,38 @@
   </Languages>
   <Texts>
     <TextGroup Id="Group1" />
+    <TextGroup Id="Unsorted">
+      <Text Id="__SingleUse_4W5M" Alignment="Left" TypographyId="Large">
+        <Translation Language="GB">Diagnostic</Translation>
+      </Text>
+      <Text Id="__SingleUse_SACW" Alignment="Left" TypographyId="Large">
+        <Translation Language="GB">Settings</Translation>
+      </Text>
+      <Text Id="__SingleUse_LLIH" Alignment="Left" TypographyId="Large">
+        <Translation Language="GB">Dry Mode</Translation>
+      </Text>
+      <Text Id="__SingleUse_GVY5" Alignment="Left" TypographyId="Large">
+        <Translation Language="GB">Torque Mode</Translation>
+      </Text>
+      <Text Id="__SingleUse_594K" Alignment="Center" TypographyId="Default">
+        <Translation Language="GB">Start</Translation>
+      </Text>
+      <Text Id="__SingleUse_SH02" Alignment="Left" TypographyId="Large">
+        <Translation Language="GB">RPM Mode</Translation>
+      </Text>
+      <Text Id="__SingleUse_0VWK" Alignment="Left" TypographyId="Small">
+        <Translation Language="GB">Scan for User Manual</Translation>
+      </Text>
+      <Text Id="__SingleUse_1A5Y" Alignment="Left" TypographyId="Small">
+        <Translation Language="GB">Initializing....</Translation>
+      </Text>
+      <Text Id="FW_Version" Alignment="Left" TypographyId="Default">
+        <Translation Language="GB">Firmware 4.0</Translation>
+      </Text>
+      <Text Id="DeviceName" Alignment="Left" TypographyId="Default">
+        <Translation Language="GB">Dorado Rod Wrapper</Translation>
+      </Text>
+    </TextGroup>
   </Texts>
   <Typographies>
     <Typography Id="Default" Font="verdana.ttf" Size="20" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />

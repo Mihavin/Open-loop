@@ -1,0 +1,13 @@
+../Core/Src/freertos.c:156:14:UIEncoder_GetCounts	4	static
+../Core/Src/freertos.c:161:13:UIEncoder_Reset	4	static
+../Core/Src/freertos.c:166:6:vApplicationStackOverflowHook	24	static,ignoring_inline_asm
+../Core/Src/freertos.c:179:6:vApplicationMallocFailedHook	4	static
+../Core/Src/freertos.c:199:6:MX_FREERTOS_Init	40	static,ignoring_inline_asm
+../Core/Src/freertos.c:271:6:StartMotorTask	24	static
+../Core/Src/freertos.c:307:6:StartGUITask	16	static
+../Core/Src/freertos.c:330:6:StartHIDTask	24	static
+../Core/Src/freertos.c:376:6:StartCommTask	16	static
+../Core/Src/freertos.c:394:6:StartStorageTask	16	static
+../Core/Src/freertos.c:412:6:StartEXTITask	80	static
+../Core/Src/freertos.c:512:6:StartStepperTask	80	static
+../Core/Src/freertos.c:552:6:HAL_GPIO_EXTI_Callback	32	static,ignoring_inline_asm

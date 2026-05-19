@@ -1,0 +1,13 @@
+../Middlewares/ST/touchgfx/framework/include/mvp/Presenter.hpp:37:18:virtual void touchgfx::Presenter::activate()	1
+../Middlewares/ST/touchgfx/framework/include/mvp/Presenter.hpp:47:18:virtual void touchgfx::Presenter::deactivate()	1
+../Middlewares/ST/touchgfx/framework/include/mvp/Presenter.hpp:52:13:touchgfx::Presenter::~Presenter()	1
+../Middlewares/ST/touchgfx/framework/include/mvp/Presenter.hpp:52:13:virtual touchgfx::Presenter::~Presenter()	1
+../Middlewares/ST/touchgfx/framework/include/mvp/Presenter.hpp:58:5:touchgfx::Presenter::Presenter()	1
+../TouchGFX/gui/include/gui/model/ModelListener.hpp:9:5:ModelListener::ModelListener()	1
+../TouchGFX/gui/include/gui/model/ModelListener.hpp:11:13:ModelListener::~ModelListener()	1
+../TouchGFX/gui/include/gui/model/ModelListener.hpp:11:13:virtual ModelListener::~ModelListener()	1
+../TouchGFX/gui/include/gui/screensettings_screen/ScreenSettingsPresenter.hpp:28:13:ScreenSettingsPresenter::~ScreenSettingsPresenter()	1
+../TouchGFX/gui/include/gui/screensettings_screen/ScreenSettingsPresenter.hpp:28:13:virtual ScreenSettingsPresenter::~ScreenSettingsPresenter()	1
+../TouchGFX/gui/src/screensettings_screen/ScreenSettingsPresenter.cpp:4:1:ScreenSettingsPresenter::ScreenSettingsPresenter(ScreenSettingsView&)	1
+../TouchGFX/gui/src/screensettings_screen/ScreenSettingsPresenter.cpp:10:6:virtual void ScreenSettingsPresenter::activate()	1
+../TouchGFX/gui/src/screensettings_screen/ScreenSettingsPresenter.cpp:15:6:virtual void ScreenSettingsPresenter::deactivate()	1

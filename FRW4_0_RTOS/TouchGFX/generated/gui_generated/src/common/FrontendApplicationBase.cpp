@@ -9,8 +9,18 @@
 #include <touchgfx/Texts.hpp>
 #include <touchgfx/hal/HAL.hpp>
 #include <platform/driver/lcd/LCD32bpp.hpp>
-#include <gui/screen_screen/screenView.hpp>
-#include <gui/screen_screen/screenPresenter.hpp>
+#include <gui/loadscreen_screen/LoadScreenView.hpp>
+#include <gui/loadscreen_screen/LoadScreenPresenter.hpp>
+#include <gui/screenrpm_screen/ScreenRPMView.hpp>
+#include <gui/screenrpm_screen/ScreenRPMPresenter.hpp>
+#include <gui/screentorque_screen/ScreenTorqueView.hpp>
+#include <gui/screentorque_screen/ScreenTorquePresenter.hpp>
+#include <gui/screendry_screen/ScreenDryView.hpp>
+#include <gui/screendry_screen/ScreenDryPresenter.hpp>
+#include <gui/screensettings_screen/ScreenSettingsView.hpp>
+#include <gui/screensettings_screen/ScreenSettingsPresenter.hpp>
+#include <gui/screendiagnostic_screen/ScreenDiagnosticView.hpp>
+#include <gui/screendiagnostic_screen/ScreenDiagnosticPresenter.hpp>
 
 using namespace touchgfx;
 
@@ -20,7 +30,8 @@ FrontendApplicationBase::FrontendApplicationBase(Model& m, FrontendHeap& heap)
       frontendHeap(heap),
       model(m)
 {
-    touchgfx::HAL::getInstance()->setDisplayOrientation(touchgfx::ORIENTATION_LANDSCAPE);
+    touchgfx::HAL::getInstance()->setDisplayOrientation(touchgfx::ORIENTATION_PORTRAIT);
+    touchgfx::Texts::setLanguage(GB);
     reinterpret_cast<touchgfx::LCD32bpp&>(touchgfx::HAL::lcd()).enableTextureMapperAll();
     reinterpret_cast<touchgfx::LCD32bpp&>(touchgfx::HAL::lcd()).enableDecompressorL8_All();
     reinterpret_cast<touchgfx::LCD32bpp&>(touchgfx::HAL::lcd()).enableDecompressorRGB();
@@ -30,15 +41,15 @@ FrontendApplicationBase::FrontendApplicationBase(Model& m, FrontendHeap& heap)
  * Screen Transition Declarations
  */
 
-// screen
+// LoadScreen
 
-void FrontendApplicationBase::gotoscreenScreenNoTransition()
+void FrontendApplicationBase::gotoLoadScreenScreenNoTransition()
 {
-    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoscreenScreenNoTransitionImpl);
+    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoLoadScreenScreenNoTransitionImpl);
     pendingScreenTransitionCallback = &transitionCallback;
 }
 
-void FrontendApplicationBase::gotoscreenScreenNoTransitionImpl()
+void FrontendApplicationBase::gotoLoadScreenScreenNoTransitionImpl()
 {
-    touchgfx::makeTransition<screenView, screenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
+    touchgfx::makeTransition<LoadScreenView, LoadScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
 }

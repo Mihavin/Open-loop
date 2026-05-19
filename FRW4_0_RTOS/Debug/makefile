@@ -6,18 +6,28 @@
 -include ../makefile.init
 
 RM := rm -rf
-.DEFAULT_GOAL := all
 
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include TouchGFX/target/generated/subdir.mk
 -include TouchGFX/target/subdir.mk
--include TouchGFX/gui/src/screen_screen/subdir.mk
+-include TouchGFX/gui/src/screentorque_screen/subdir.mk
+-include TouchGFX/gui/src/screensettings_screen/subdir.mk
+-include TouchGFX/gui/src/screenrpm_screen/subdir.mk
+-include TouchGFX/gui/src/screendry_screen/subdir.mk
+-include TouchGFX/gui/src/screendiagnostic_screen/subdir.mk
 -include TouchGFX/gui/src/model/subdir.mk
+-include TouchGFX/gui/src/loadscreen_screen/subdir.mk
 -include TouchGFX/gui/src/common/subdir.mk
 -include TouchGFX/generated/texts/src/subdir.mk
+-include TouchGFX/generated/images/src/__generated/subdir.mk
 -include TouchGFX/generated/images/src/subdir.mk
--include TouchGFX/generated/gui_generated/src/screen_screen/subdir.mk
+-include TouchGFX/generated/gui_generated/src/screentorque_screen/subdir.mk
+-include TouchGFX/generated/gui_generated/src/screensettings_screen/subdir.mk
+-include TouchGFX/generated/gui_generated/src/screenrpm_screen/subdir.mk
+-include TouchGFX/generated/gui_generated/src/screendry_screen/subdir.mk
+-include TouchGFX/generated/gui_generated/src/screendiagnostic_screen/subdir.mk
+-include TouchGFX/generated/gui_generated/src/loadscreen_screen/subdir.mk
 -include TouchGFX/generated/gui_generated/src/common/subdir.mk
 -include TouchGFX/generated/fonts/src/subdir.mk
 -include TouchGFX/App/subdir.mk
@@ -101,8 +111,8 @@ all: main-build
 main-build: FRW4_0_RTOS.elf secondary-outputs
 
 # Tool invocations
-FRW4_0_RTOS.elf FRW4_0_RTOS.map: $(OBJS) $(USER_OBJS) ../STM32H743IITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "FRW4_0_RTOS.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"../STM32H743IITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="FRW4_0_RTOS.map" -Wl,--gc-sections -static -L"../Middlewares/ST/touchgfx/lib/core/cortex_m7/gcc" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+FRW4_0_RTOS.elf FRW4_0_RTOS.map: $(OBJS) $(USER_OBJS) C:\GitHub\Open-loop\FRW4_0_RTOS\STM32H743IITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "FRW4_0_RTOS.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\GitHub\Open-loop\FRW4_0_RTOS\STM32H743IITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="FRW4_0_RTOS.map" -Wl,--gc-sections -static -L"C:\GitHub\Open-loop\FRW3_1_RTOS\Middlewares\ST\touchgfx\lib\core\cortex_m7\gcc" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

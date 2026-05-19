@@ -20,10 +20,25 @@
     <ClCompile Include="..\..\gui\src\common\FrontendApplication.cpp"/>
     <ClCompile Include="..\..\generated\gui_generated\src\common\FrontendApplicationBase.cpp"/>
     <ClCompile Include="..\..\gui\src\model\Model.cpp"/>
-    <ClCompile Include="..\..\gui\src\screen_screen\screenPresenter.cpp"/>
-    <ClCompile Include="..\..\gui\src\screen_screen\screenView.cpp"/>
-    <ClCompile Include="..\..\generated\gui_generated\src\screen_screen\screenViewBase.cpp"/>
     <ClCompile Include="..\..\generated\simulator\src\video\SoftwareMJPEGDecoder.cpp"/>
+    <ClCompile Include="..\..\gui\src\loadscreen_screen\LoadScreenPresenter.cpp"/>
+    <ClCompile Include="..\..\gui\src\loadscreen_screen\LoadScreenView.cpp"/>
+    <ClCompile Include="..\..\generated\gui_generated\src\loadscreen_screen\LoadScreenViewBase.cpp"/>
+    <ClCompile Include="..\..\gui\src\screendiagnostic_screen\ScreenDiagnosticPresenter.cpp"/>
+    <ClCompile Include="..\..\gui\src\screendiagnostic_screen\ScreenDiagnosticView.cpp"/>
+    <ClCompile Include="..\..\generated\gui_generated\src\screendiagnostic_screen\ScreenDiagnosticViewBase.cpp"/>
+    <ClCompile Include="..\..\gui\src\screendry_screen\ScreenDryPresenter.cpp"/>
+    <ClCompile Include="..\..\gui\src\screendry_screen\ScreenDryView.cpp"/>
+    <ClCompile Include="..\..\generated\gui_generated\src\screendry_screen\ScreenDryViewBase.cpp"/>
+    <ClCompile Include="..\..\gui\src\screenrpm_screen\ScreenRPMPresenter.cpp"/>
+    <ClCompile Include="..\..\gui\src\screenrpm_screen\ScreenRPMView.cpp"/>
+    <ClCompile Include="..\..\generated\gui_generated\src\screenrpm_screen\ScreenRPMViewBase.cpp"/>
+    <ClCompile Include="..\..\gui\src\screensettings_screen\ScreenSettingsPresenter.cpp"/>
+    <ClCompile Include="..\..\gui\src\screensettings_screen\ScreenSettingsView.cpp"/>
+    <ClCompile Include="..\..\generated\gui_generated\src\screensettings_screen\ScreenSettingsViewBase.cpp"/>
+    <ClCompile Include="..\..\gui\src\screentorque_screen\ScreenTorquePresenter.cpp"/>
+    <ClCompile Include="..\..\gui\src\screentorque_screen\ScreenTorqueView.cpp"/>
+    <ClCompile Include="..\..\generated\gui_generated\src\screentorque_screen\ScreenTorqueViewBase.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(ApplicationRoot)\assets\texts\texts.xml"/>
@@ -172,11 +187,26 @@
     <ClInclude Include="..\..\generated\simulator\include\simulator\video\MJPEGDecoder.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\model\Model.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\model\ModelListener.hpp"/>
-    <ClInclude Include="..\..\gui\include\gui\screen_screen\screenPresenter.hpp"/>
-    <ClInclude Include="..\..\gui\include\gui\screen_screen\screenView.hpp"/>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screen_screen\screenViewBase.hpp"/>
     <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\common\SimConstants.hpp"/>
     <ClInclude Include="..\..\generated\simulator\include\simulator\video\SoftwareMJPEGDecoder.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\loadscreen_screen\LoadScreenPresenter.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\loadscreen_screen\LoadScreenView.hpp"/>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\loadscreen_screen\LoadScreenViewBase.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\screendiagnostic_screen\ScreenDiagnosticPresenter.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\screendiagnostic_screen\ScreenDiagnosticView.hpp"/>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screendiagnostic_screen\ScreenDiagnosticViewBase.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\screendry_screen\ScreenDryPresenter.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\screendry_screen\ScreenDryView.hpp"/>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screendry_screen\ScreenDryViewBase.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\screenrpm_screen\ScreenRPMPresenter.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\screenrpm_screen\ScreenRPMView.hpp"/>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screenrpm_screen\ScreenRPMViewBase.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\screensettings_screen\ScreenSettingsPresenter.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\screensettings_screen\ScreenSettingsView.hpp"/>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screensettings_screen\ScreenSettingsViewBase.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\screentorque_screen\ScreenTorquePresenter.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\screentorque_screen\ScreenTorqueView.hpp"/>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screentorque_screen\ScreenTorqueViewBase.hpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(ApplicationRoot)\generated\simulator\touchgfx.rc"/>

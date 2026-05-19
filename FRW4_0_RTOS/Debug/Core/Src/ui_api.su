@@ -1,0 +1,16 @@
+../Core/Src/ui_api.c:9:6:UI_GetSnapshot	16	static
+../Core/Src/ui_api.c:32:6:UI_SetBldcMode	16	static
+../Core/Src/ui_api.c:37:6:UI_SetBldcSpeed	16	static
+../Core/Src/ui_api.c:42:6:UI_SetBldcTorque	16	static
+../Core/Src/ui_api.c:47:6:UI_SetBldcPositionRev	16	static
+../Core/Src/ui_api.c:52:6:UI_BldcArm	8	static
+../Core/Src/ui_api.c:57:6:UI_BldcDisarm	8	static
+../Core/Src/ui_api.c:62:6:UI_BldcStop	8	static
+../Core/Src/ui_api.c:67:6:UI_StepperEnable	16	static
+../Core/Src/ui_api.c:72:6:UI_StepperMoveTo	16	static
+../Core/Src/ui_api.c:77:6:UI_StepperMoveBy	16	static
+../Core/Src/ui_api.c:82:6:UI_StepperStop	8	static
+../Core/Src/ui_api.c:87:6:UI_StepperEmergencyStop	8	static
+../Core/Src/ui_api.c:92:6:UI_StepperZero	8	static
+../Core/Src/ui_api.c:99:6:UI_StepperSyncEnable	16	static
+../Core/Src/ui_api.c:104:6:UI_StepperSyncDisable	8	static

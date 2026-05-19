@@ -49,12 +49,23 @@ Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang \
 TouchGFX/App \
 TouchGFX/generated/fonts/src \
 TouchGFX/generated/gui_generated/src/common \
-TouchGFX/generated/gui_generated/src/screen_screen \
+TouchGFX/generated/gui_generated/src/loadscreen_screen \
+TouchGFX/generated/gui_generated/src/screendiagnostic_screen \
+TouchGFX/generated/gui_generated/src/screendry_screen \
+TouchGFX/generated/gui_generated/src/screenrpm_screen \
+TouchGFX/generated/gui_generated/src/screensettings_screen \
+TouchGFX/generated/gui_generated/src/screentorque_screen \
 TouchGFX/generated/images/src \
+TouchGFX/generated/images/src/__generated \
 TouchGFX/generated/texts/src \
 TouchGFX/gui/src/common \
+TouchGFX/gui/src/loadscreen_screen \
 TouchGFX/gui/src/model \
-TouchGFX/gui/src/screen_screen \
+TouchGFX/gui/src/screendiagnostic_screen \
+TouchGFX/gui/src/screendry_screen \
+TouchGFX/gui/src/screenrpm_screen \
+TouchGFX/gui/src/screensettings_screen \
+TouchGFX/gui/src/screentorque_screen \
 TouchGFX/target \
 TouchGFX/target/generated \
 

@@ -10,5 +10,14 @@ KEEP extern const uint32_t indicesGb[] TEXT_LOCATION_FLASH_ATTRIBUTE;
 // Remap all strings
 TEXT_LOCATION_FLASH_PRAGMA
 KEEP extern const uint32_t indicesGb[] TEXT_LOCATION_FLASH_ATTRIBUTE = {
-    0
+    82,  // T___SINGLEUSE_4W5M: "Diagnostic"
+    111, // T___SINGLEUSE_SACW: "Settings"
+    93,  // T___SINGLEUSE_LLIH: "Dry Mode"
+    70,  // T___SINGLEUSE_GVY5: "Torque Mode"
+    120, // T___SINGLEUSE_594K: "Start"
+    102, // T___SINGLEUSE_SH02: "RPM Mode"
+    0,   // T___SINGLEUSE_0VWK: "Scan for User Manual"
+    40,  // T___SINGLEUSE_1A5Y: "Initializing...."
+    57,  // T_FW_VERSION: "Firmware 4.0"
+    21   // T_DEVICENAME: "Dorado Rod Wrapper"
 };

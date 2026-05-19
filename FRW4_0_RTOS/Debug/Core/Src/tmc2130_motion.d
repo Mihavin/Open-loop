@@ -47,7 +47,7 @@ Core/Src/tmc2130_motion.o: ../Core/Src/tmc2130_motion.c \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h \
- ../Core/Inc/motor_foc.h
+ ../Core/Inc/motor_foc.h ../Core/Inc/fault_manager.h
 ../Core/Inc/tmc2130_motion.h:
 ../Core/Inc/tmc2130.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
@@ -98,3 +98,4 @@ Core/Src/tmc2130_motion.o: ../Core/Src/tmc2130_motion.c \
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h:
 ../Core/Inc/motor_foc.h:
+../Core/Inc/fault_manager.h:

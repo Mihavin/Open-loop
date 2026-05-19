@@ -142,29 +142,17 @@
     <Filter Include="Source Files\gui\model">
       <UniqueIdentifier>A8D7485B-F28D-75C0-E0DC-D50241B8D65B</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\gui\screen_screen">
-      <UniqueIdentifier>8BE881D4-95E7-EE93-5CCC-B1D03C7E364C</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\generated\gui_generated">
       <UniqueIdentifier>11853373-CC8C-1E47-2FB2-E99F1C2D62C7</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\gui\common">
       <UniqueIdentifier>67062C5D-7D75-CB58-B9D2-18D0B35BE7EE</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\gui\screen_screen">
-      <UniqueIdentifier>7CE742FF-AC5A-219E-0F64-04E746E61B73</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\generated\gui_generated">
       <UniqueIdentifier>898DFE54-E678-6676-D699-D7200359726E</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\gui\common">
       <UniqueIdentifier>47B37A14-182C-B787-381C-4D11D7BF9830</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\generated\gui_generated\screen_screen">
-      <UniqueIdentifier>790FBC8C-6421-7197-63F3-8354F20BCB98</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\generated\gui_generated\screen_screen">
-      <UniqueIdentifier>6B397A81-05BD-DDC4-0571-50479A3DCCD8</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\generated\simulator\include">
       <UniqueIdentifier>010AAB51-4A03-68CA-A34E-DB7FA245E792</UniqueIdentifier>
@@ -183,6 +171,78 @@
     </Filter>
     <Filter Include="Header Files\generated\simulator\include\simulator\video">
       <UniqueIdentifier>D002DA2C-58FF-0CDA-33D2-E5620C2AF4F7</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\screendry_screen">
+      <UniqueIdentifier>7609E0DD-1F64-C74F-A5C5-9930104E81BB</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\loadscreen_screen">
+      <UniqueIdentifier>A0F7CC4C-CDE5-3335-7A61-604478E58C3C</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\screenrpm_screen">
+      <UniqueIdentifier>27CEF811-208B-3126-7D7A-16A307421B32</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\screendry_screen">
+      <UniqueIdentifier>44EFDA88-4B50-3C81-E45C-F9E4DF71B372</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\screenrpm_screen">
+      <UniqueIdentifier>C8F81FA3-96F5-7A9B-8B62-4A7193FC4307</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\loadscreen_screen">
+      <UniqueIdentifier>731090EF-D77C-FE5F-6879-349DA9098C40</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\screentorque_screen">
+      <UniqueIdentifier>BE8A8D05-9ACD-89BF-10B7-35D27EEDC504</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\screendiagnostic_screen">
+      <UniqueIdentifier>3D3614C6-7E02-6AA1-FC6C-0D773899E9C1</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\screensettings_screen">
+      <UniqueIdentifier>4E6F073D-52DC-A1E0-8D4D-8CA97037BB1C</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\screendiagnostic_screen">
+      <UniqueIdentifier>5FDAA60F-6BD4-E2AF-77AC-7A81A9E0FDB9</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\screensettings_screen">
+      <UniqueIdentifier>CAA3207F-3B13-21AB-1CDF-948EAFF8AEC6</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\screentorque_screen">
+      <UniqueIdentifier>9F7B0920-114E-72C0-85E7-0F6835E14AAD</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\screensettings_screen">
+      <UniqueIdentifier>A0CA07EB-7966-973D-A693-672579209C09</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\screenrpm_screen">
+      <UniqueIdentifier>CFFCA4C8-38DA-55EA-6EC2-CB5E16371261</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\screenrpm_screen">
+      <UniqueIdentifier>5FD4AD25-F508-7CE3-2A91-32237E28FF4A</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\screentorque_screen">
+      <UniqueIdentifier>3D614E1E-B888-2A31-A598-9B7201C8E1A1</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\screendry_screen">
+      <UniqueIdentifier>8780802B-47BC-B157-9602-2F6E96552AD1</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\screendry_screen">
+      <UniqueIdentifier>13E1B940-9CE8-C257-A717-8546E020644B</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\screendiagnostic_screen">
+      <UniqueIdentifier>40EF8C59-9726-52DB-1A20-D3AC66F71DF5</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\screentorque_screen">
+      <UniqueIdentifier>B89EA3DB-EB21-18AE-8296-CA8C1A0EF9D0</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\screendiagnostic_screen">
+      <UniqueIdentifier>BA8A8CE0-AE83-CCF1-C29F-F8ACC8AB8899</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\loadscreen_screen">
+      <UniqueIdentifier>B72FAB4C-5332-90B5-AEFF-D151B2D52F86</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\loadscreen_screen">
+      <UniqueIdentifier>2362A809-BF87-1B82-64AA-2DF676AD8BD1</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\screensettings_screen">
+      <UniqueIdentifier>96348EF2-0693-E9AD-AE58-DAC84ABFF4D5</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -213,17 +273,62 @@
     <ClCompile Include="..\..\gui\src\model\Model.cpp">
       <Filter>Source Files\gui\model</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\screen_screen\screenPresenter.cpp">
-      <Filter>Source Files\gui\screen_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gui\src\screen_screen\screenView.cpp">
-      <Filter>Source Files\gui\screen_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\generated\gui_generated\src\screen_screen\screenViewBase.cpp">
-      <Filter>Source Files\generated\gui_generated\screen_screen</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\generated\simulator\src\video\SoftwareMJPEGDecoder.cpp">
       <Filter>Source Files\generated\simulator\video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\loadscreen_screen\LoadScreenPresenter.cpp">
+      <Filter>Source Files\gui\loadscreen_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\loadscreen_screen\LoadScreenView.cpp">
+      <Filter>Source Files\gui\loadscreen_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\generated\gui_generated\src\loadscreen_screen\LoadScreenViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\loadscreen_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\screendiagnostic_screen\ScreenDiagnosticPresenter.cpp">
+      <Filter>Source Files\gui\screendiagnostic_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\screendiagnostic_screen\ScreenDiagnosticView.cpp">
+      <Filter>Source Files\gui\screendiagnostic_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\generated\gui_generated\src\screendiagnostic_screen\ScreenDiagnosticViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\screendiagnostic_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\screendry_screen\ScreenDryPresenter.cpp">
+      <Filter>Source Files\gui\screendry_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\screendry_screen\ScreenDryView.cpp">
+      <Filter>Source Files\gui\screendry_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\generated\gui_generated\src\screendry_screen\ScreenDryViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\screendry_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\screenrpm_screen\ScreenRPMPresenter.cpp">
+      <Filter>Source Files\gui\screenrpm_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\screenrpm_screen\ScreenRPMView.cpp">
+      <Filter>Source Files\gui\screenrpm_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\generated\gui_generated\src\screenrpm_screen\ScreenRPMViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\screenrpm_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\screensettings_screen\ScreenSettingsPresenter.cpp">
+      <Filter>Source Files\gui\screensettings_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\screensettings_screen\ScreenSettingsView.cpp">
+      <Filter>Source Files\gui\screensettings_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\generated\gui_generated\src\screensettings_screen\ScreenSettingsViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\screensettings_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\screentorque_screen\ScreenTorquePresenter.cpp">
+      <Filter>Source Files\gui\screentorque_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\screentorque_screen\ScreenTorqueView.cpp">
+      <Filter>Source Files\gui\screentorque_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\generated\gui_generated\src\screentorque_screen\ScreenTorqueViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\screentorque_screen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -661,20 +766,65 @@
     <ClInclude Include="..\..\gui\include\gui\model\ModelListener.hpp">
       <Filter>Header Files\gui\model</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screen_screen\screenPresenter.hpp">
-      <Filter>Header Files\gui\screen_screen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screen_screen\screenView.hpp">
-      <Filter>Header Files\gui\screen_screen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screen_screen\screenViewBase.hpp">
-      <Filter>Header Files\generated\gui_generated\screen_screen</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\common\SimConstants.hpp">
       <Filter>Header Files\generated\gui_generated\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\generated\simulator\include\simulator\video\SoftwareMJPEGDecoder.hpp">
       <Filter>Header Files\generated\simulator\include\simulator\video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\loadscreen_screen\LoadScreenPresenter.hpp">
+      <Filter>Header Files\gui\loadscreen_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\loadscreen_screen\LoadScreenView.hpp">
+      <Filter>Header Files\gui\loadscreen_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\loadscreen_screen\LoadScreenViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\loadscreen_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\screendiagnostic_screen\ScreenDiagnosticPresenter.hpp">
+      <Filter>Header Files\gui\screendiagnostic_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\screendiagnostic_screen\ScreenDiagnosticView.hpp">
+      <Filter>Header Files\gui\screendiagnostic_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screendiagnostic_screen\ScreenDiagnosticViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\screendiagnostic_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\screendry_screen\ScreenDryPresenter.hpp">
+      <Filter>Header Files\gui\screendry_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\screendry_screen\ScreenDryView.hpp">
+      <Filter>Header Files\gui\screendry_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screendry_screen\ScreenDryViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\screendry_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\screenrpm_screen\ScreenRPMPresenter.hpp">
+      <Filter>Header Files\gui\screenrpm_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\screenrpm_screen\ScreenRPMView.hpp">
+      <Filter>Header Files\gui\screenrpm_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screenrpm_screen\ScreenRPMViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\screenrpm_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\screensettings_screen\ScreenSettingsPresenter.hpp">
+      <Filter>Header Files\gui\screensettings_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\screensettings_screen\ScreenSettingsView.hpp">
+      <Filter>Header Files\gui\screensettings_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screensettings_screen\ScreenSettingsViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\screensettings_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\screentorque_screen\ScreenTorquePresenter.hpp">
+      <Filter>Header Files\gui\screentorque_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\screentorque_screen\ScreenTorqueView.hpp">
+      <Filter>Header Files\gui\screentorque_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screentorque_screen\ScreenTorqueViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\screentorque_screen</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

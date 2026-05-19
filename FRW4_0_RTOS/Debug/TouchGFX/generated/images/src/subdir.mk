@@ -6,15 +6,21 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../TouchGFX/generated/images/src/BitmapDatabase.cpp \
-../TouchGFX/generated/images/src/SVGDatabase.cpp 
+../TouchGFX/generated/images/src/SVGDatabase.cpp \
+../TouchGFX/generated/images/src/image_Company_Logo__NB_1_-_Copy.cpp \
+../TouchGFX/generated/images/src/image_Untitled.cpp 
 
 OBJS += \
 ./TouchGFX/generated/images/src/BitmapDatabase.o \
-./TouchGFX/generated/images/src/SVGDatabase.o 
+./TouchGFX/generated/images/src/SVGDatabase.o \
+./TouchGFX/generated/images/src/image_Company_Logo__NB_1_-_Copy.o \
+./TouchGFX/generated/images/src/image_Untitled.o 
 
 CPP_DEPS += \
 ./TouchGFX/generated/images/src/BitmapDatabase.d \
-./TouchGFX/generated/images/src/SVGDatabase.d 
+./TouchGFX/generated/images/src/SVGDatabase.d \
+./TouchGFX/generated/images/src/image_Company_Logo__NB_1_-_Copy.d \
+./TouchGFX/generated/images/src/image_Untitled.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -24,7 +30,7 @@ TouchGFX/generated/images/src/%.o TouchGFX/generated/images/src/%.su TouchGFX/ge
 clean: clean-TouchGFX-2f-generated-2f-images-2f-src
 
 clean-TouchGFX-2f-generated-2f-images-2f-src:
-	-$(RM) ./TouchGFX/generated/images/src/BitmapDatabase.cyclo ./TouchGFX/generated/images/src/BitmapDatabase.d ./TouchGFX/generated/images/src/BitmapDatabase.o ./TouchGFX/generated/images/src/BitmapDatabase.su ./TouchGFX/generated/images/src/SVGDatabase.cyclo ./TouchGFX/generated/images/src/SVGDatabase.d ./TouchGFX/generated/images/src/SVGDatabase.o ./TouchGFX/generated/images/src/SVGDatabase.su
+	-$(RM) ./TouchGFX/generated/images/src/BitmapDatabase.cyclo ./TouchGFX/generated/images/src/BitmapDatabase.d ./TouchGFX/generated/images/src/BitmapDatabase.o ./TouchGFX/generated/images/src/BitmapDatabase.su ./TouchGFX/generated/images/src/SVGDatabase.cyclo ./TouchGFX/generated/images/src/SVGDatabase.d ./TouchGFX/generated/images/src/SVGDatabase.o ./TouchGFX/generated/images/src/SVGDatabase.su ./TouchGFX/generated/images/src/image_Company_Logo__NB_1_-_Copy.cyclo ./TouchGFX/generated/images/src/image_Company_Logo__NB_1_-_Copy.d ./TouchGFX/generated/images/src/image_Company_Logo__NB_1_-_Copy.o ./TouchGFX/generated/images/src/image_Company_Logo__NB_1_-_Copy.su ./TouchGFX/generated/images/src/image_Untitled.cyclo ./TouchGFX/generated/images/src/image_Untitled.d ./TouchGFX/generated/images/src/image_Untitled.o ./TouchGFX/generated/images/src/image_Untitled.su
 
 .PHONY: clean-TouchGFX-2f-generated-2f-images-2f-src
 
