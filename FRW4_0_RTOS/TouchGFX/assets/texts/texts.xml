@@ -6,6 +6,18 @@
   <Texts>
     <TextGroup Id="Group1" />
     <TextGroup Id="Unsorted">
+      <Text Id="__SingleUse_6XJE" Alignment="Left" TypographyId="Large">
+        <Translation Language="GB">RPM</Translation>
+      </Text>
+      <Text Id="__SingleUse_9VVZ" Alignment="Left" TypographyId="Default">
+        <Translation Language="GB">02:20:36</Translation>
+      </Text>
+      <Text Id="__SingleUse_22SY" Alignment="Center" TypographyId="Default">
+        <Translation Language="GB">Start</Translation>
+      </Text>
+      <Text Id="rpm_value" Alignment="Left" TypographyId="veryLarge">
+        <Translation Language="GB">200</Translation>
+      </Text>
       <Text Id="__SingleUse_4W5M" Alignment="Left" TypographyId="Large">
         <Translation Language="GB">Diagnostic</Translation>
       </Text>
@@ -21,7 +33,7 @@
       <Text Id="__SingleUse_594K" Alignment="Center" TypographyId="Default">
         <Translation Language="GB">Start</Translation>
       </Text>
-      <Text Id="__SingleUse_SH02" Alignment="Left" TypographyId="Large">
+      <Text Id="__SingleUse_SH02" Alignment="Left" TypographyId="Default">
         <Translation Language="GB">RPM Mode</Translation>
       </Text>
       <Text Id="__SingleUse_0VWK" Alignment="Left" TypographyId="Small">
@@ -42,5 +54,6 @@
     <Typography Id="Default" Font="verdana.ttf" Size="20" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
     <Typography Id="Large" Font="verdana.ttf" Size="40" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
     <Typography Id="Small" Font="verdana.ttf" Size="10" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
+    <Typography Id="veryLarge" Font="verdana.ttf" Size="100" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
   </Typographies>
 </TextDatabase>
