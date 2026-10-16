@@ -85,8 +85,14 @@ typedef struct
     uint32_t spi_timeout_ms;
     uint32_t step_timer_clock_hz; /* 0 = auto-detect from RCC */
 
-    bool step_clock_running;
-    uint32_t step_frequency_hz;
+    volatile int32_t emitted_steps; /* command edges, not measured rotor position */
+    volatile int32_t step_target;
+    volatile uint32_t half_period_ticks;
+    volatile bool step_high;
+    volatile bool stop_requested;
+    int32_t step_direction;
+    volatile bool step_clock_running;
+    volatile uint32_t step_frequency_hz;
 } TMC2130_Handle_t;
 
 typedef struct
@@ -133,6 +139,9 @@ HAL_StatusTypeDef TMC2130_ReadReg(TMC2130_Handle_t *dev, uint8_t addr, uint32_t 
 
 HAL_StatusTypeDef TMC2130_Enable(TMC2130_Handle_t *dev, bool enable);
 void TMC2130_SetDirection(TMC2130_Direction_t dir);
+void TMC2130_SetStepTarget(TMC2130_Handle_t *dev, int32_t target);
+int32_t TMC2130_GetEmittedSteps(const TMC2130_Handle_t *dev);
+HAL_StatusTypeDef TMC2130_ZeroEmittedSteps(TMC2130_Handle_t *dev);
 
 HAL_StatusTypeDef TMC2130_SetStepFrequency(TMC2130_Handle_t *dev, uint32_t frequency_hz);
 HAL_StatusTypeDef TMC2130_StartStepClock(TMC2130_Handle_t *dev, uint32_t frequency_hz);
@@ -140,6 +149,7 @@ HAL_StatusTypeDef TMC2130_StopStepClock(TMC2130_Handle_t *dev);
 bool TMC2130_IsStepClockRunning(const TMC2130_Handle_t *dev);
 uint32_t TMC2130_GetStepFrequencyHz(const TMC2130_Handle_t *dev);
 
+/* Deprecated timed-move API returns HAL_ERROR. Use queued counted motion. */
 HAL_StatusTypeDef TMC2130_MoveBlocking(TMC2130_Handle_t *dev,
                                       int32_t steps,
                                       uint32_t frequency_hz);

@@ -30,6 +30,12 @@ typedef struct
 } UI_SystemSnapshot_t;
 
 void UI_GetSnapshot(UI_SystemSnapshot_t *out);
+typedef enum { UI_CONTROL_KNOB, UI_CONTROL_API } UI_ControlSource_t;
+bool UI_SelectControlSource(UI_ControlSource_t source); /* only while idle */
+UI_ControlSource_t UI_GetControlSource(void);
+void UI_InitCommandQueues(void); /* called before task creation */
+void UI_ProcessStepperCommands(void); /* StepperTask only */
+void UI_PublishStepperSnapshot(void); /* StepperTask only */
 
 void UI_SetBldcMode(MotorFOC_Mode_t mode);
 void UI_SetBldcSpeed(float rpm);

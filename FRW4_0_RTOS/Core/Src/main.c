@@ -42,7 +42,7 @@
 #include "buzzer.h"
 #include "drv_spi.h"
 #include "s25fl256s.h"
-#include "tmc2130.h"
+#include "fault_manager.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -65,8 +65,7 @@ extern SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
 static Buzzer_Handle_t buzzer;
-static TMC2130_Handle_t stepper;
-static drv8323_spi_t g_drv8323 = { .hspi = &hspi1,
+drv8323_spi_t g_drv8323 = { .hspi = &hspi1,
 		.ncs_port = DRV_NSS_GPIO_Port, .ncs_pin = DRV_NSS_Pin, .en_port =
 				DRV_EN_GPIO_Port, .en_pin = DRV_EN_Pin, .spi_timeout_ms = 5, };
 /* USER CODE END PV */
@@ -153,11 +152,7 @@ int main(void)
   MX_TouchGFX_PreOSInit();
   /* USER CODE BEGIN 2 */
 
-	drv8323_cfg_t cfg;
-	drv8323_cfg_set_defaults(&cfg);
-	drv8323_init(&g_drv8323, &cfg);
-	bool pass = false;
-	drv8323_comm_test(&g_drv8323, &pass);
+  /* MotorFOC_Start/Arm configure and verify DRV with timer outputs inhibited. */
 	Buzzer_Init(&buzzer, &htim8);
 	Buzzer_Beep(&buzzer, 2000, 80, 50);
 	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
@@ -175,27 +170,7 @@ int main(void)
 	HAL_Delay(50);
 	HAL_GPIO_WritePin(VIB_GPIO_Port, VIB_Pin, GPIO_PIN_RESET);
 
-//	   MotorFOC_Init();
-//	   MotorFOC_Start();
-//	   MotorFOC_Arm();
-
-//   MotorFOC_Arm();        // FORCE it for now (ignore AUTOSTART)
-	//  MotorFOC_SetMode(MOTOR_FOC_MODE_TORQUE);
-	//  MotorFOC_SetTorqueCurrentA(1.8f);
-	// MotorFOC_SetMode(MOTOR_FOC_MODE_SPEED);
-	//  MotorFOC_SetSpeedRPM(100.0f);
-	/* Example: arm motor control (enable driver + alignment) */
-#if MOTOR_FOC_AUTOSTART
-   /* nothing: autostart is handled inside MotorFOC_Start() */
- #else
-	/* call MotorFOC_Arm() when you are ready to energize the inverter */
-	//MotorFOC_Arm();
-//  MotorFOC_SetMode(MOTOR_FOC_MODE_TORQUE);
-	//  MotorFOC_SetTorqueCurrentA(1.8f);
-	//MotorFOC_SetMode(MOTOR_FOC_MODE_SPEED);
-	//  MotorFOC_SetSpeedRPM(2500.0f);
-
-#endif
+  /* Arming is an explicit application command after calibration. */
 
   /* USER CODE END 2 */
 
@@ -274,7 +249,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_HSE, RCC_MCODIV_10);
+  HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_HSE, RCC_MCODIV_2);
 
   /** Enables the Clock Security System
   */
@@ -311,25 +286,6 @@ void PeriphCommonClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void Stepper_Init(void)
-{
-    TMC2130_Config_t cfg;
-    TMC2130_ConfigDefaults(&cfg);
-
-    cfg.microsteps = 16;
-    cfg.interpolate_256 = true;
-    cfg.ihold = 8;
-    cfg.irun = 16;
-    cfg.ihold_delay = 6;
-
-    /* Uses SPI3 hardware NSS and TIM12_CH2 STEP. */
-    if (TMC2130_Init(&stepper, &hspi3, &htim12, TIM_CHANNEL_2, &cfg) != HAL_OK)
-    {
-        Error_Handler();
-    }
-
-    TMC2130_Enable(&stepper, true);
-}
 /* USER CODE END 4 */
 
  /* MPU Configuration */
@@ -375,7 +331,7 @@ void MPU_Config(void)
   */
   MPU_InitStruct.Number = MPU_REGION_NUMBER2;
   MPU_InitStruct.BaseAddress = 0x90000000;
-  MPU_InitStruct.Size = MPU_REGION_SIZE_256MB;
+  MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
   MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
   MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
   MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
@@ -388,10 +344,11 @@ void MPU_Config(void)
   MPU_InitStruct.Number = MPU_REGION_NUMBER3;
   MPU_InitStruct.BaseAddress = 0xC0000000;
   MPU_InitStruct.Size = MPU_REGION_SIZE_8MB;
-  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
-  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1; /* Normal, non-cacheable SDRAM */
+  MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
   MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
-  MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
   /* Enables the MPU */
@@ -429,6 +386,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
 	/* User can add his own implementation to report the HAL error return state */
+	Fault_Report(FAULT_CPU);
 	__disable_irq();
 	while (1) {
 	}

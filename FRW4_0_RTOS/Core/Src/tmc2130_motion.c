@@ -3,6 +3,7 @@
 #include "motor_foc.h"
 #include "fault_manager.h"
 #include <string.h>
+#include <math.h>
 
 #define TMC2130_MOTION_DEFAULT_MAX_SPEED_STEPS_S       2000.0f
 #define TMC2130_MOTION_DEFAULT_ACCEL_STEPS_S2          4000.0f
@@ -34,17 +35,15 @@ static uint32_t motion_frequency_from_speed(float speed_steps_s)
     float freq = motion_absf(speed_steps_s);
     if (freq < 0.5f)
         return 0u;
+    /* The 16-bit compare engine supports >=8 Hz at its 1 MHz timebase.
+       Position still comes from emitted edges, including this slow tail. */
+    if (freq < 8.0f)
+        return 8u;
 
     if (freq > 4294967295.0f)
         return 0xFFFFFFFFu;
 
     return (uint32_t)(freq + 0.5f);
-}
-
-static bool motion_crossed_target(float old_error, float new_error)
-{
-    return ((old_error > 0.0f) && (new_error <= 0.0f)) ||
-           ((old_error < 0.0f) && (new_error >= 0.0f));
 }
 
 static void motion_stop_output(TMC2130Motion_Handle_t *motion)
@@ -63,12 +62,19 @@ static HAL_StatusTypeDef motion_apply_output(TMC2130Motion_Handle_t *motion)
         return HAL_OK;
     }
 
-    TMC2130_SetDirection((motion->velocity_steps_s < 0.0f) ?
-                         TMC2130_DIR_REVERSE : TMC2130_DIR_FORWARD);
-
+    int32_t direction = motion->velocity_steps_s < 0 ? -1 : 1;
+    if (motion->driver->step_direction != direction)
+    {
+        if (TMC2130_IsStepClockRunning(motion->driver))
+            return TMC2130_StopStepClock(motion->driver);
+        TMC2130_SetDirection(direction < 0 ? TMC2130_DIR_REVERSE : TMC2130_DIR_FORWARD);
+    }
+    int32_t target = (int32_t)roundf(motion->target_steps);
+    if (motion->state == TMC2130_MOTION_STOPPING)
+        target = TMC2130_GetEmittedSteps(motion->driver) + direction * 1000;
+    TMC2130_SetStepTarget(motion->driver, target);
     if (TMC2130_IsStepClockRunning(motion->driver))
         return TMC2130_SetStepFrequency(motion->driver, frequency_hz);
-
     return TMC2130_StartStepClock(motion->driver, frequency_hz);
 }
 
@@ -150,8 +156,9 @@ HAL_StatusTypeDef TMC2130Motion_MoveTo(TMC2130Motion_Handle_t *motion, float tar
         return HAL_ERROR;
     }
 
+    if (!isfinite(target_steps) || fabsf(target_steps) > 1000000.0f) return HAL_ERROR;
     motion->sync_enabled = false;
-    motion->target_steps = target_steps;
+    motion->target_steps = roundf(target_steps);
     motion->state = TMC2130_MOTION_MOVING;
     return HAL_OK;
 }
@@ -180,18 +187,21 @@ HAL_StatusTypeDef TMC2130Motion_EmergencyStop(TMC2130Motion_Handle_t *motion)
     if ((motion == NULL) || (motion->driver == NULL))
         return HAL_ERROR;
 
+    Fault_Report(FAULT_USER_STOP); /* Never wait for a normal pulse-end stop. */
+    motion->enabled = false;
     motion->sync_enabled = false;
     motion->velocity_steps_s = 0.0f;
     motion->target_steps = motion->position_steps;
     motion_stop_output(motion);
-    motion->state = TMC2130_MOTION_IDLE;
+    motion->state = TMC2130_MOTION_FAULT;
     return HAL_OK;
 }
 
 void TMC2130Motion_Task(TMC2130Motion_Handle_t *motion, float dt_s)
 {
-    if ((motion == NULL) || (motion->driver == NULL) || !motion->enabled)
-        return;
+    if ((motion == NULL) || (motion->driver == NULL)) return;
+    motion->position_steps = (float)TMC2130_GetEmittedSteps(motion->driver);
+    if (!motion->enabled) return;
 
     if (Fault_IsCriticalActive())
     {
@@ -206,14 +216,17 @@ void TMC2130Motion_Task(TMC2130Motion_Handle_t *motion, float dt_s)
     if ((motion->state == TMC2130_MOTION_FAULT) || (dt_s <= 0.0f))
         return;
 
-    if (dt_s > TMC2130_MOTION_MAX_DT_S)
-        dt_s = TMC2130_MOTION_MAX_DT_S;
+    if (!isfinite(dt_s) || dt_s > TMC2130_MOTION_MAX_DT_S)
+    { Fault_Report(FAULT_MOTION_TIMEOUT); return; }
 
     if (motion->sync_enabled && (motion->state != TMC2130_MOTION_STOPPING))
     {
         motion->target_steps = motion->sync_offset_steps +
                                ((float)MotorFOC_GetPositionCounts() *
                                 motion->sync_scale_steps_per_bldc_count);
+        if (!isfinite(motion->target_steps) || fabsf(motion->target_steps) > 1000000.0f)
+        { Fault_Report(FAULT_STEPPER_DRIVER); return; }
+        motion->target_steps = roundf(motion->target_steps);
         motion->state = TMC2130_MOTION_SYNC;
     }
 
@@ -229,7 +242,6 @@ void TMC2130Motion_Task(TMC2130Motion_Handle_t *motion, float dt_s)
     else if ((abs_error <= motion->limits.position_tolerance_steps) &&
              (abs_velocity <= motion->limits.min_run_speed_steps_s))
     {
-        motion->position_steps = motion->target_steps;
         motion->velocity_steps_s = 0.0f;
         motion_stop_output(motion);
         if (!motion->sync_enabled)
@@ -267,22 +279,6 @@ void TMC2130Motion_Task(TMC2130Motion_Handle_t *motion, float dt_s)
     {
         motion->velocity_steps_s = motion_signf(desired_velocity) *
                                    motion->limits.min_run_speed_steps_s;
-    }
-
-    float previous_position = motion->position_steps;
-    float old_error = motion->target_steps - previous_position;
-    motion->position_steps += motion->velocity_steps_s * dt_s;
-    float new_error = motion->target_steps - motion->position_steps;
-
-    if ((motion->state != TMC2130_MOTION_SYNC) &&
-        (motion->state != TMC2130_MOTION_STOPPING) &&
-        motion_crossed_target(old_error, new_error))
-    {
-        motion->position_steps = motion->target_steps;
-        motion->velocity_steps_s = 0.0f;
-        motion_stop_output(motion);
-        motion->state = TMC2130_MOTION_IDLE;
-        return;
     }
 
     if ((motion->state == TMC2130_MOTION_STOPPING) &&
