@@ -1,7 +1,7 @@
 Middlewares/Third_Party/FreeRTOS/Source/croutine.o: \
  ../Middlewares/Third_Party/FreeRTOS/Source/croutine.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
- ../Core/Inc/FreeRTOSConfig.h \
+ ../Core/Inc/FreeRTOSConfig.h ../Core/Inc/fault_manager.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
@@ -13,6 +13,7 @@ Middlewares/Third_Party/FreeRTOS/Source/croutine.o: \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/croutine.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
+../Core/Inc/fault_manager.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h:

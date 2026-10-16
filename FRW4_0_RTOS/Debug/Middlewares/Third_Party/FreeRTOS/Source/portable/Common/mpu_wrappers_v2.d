@@ -1,7 +1,7 @@
 Middlewares/Third_Party/FreeRTOS/Source/portable/Common/mpu_wrappers_v2.o: \
  ../Middlewares/Third_Party/FreeRTOS/Source/portable/Common/mpu_wrappers_v2.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
- ../Core/Inc/FreeRTOSConfig.h \
+ ../Core/Inc/FreeRTOSConfig.h ../Core/Inc/fault_manager.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
@@ -20,6 +20,7 @@ Middlewares/Third_Party/FreeRTOS/Source/portable/Common/mpu_wrappers_v2.o: \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_syscall_numbers.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
+../Core/Inc/fault_manager.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h:

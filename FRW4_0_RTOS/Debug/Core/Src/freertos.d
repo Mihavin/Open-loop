@@ -1,6 +1,6 @@
 Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
- ../Core/Inc/FreeRTOSConfig.h \
+ ../Core/Inc/FreeRTOSConfig.h ../Core/Inc/fault_manager.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
@@ -61,9 +61,11 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Core/Inc/drv_spi.h ../TouchGFX/App/app_touchgfx.h \
  ../Core/Inc/tmc2130.h ../Core/Inc/tmc2130_motion.h ../Core/Inc/tmc2130.h \
  ../Core/Inc/fault_manager.h ../Core/Inc/spi.h ../Core/Inc/main.h \
- ../Core/Inc/tim.h
+ ../Core/Inc/tim.h ../Core/Inc/ui_api.h ../Core/Inc/motor_foc.h \
+ ../Core/Inc/tmc2130_motion.h ../Core/Inc/operator_input.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
+../Core/Inc/fault_manager.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h:
@@ -134,3 +136,7 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Core/Inc/spi.h:
 ../Core/Inc/main.h:
 ../Core/Inc/tim.h:
+../Core/Inc/ui_api.h:
+../Core/Inc/motor_foc.h:
+../Core/Inc/tmc2130_motion.h:
+../Core/Inc/operator_input.h:

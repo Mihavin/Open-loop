@@ -48,7 +48,8 @@ Core/Src/ui_api.o: ../Core/Src/ui_api.c ../Core/Inc/ui_api.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h \
- ../Core/Inc/fault_manager.h
+ ../Core/Inc/fault_manager.h ../Drivers/CMSIS/RTOS2/Include/cmsis_os2.h \
+ ../Core/Inc/main.h
 ../Core/Inc/ui_api.h:
 ../Core/Inc/motor_foc.h:
 ../Core/Inc/tmc2130_motion.h:
@@ -101,3 +102,5 @@ Core/Src/ui_api.o: ../Core/Src/ui_api.c ../Core/Inc/ui_api.h \
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h:
 ../Core/Inc/fault_manager.h:
+../Drivers/CMSIS/RTOS2/Include/cmsis_os2.h:
+../Core/Inc/main.h:

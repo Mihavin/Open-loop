@@ -47,7 +47,7 @@ Core/Src/motor_foc.o: ../Core/Src/motor_foc.c ../Core/Inc/motor_foc.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h \
  ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/tim.h \
- ../Core/Inc/leds.h
+ ../Core/Inc/leds.h ../Core/Inc/fault_manager.h ../Core/Inc/drv_spi.h
 ../Core/Inc/motor_foc.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
@@ -101,3 +101,5 @@ Core/Src/motor_foc.o: ../Core/Src/motor_foc.c ../Core/Inc/motor_foc.h \
 ../Core/Inc/main.h:
 ../Core/Inc/tim.h:
 ../Core/Inc/leds.h:
+../Core/Inc/fault_manager.h:
+../Core/Inc/drv_spi.h:

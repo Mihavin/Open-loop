@@ -1,5 +1,9 @@
-../Core/Src/fault_manager.c:5:6:Fault_Report	1
-../Core/Src/fault_manager.c:10:6:Fault_Clear	1
-../Core/Src/fault_manager.c:15:10:Fault_GetActive	1
-../Core/Src/fault_manager.c:20:6:Fault_IsActive	1
-../Core/Src/fault_manager.c:25:6:Fault_IsCriticalActive	1
+../Core/Src/fault_manager.c:8:6:Fault_OutputsOff	5
+../Core/Src/fault_manager.c:26:6:Fault_Report	2
+../Core/Src/fault_manager.c:32:6:Fault_Clear	1
+../Core/Src/fault_manager.c:38:10:Fault_GetActive	1
+../Core/Src/fault_manager.c:43:6:Fault_IsActive	1
+../Core/Src/fault_manager.c:48:6:Fault_IsCriticalActive	1
+../Core/Src/fault_manager.c:53:6:Fault_Heartbeat	2
+../Core/Src/fault_manager.c:59:6:Fault_WatchdogStart	6
+../Core/Src/fault_manager.c:89:6:Fault_WatchdogPoll	4
