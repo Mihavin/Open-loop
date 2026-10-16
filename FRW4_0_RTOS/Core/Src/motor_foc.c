@@ -2,7 +2,7 @@
 /**
   ******************************************************************************
   * @file    motor_foc.c
-  * @brief   Basic FOC implementation for this project (STM32H723 + TIM1 + ADC1/2/3 + TIM2 encoder).
+  * @brief   Basic FOC implementation for this project (STM32H743 + TIM1 + ADC1/2/3 + TIM2 encoder).
   *
   * This module is designed to live entirely in USER code (no CubeMX regeneration conflicts).
   * It uses:
@@ -18,6 +18,19 @@
 #include "adc.h"
 #include "tim.h"
 #include "leds.h"
+#include "fault_manager.h"
+#include "drv_spi.h"
+
+extern drv8323_spi_t g_drv8323;
+static volatile bool g_calibrated;
+static bool g_started;
+static volatile uint32_t g_adc_mask;
+static volatile uint32_t g_sample_tick;
+static uint32_t g_slow_tick;
+static uint32_t g_driver_poll_tick;
+static int32_t g_position_origin;
+static uint32_t g_angle_raw;
+static volatile int32_t g_angle_mod;
 
 #include <math.h>
 
@@ -28,6 +41,7 @@
 
 static inline float clamp_f(float x, float lo, float hi)
 {
+  if (!isfinite(x)) return 0.0f;
   if (x < lo) return lo;
   if (x > hi) return hi;
   return x;
@@ -319,10 +333,21 @@ void MotorFOC_Init(void)
   g_foc.pos_ref_counts = g_foc.pos_counts;
 
   foc_cmd_init(g_foc.pos_counts);
+  g_position_origin = g_foc.pos_counts;
+  g_angle_raw = (uint32_t)g_foc.pos_counts;
+  g_angle_mod = g_foc.pos_counts % MOTOR_FOC_ENCODER_CPR;
 
   g_foc.elec_offset = 0.0f;
 
-  g_foc.dt_i = 1.0f / MOTOR_FOC_PWM_HZ;
+  RCC_ClkInitTypeDef clock = {0};
+  uint32_t latency;
+  HAL_RCC_GetClockConfig(&clock, &latency);
+  uint32_t timer_hz = HAL_RCC_GetPCLK2Freq();
+  if (clock.APB2CLKDivider != RCC_HCLK_DIV1) timer_hz *= 2u;
+  g_foc.dt_i = (float)((htim1.Init.Prescaler + 1u) * 2u * htim1.Init.Period) / (float)timer_hz;
+  g_calibrated = false;
+  g_started = false;
+  g_adc_mask = 0u;
   g_foc.dt_w = 1.0f / MOTOR_FOC_SPEED_HZ;
 
   g_foc.vbus = MOTOR_FOC_VBUS_VOLTS;
@@ -354,83 +379,82 @@ void MotorFOC_Init(void)
   g_foc.enc_prev = (int32_t)__HAL_TIM_GET_COUNTER(&htim2);
 }
 
+static bool foc_configure_driver(void)
+{
+  /* ENABLE low resets registers. Every arm performs a checked configuration
+     while OSSI/OIS force all six timer outputs low. */
+  CLEAR_BIT(htim1.Instance->BDTR, TIM_BDTR_MOE);
+  if (Fault_IsCriticalActive()) return false;
+  drv8323_cfg_t cfg;
+  drv8323_cfg_set_defaults(&cfg);
+  if (drv8323_init(&g_drv8323, &cfg) != HAL_OK ||
+      HAL_GPIO_ReadPin(DRV_NFAULT_GPIO_Port, DRV_NFAULT_Pin) == GPIO_PIN_RESET)
+  {
+    Fault_Report(FAULT_BLDC_DRIVER | FAULT_SPI);
+    return false;
+  }
+  if (Fault_IsCriticalActive()) { Fault_OutputsOff(); return false; }
+  __HAL_TIM_CLEAR_FLAG(&htim1, TIM_FLAG_BREAK);
+  return true;
+}
+
 void MotorFOC_Start(void)
 {
-  HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_SET);
-  HAL_Delay(10);
+  if (g_started || Fault_IsCriticalActive()) return;
+  HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_RESET);
+  pwm_set_duty_abc(0.5f, 0.5f, 0.5f);
+  /* Start all timer channels behind the disabled external driver. */
+  if (HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL) != HAL_OK ||
+      HAL_TIM_Base_Start(&htim1) != HAL_OK ||
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1) != HAL_OK ||
+      HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1) != HAL_OK ||
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2) != HAL_OK ||
+      HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2) != HAL_OK ||
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3) != HAL_OK ||
+      HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3) != HAL_OK ||
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4) != HAL_OK)
+  { Fault_Report(FAULT_CPU); return; }
+  CLEAR_BIT(htim1.Instance->BDTR, TIM_BDTR_MOE);
+  if (!foc_configure_driver()) return;
   HAL_GPIO_WritePin(DRV_CAL_GPIO_Port, DRV_CAL_Pin, GPIO_PIN_SET);
   HAL_Delay(1);
-  HAL_GPIO_WritePin(DRV_CAL_GPIO_Port,DRV_CAL_Pin, GPIO_PIN_RESET);
-  /* Start encoder counter */
-  (void)HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
-  HAL_Delay(1);
-
-  /* Put PWM in a safe 50% duty state before enabling outputs */
-  pwm_set_duty_abc(0.5f, 0.5f, 0.5f);
-
-  /* Ensure TIM1 counter is running (needed for PWM outputs + TRGO2 -> ADC injected trigger) */
-  (void)HAL_TIM_Base_Start(&htim1);
-
-  /* Start PWM timer and complementary outputs (signals will toggle, but driver is disabled) */
-  (void)HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-  (void)HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
-
-  (void)HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-  (void)HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
-
-  (void)HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
-  (void)HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
-
-  /* TIM1 advanced timer outputs require MOE=1 */
-
-
-  /* Start OC4 (used for TRGO2 -> ADC injected trigger) */
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
-
-  /* Start injected ADC conversions:
-   *  - Use ADC1 interrupt as the single "current-loop" trigger
-   *  - Start ADC2/ADC3 without interrupts (we read their injected values in ADC1 callback)
-   */
-  (void)HAL_ADCEx_InjectedStart_IT(&hadc1);
-  (void)HAL_ADCEx_InjectedStart(&hadc2);
-  (void)HAL_ADCEx_InjectedStart(&hadc3);
- __HAL_TIM_MOE_ENABLE(&htim1);
-  /* Start speed loop timer - no need for rtos */
- // (void)HAL_TIM_Base_Start_IT(&htim7);
- // HAL_TIM_Base_Start_IT(&htim6);
-
-  /* Reset calibration accumulators */
+  HAL_GPIO_WritePin(DRV_CAL_GPIO_Port, DRV_CAL_Pin, GPIO_PIN_RESET);
+  if (HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED) != HAL_OK ||
+      HAL_ADCEx_Calibration_Start(&hadc2, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED) != HAL_OK ||
+      HAL_ADCEx_Calibration_Start(&hadc3, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED) != HAL_OK)
+  { Fault_Report(FAULT_ADC); return; }
   g_foc.calib_samples = 0;
-  g_foc.sum_ia = 0;
-  g_foc.sum_ib = 0;
-  g_foc.sum_ic = 0;
+  g_foc.sum_ia = g_foc.sum_ib = g_foc.sum_ic = 0;
+  g_adc_mask = 0;
+  g_sample_tick = g_slow_tick = HAL_GetTick();
+  g_driver_poll_tick = g_slow_tick;
   g_foc.state = MOTOR_FOC_STATE_CALIB;
-
-#if MOTOR_FOC_AUTOSTART
-  /* Autostart will arm once calibration is done */
-#endif
+  /* All three completion callbacks rendezvous before consuming a sample. */
+  HAL_NVIC_SetPriority(ADC3_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(ADC3_IRQn);
+  if (HAL_ADCEx_InjectedStart_IT(&hadc2) != HAL_OK ||
+      HAL_ADCEx_InjectedStart_IT(&hadc3) != HAL_OK ||
+      HAL_ADCEx_InjectedStart_IT(&hadc1) != HAL_OK)
+  { Fault_Report(FAULT_ADC); return; }
+  g_started = true;
 }
 
 static void foc_apply_disarm(void)
 {
-  /* Disable driver outputs */
-  HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_RESET);
-
-  /* Force zero voltage vector (50% duty) */
+  CLEAR_BIT(htim1.Instance->BDTR, TIM_BDTR_MOE);
+  /* Keep driver/ADC/encoder awake for zero-current and standstill monitoring.
+     Emergency shutdown additionally removes driver enable. */
   pwm_set_duty_abc(0.5f, 0.5f, 0.5f);
-
-  g_foc.id_ref = 0.0f;
-  g_foc.iq_ref = 0.0f;
-  g_foc.state  = MOTOR_FOC_STATE_IDLE;
+  g_foc.id_ref = g_foc.iq_ref = g_foc.speed_ref_rpm = 0.0f;
+  g_foc.pi_id.integrator = g_foc.pi_iq.integrator = 0.0f;
+  g_foc.pi_speed.integrator = g_foc.pi_pos.integrator = 0.0f;
+  g_foc.state = Fault_IsCriticalActive() ? MOTOR_FOC_STATE_FAULT : MOTOR_FOC_STATE_IDLE;
 }
 
 static void foc_apply_emergency_stop(void)
 {
-  HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_RESET);
-  pwm_set_duty_abc(0.5f, 0.5f, 0.5f);
-
-  g_foc.id_ref = 0.0f;
-  g_foc.iq_ref = 0.0f;
+  Fault_OutputsOff();
+  g_foc.id_ref = g_foc.iq_ref = g_foc.speed_ref_rpm = 0.0f;
   g_foc.state = MOTOR_FOC_STATE_FAULT;
 }
 
@@ -440,58 +464,39 @@ static void foc_apply_zero_encoder(void)
   g_foc.enc_prev = 0;
   g_foc.pos_counts = 0;
   g_foc.pos_ref_counts = 0;
+  g_position_origin = 0;
+  g_angle_raw = 0;
+  g_angle_mod = 0;
 }
 
 static void foc_apply_stop(void)
 {
   foc_apply_disarm();
-
-//  (void)HAL_TIM_Base_Stop_IT(&htim7);
-
-  (void)HAL_ADCEx_InjectedStop_IT(&hadc1);
-  (void)HAL_ADCEx_InjectedStop(&hadc2);
-  (void)HAL_ADCEx_InjectedStop(&hadc3);
-
-  (void)HAL_TIM_OC_Stop(&htim1, TIM_CHANNEL_4);
-
-  (void)HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
-  (void)HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
-
-  (void)HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
-  (void)HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_2);
-
-  (void)HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_3);
-  (void)HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_3);
-
-  (void)HAL_TIM_Encoder_Stop(&htim2, TIM_CHANNEL_ALL);
-
-  g_foc.state = MOTOR_FOC_STATE_IDLE;
+  /* STOP is a restartable output inhibit; acquisition and encoder keep running. */
+  uint32_t key = foc_irq_lock();
+  g_cmd.speed_ref_rpm = g_cmd.torque_iq_ref_a = 0.0f;
+  g_cmd.position_ref_counts = g_foc.pos_counts;
+  foc_irq_unlock(key);
 }
 
 static void foc_apply_arm(void)
 {
-  LED1_On();
-
-  if (g_foc.state == MOTOR_FOC_STATE_FAULT)
-    return;
-
-  /* Only allow arming after calibration finished */
-  if (g_foc.state == MOTOR_FOC_STATE_CALIB)
-    return;
-
-  /* Enable gate driver */
-  HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_SET);
-
-  /* Enter alignment stage to determine encoder electrical offset */
+  if (!g_started || !g_calibrated || g_foc.state != MOTOR_FOC_STATE_IDLE ||
+      fabsf(g_foc.speed_rpm) > 10.0f || Fault_IsCriticalActive()) return;
+  if (!foc_configure_driver()) return;
+  pwm_set_duty_abc(0.5f, 0.5f, 0.5f);
   g_foc.align_ticks = 0;
   g_foc.id_ref = MOTOR_FOC_ALIGN_ID_A;
   g_foc.iq_ref = 0.0f;
-
-  /* Reset current PI integrators */
-  g_foc.pi_id.integrator = 0.0f;
-  g_foc.pi_iq.integrator = 0.0f;
-
-  g_foc.state = MOTOR_FOC_STATE_ALIGN;
+  g_foc.pi_id.integrator = g_foc.pi_iq.integrator = 0.0f;
+  uint32_t key = foc_irq_lock();
+  if (!Fault_IsCriticalActive() &&
+      HAL_GPIO_ReadPin(DRV_NFAULT_GPIO_Port, DRV_NFAULT_Pin) == GPIO_PIN_SET)
+  {
+    g_foc.state = MOTOR_FOC_STATE_ALIGN;
+    __HAL_TIM_MOE_ENABLE(&htim1); /* Last operation, after configuration/readback. */
+  }
+  foc_irq_unlock(key);
 }
 
 void MotorFOC_Stop(void)
@@ -521,12 +526,15 @@ void MotorFOC_RequestDisarm(void)
 
 void MotorFOC_RequestEmergencyStop(void)
 {
+  Fault_Report(FAULT_USER_STOP);
   foc_request(MOTOR_FOC_REQ_EMERGENCY_STOP);
 }
 
 void MotorFOC_RequestZeroEncoder(void)
 {
   uint32_t primask = foc_irq_lock();
+  if (g_foc.state != MOTOR_FOC_STATE_IDLE || fabsf(g_foc.speed_rpm) > 10.0f)
+  { foc_irq_unlock(primask); return; }
 
   g_cmd.position_ref_counts = 0;
   g_cmd.requests |= MOTOR_FOC_REQ_ZERO_ENCODER;
@@ -542,13 +550,14 @@ void MotorFOC_RequestStop(void)
 
 void MotorFOC_SetMode(MotorFOC_Mode_t mode)
 {
-  if (mode > MOTOR_FOC_MODE_POSITION)
-    return;
-
   uint32_t primask = foc_irq_lock();
+  if ((unsigned)mode > MOTOR_FOC_MODE_POSITION ||
+      (mode != g_cmd.mode && (g_foc.state != MOTOR_FOC_STATE_IDLE || fabsf(g_foc.speed_rpm) > 10.0f)))
+  { foc_irq_unlock(primask); return; }
 
   if (g_cmd.mode != mode)
   {
+    g_position_origin = g_foc.pos_counts;
     g_cmd.mode = mode;
     g_cmd.seq++;
   }
@@ -561,7 +570,8 @@ void MotorFOC_SetCommand(MotorFOC_Mode_t mode,
                          float torque_iq_A,
                          int32_t position_counts)
 {
-  if (mode > MOTOR_FOC_MODE_POSITION)
+  if ((unsigned)mode > MOTOR_FOC_MODE_POSITION ||
+      (mode != g_cmd.mode && (g_foc.state != MOTOR_FOC_STATE_IDLE || fabsf(g_foc.speed_rpm) > 10.0f)))
     return;
 
   speed_rpm = clamp_f(speed_rpm, -MOTOR_FOC_SPEED_MAX_RPM, MOTOR_FOC_SPEED_MAX_RPM);
@@ -569,9 +579,15 @@ void MotorFOC_SetCommand(MotorFOC_Mode_t mode,
 
   uint32_t primask = foc_irq_lock();
 
+  if ((mode != g_cmd.mode) && (g_foc.state != MOTOR_FOC_STATE_IDLE || fabsf(g_foc.speed_rpm) > 10.0f))
+  { foc_irq_unlock(primask); return; }
+  if (mode != g_cmd.mode) g_position_origin = g_foc.pos_counts;
   g_cmd.mode = mode;
   g_cmd.speed_ref_rpm = speed_rpm;
   g_cmd.torque_iq_ref_a = torque_iq_A;
+  int64_t difference = (int64_t)position_counts - g_position_origin;
+  if (difference > MOTOR_FOC_POSITION_MAX_COUNTS) position_counts = g_position_origin + MOTOR_FOC_POSITION_MAX_COUNTS;
+  if (difference < -MOTOR_FOC_POSITION_MAX_COUNTS) position_counts = g_position_origin - MOTOR_FOC_POSITION_MAX_COUNTS;
   g_cmd.position_ref_counts = position_counts;
   g_cmd.seq++;
 
@@ -606,6 +622,9 @@ void MotorFOC_SetPositionCounts(int32_t pos_counts)
 {
   uint32_t primask = foc_irq_lock();
 
+  int64_t difference = (int64_t)pos_counts - g_position_origin;
+  if (difference > MOTOR_FOC_POSITION_MAX_COUNTS) pos_counts = g_position_origin + MOTOR_FOC_POSITION_MAX_COUNTS;
+  if (difference < -MOTOR_FOC_POSITION_MAX_COUNTS) pos_counts = g_position_origin - MOTOR_FOC_POSITION_MAX_COUNTS;
   g_cmd.position_ref_counts = pos_counts;
   g_cmd.seq++;
 
@@ -614,10 +633,12 @@ void MotorFOC_SetPositionCounts(int32_t pos_counts)
 
 void MotorFOC_SetPositionRevolutions(float revolutions)
 {
-  const float counts_f = revolutions * (float)MOTOR_FOC_ENCODER_CPR;
-  const int32_t counts = (int32_t)((counts_f >= 0.0f) ? (counts_f + 0.5f) : (counts_f - 0.5f));
-
-  MotorFOC_SetPositionCounts(counts);
+  if (!isfinite(revolutions)) return;
+  double counts = (double)revolutions * MOTOR_FOC_ENCODER_CPR;
+  /* Bound before conversion, including at the int32 counter endpoints. */
+  if (counts > 2147483647.0) counts = 2147483647.0;
+  if (counts < -2147483648.0) counts = -2147483648.0;
+  MotorFOC_SetPositionCounts((int32_t)counts);
 }
 
 MotorFOC_State_t MotorFOC_GetState(void)
@@ -705,11 +726,21 @@ int32_t MotorFOC_GetPositionCounts(void)
 /* This callback is called from HAL_ADC_IRQHandler() when injected conversion finishes */
 void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
-  if (hadc != &hadc1)
-  {
-    /* Use ADC1 as the single control-loop trigger */
-    return;
-  }
+  if (Fault_IsCriticalActive()) { foc_apply_emergency_stop(); return; }
+  uint32_t bit = hadc == &hadc1 ? 1u : hadc == &hadc2 ? 2u : hadc == &hadc3 ? 4u : 0u;
+  if (!bit) return;
+  if (g_adc_mask & bit) { Fault_Report(FAULT_ADC); return; }
+  g_adc_mask |= bit;
+  if (g_adc_mask != 7u) return;
+  g_adc_mask = 0u;
+  g_sample_tick = HAL_GetTick();
+  /* Integrate unsigned counter differences before reducing modulo CPR. Taking
+     signed CNT % CPR directly jumps electrical angle at either counter wrap. */
+  uint32_t angle_now = __HAL_TIM_GET_COUNTER(&htim2);
+  int32_t angle_delta = (int32_t)(angle_now - g_angle_raw);
+  g_angle_raw = angle_now;
+  g_angle_mod = (int32_t)(((int64_t)g_angle_mod + angle_delta) % MOTOR_FOC_ENCODER_CPR);
+
 
   /* Read injected ADC values (rank 1) */
   const uint32_t raw_ia = HAL_ADCEx_InjectedGetValue(&hadc1, ADC_INJECTED_RANK_1); /* SOA -> phase A */
@@ -732,6 +763,11 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
       g_foc.id_ref = 0.0f;
       g_foc.iq_ref = 0.0f;
 
+      if (g_foc.off_ia < 0.4f * MOTOR_FOC_ADC_FULL_SCALE || g_foc.off_ia > 0.6f * MOTOR_FOC_ADC_FULL_SCALE ||
+          g_foc.off_ib < 0.4f * MOTOR_FOC_ADC_FULL_SCALE || g_foc.off_ib > 0.6f * MOTOR_FOC_ADC_FULL_SCALE ||
+          g_foc.off_ic < 0.4f * MOTOR_FOC_ADC_FULL_SCALE || g_foc.off_ic > 0.6f * MOTOR_FOC_ADC_FULL_SCALE)
+      { Fault_Report(FAULT_ADC); return; }
+      g_calibrated = true;
       g_foc.state = MOTOR_FOC_STATE_IDLE;
 
 #if MOTOR_FOC_AUTOSTART
@@ -758,6 +794,11 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
     return;
   }
 
+  if (fabsf(ia) > MOTOR_FOC_CURRENT_TRIP_A || fabsf(ib) > MOTOR_FOC_CURRENT_TRIP_A ||
+      fabsf(ic) > MOTOR_FOC_CURRENT_TRIP_A || raw_ia < 1024u || raw_ib < 1024u || raw_ic < 1024u ||
+      raw_ia > 64511u || raw_ib > 64511u || raw_ic > 64511u)
+  { Fault_Report(FAULT_CURRENT); return; }
+
   /* Clarke transform (assuming ia+ib+ic ~= 0) */
   const float i_alpha = ia;
   const float i_beta  = (ia + 2.0f * ib) * 0.57735026919f; /* 1/sqrt(3) */
@@ -768,8 +809,7 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 
   if (g_foc.state == MOTOR_FOC_STATE_RUN)
   {
-    const int32_t enc = (int32_t)__HAL_TIM_GET_COUNTER(&htim2);
-    const float mech = get_mech_angle_rad(enc);
+    const float mech = get_mech_angle_rad(g_angle_mod);
     theta = get_elec_angle_rad(mech, g_foc.elec_offset);
     sin_t = sinf(theta);
     cos_t = cosf(theta);
@@ -833,10 +873,44 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
   pwm_set_duty_abc(d_a, d_b, d_c);
 }
 
-/* TIM7 period callback for speed loop + alignment timing */
+/* MotorTask owner: measured elapsed time, nominally 1 ms. */
 void MotorFOC(void)
 {
   MotorFOC_Command_t cmd = foc_cmd_snapshot_and_clear_requests();
+  if (Fault_IsCriticalActive()) { foc_apply_emergency_stop(); return; }
+  uint32_t now = HAL_GetTick();
+  uint32_t elapsed_ms = now - g_slow_tick;
+  if (g_started)
+  {
+    /* Catch a limit already held at boot as well as EXTI edges. */
+    if (HAL_GPIO_ReadPin(LIMIT_BUTTON_GPIO_Port, LIMIT_BUTTON_Pin) == GPIO_PIN_RESET)
+    { Fault_Report(FAULT_LIMIT); return; }
+    if (HAL_GPIO_ReadPin(DRV_NFAULT_GPIO_Port, DRV_NFAULT_Pin) == GPIO_PIN_RESET ||
+        __HAL_TIM_GET_FLAG(&htim1, TIM_FLAG_BREAK))
+    { Fault_Report(FAULT_BLDC_DRIVER); return; }
+    if ((uint32_t)(now - g_sample_tick) > 10u)
+    { Fault_Report(FAULT_ADC); return; }
+    if ((uint32_t)(now - g_driver_poll_tick) >= 50u)
+    {
+      uint16_t status;
+      g_driver_poll_tick = now;
+      if (drv8323_read_reg(&g_drv8323, DRV_REG_FAULT_STATUS_1, &status) != HAL_OK)
+      { Fault_Report(FAULT_SPI); return; }
+      if (drv8323_fault_active(status)) { Fault_Report(FAULT_BLDC_DRIVER); return; }
+    }
+  }
+  if (elapsed_ms > 10u) { Fault_Report(FAULT_MOTION_TIMEOUT); return; }
+  if (elapsed_ms != 0u)
+  {
+    g_slow_tick = now;
+    g_foc.dt_w = (float)elapsed_ms * 0.001f;
+    /* Keep speed feedback live even while disarmed: mode changes use standstill. */
+    int32_t enc = (int32_t)__HAL_TIM_GET_COUNTER(&htim2);
+    int32_t delta = (int32_t)((uint32_t)enc - (uint32_t)g_foc.enc_prev);
+    g_foc.enc_prev = enc;
+    g_foc.pos_counts = enc;
+    g_foc.speed_rpm = (float)delta * 60.0f / ((float)MOTOR_FOC_ENCODER_CPR * g_foc.dt_w);
+  }
 
   if (cmd.requests & MOTOR_FOC_REQ_EMERGENCY_STOP)
   {
@@ -852,18 +926,21 @@ void MotorFOC(void)
 
   if (cmd.requests & MOTOR_FOC_REQ_DISARM)
   {
-    foc_apply_disarm();
+    foc_apply_stop();
+    return; /* A coalesced ARM can never override DISARM. */
   }
 
   if (cmd.requests & MOTOR_FOC_REQ_ZERO_ENCODER)
   {
-    foc_apply_zero_encoder();
+    if (g_foc.state == MOTOR_FOC_STATE_IDLE && fabsf(g_foc.speed_rpm) <= 10.0f) foc_apply_zero_encoder();
   }
 
   if (cmd.requests & MOTOR_FOC_REQ_ARM)
   {
     foc_apply_arm();
   }
+
+  if (elapsed_ms == 0u) return;
 
   if (cmd.mode != g_foc.mode)
   {
@@ -874,13 +951,13 @@ void MotorFOC(void)
 
   if (g_foc.state == MOTOR_FOC_STATE_ALIGN)
   {
-    g_foc.align_ticks++;
+    g_foc.align_ticks += elapsed_ms;
 
     if (g_foc.align_ticks >= g_foc.align_ticks_total)
     {
       /* Capture encoder position while rotor is aligned to theta=0 */
       const int32_t enc = (int32_t)__HAL_TIM_GET_COUNTER(&htim2);
-      const float mech = get_mech_angle_rad(enc);
+      const float mech = get_mech_angle_rad(g_angle_mod);
 
       /* theta_e = pole_pairs*mech + offset; want theta_e==0 at this mech */
       g_foc.elec_offset = -((float)MOTOR_FOC_POLE_PAIRS) * mech;
@@ -903,31 +980,25 @@ void MotorFOC(void)
   if (g_foc.state != MOTOR_FOC_STATE_RUN)
     return;
 
-  /* Speed estimate from encoder delta */
-  const int32_t enc_now = (int32_t)__HAL_TIM_GET_COUNTER(&htim2);
-  g_foc.pos_counts = enc_now;
-  int32_t delta = enc_now - g_foc.enc_prev;
-  g_foc.enc_prev = enc_now;
+  const int32_t enc_now = g_foc.pos_counts;
+  const float rpm = g_foc.speed_rpm;
 
-  /* Convert to mechanical rad/s */
-  const float mech_rad = ((float)delta) * (2.0f * (float)M_PI / (float)MOTOR_FOC_ENCODER_CPR);
-  const float mech_w   = mech_rad / g_foc.dt_w;
-  const float rpm      = mech_w * (60.0f / (2.0f * (float)M_PI));
-  g_foc.speed_rpm = rpm;
 
   if (g_foc.mode == MOTOR_FOC_MODE_SPEED)
   {
-    const float err = cmd.speed_ref_rpm - rpm;
+    float max_delta = 500.0f * g_foc.dt_w; /* conservative motor-rpm/s bring-up ramp */
+    float requested = g_foc.speed_ref_rpm + clamp_f(cmd.speed_ref_rpm - g_foc.speed_ref_rpm, -max_delta, max_delta);
+    const float err = requested - rpm;
 
     float iq_cmd = PI_Run(&g_foc.pi_speed, err, g_foc.dt_w);
     iq_cmd = clamp_f(iq_cmd, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
 
-    g_foc.speed_ref_rpm = cmd.speed_ref_rpm;   /* debug/telemetry copy */
+    g_foc.speed_ref_rpm = requested;   /* debug/telemetry copy */
     foc_set_current_refs(0.0f, iq_cmd);
   }
   else if (g_foc.mode == MOTOR_FOC_MODE_POSITION)
   {
-    const int32_t err_counts = (int32_t)(cmd.position_ref_counts - enc_now);
+    const int64_t err_counts = (int64_t)cmd.position_ref_counts - (int64_t)enc_now;
     const float err_rev = (float)err_counts / (float)MOTOR_FOC_ENCODER_CPR;
 
     float speed_ref = PI_Run(&g_foc.pi_pos, err_rev, g_foc.dt_w);
@@ -953,6 +1024,8 @@ static float theta = 0.0f;
 
 void Motor_OpenLoopStep_20kHz(void)
 {
+    /* Debug entry point cannot bypass arming or a latched fault. */
+    if (Fault_IsCriticalActive() || g_foc.state != MOTOR_FOC_STATE_RUN) return;
     const float electrical_hz = 5.0f;     // start low
     const float dt = 1.0f / 20000.0f;
  //   const float vbus = 24.0f;

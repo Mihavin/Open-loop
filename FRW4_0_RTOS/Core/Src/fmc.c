@@ -34,19 +34,19 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram)
   cmd.CommandTarget          = FMC_SDRAM_CMD_TARGET_BANK1;
   cmd.AutoRefreshNumber      = 1;
   cmd.ModeRegisterDefinition = 0;
-  HAL_SDRAM_SendCommand(hsdram, &cmd, 0x1000);
+  if (HAL_SDRAM_SendCommand(hsdram, &cmd, 0x1000) != HAL_OK) Error_Handler();
 
   HAL_Delay(1);
 
   // Step 2: Precharge all
   cmd.CommandMode = FMC_SDRAM_CMD_PALL;
   cmd.AutoRefreshNumber = 1;
-  HAL_SDRAM_SendCommand(hsdram, &cmd, 0x1000);
+  if (HAL_SDRAM_SendCommand(hsdram, &cmd, 0x1000) != HAL_OK) Error_Handler();
 
   // Step 3: Auto-refresh (usually 8 is safe)
   cmd.CommandMode = FMC_SDRAM_CMD_AUTOREFRESH_MODE;
   cmd.AutoRefreshNumber = 8;
-  HAL_SDRAM_SendCommand(hsdram, &cmd, 0x1000);
+  if (HAL_SDRAM_SendCommand(hsdram, &cmd, 0x1000) != HAL_OK) Error_Handler();
 
   // Step 4: Load Mode Register
   // For MT48LC4M16A2 / similar:
@@ -62,7 +62,7 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram)
   cmd.CommandMode            = FMC_SDRAM_CMD_LOAD_MODE;
   cmd.AutoRefreshNumber      = 1;
   cmd.ModeRegisterDefinition = mode;
-  HAL_SDRAM_SendCommand(hsdram, &cmd, 0x1000);
+  if (HAL_SDRAM_SendCommand(hsdram, &cmd, 0x1000) != HAL_OK) Error_Handler();
 
   // Step 5: Set the refresh rate
   // Refresh period = 64ms, rows = 4096 => 15.625us per row
@@ -72,7 +72,7 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram)
   uint32_t sdclk_hz   = fmc_ker_hz / 2;
   uint32_t refresh    = (uint32_t)((sdclk_hz * 15.625e-6f) - 20.0f);
 
-  HAL_SDRAM_ProgramRefreshRate(hsdram, refresh);
+  if (HAL_SDRAM_ProgramRefreshRate(hsdram, refresh) != HAL_OK) Error_Handler();
 }
 /* USER CODE END 0 */
 
@@ -108,9 +108,9 @@ void MX_FMC_Init(void)
   /* SdramTiming */
   SdramTiming.LoadToActiveDelay = 2;
   SdramTiming.ExitSelfRefreshDelay = 7;
-  SdramTiming.SelfRefreshTime = 4;
-  SdramTiming.RowCycleDelay = 6;
-  SdramTiming.WriteRecoveryTime = 2;
+  SdramTiming.SelfRefreshTime = 5; /* ceil(42 ns / 10.323 ns) */
+  SdramTiming.RowCycleDelay = 7; /* tRC >= tRAS + tRP */
+  SdramTiming.WriteRecoveryTime = 3; /* tWR >= tRAS-tRCD and tRC-tRCD-tRP */
   SdramTiming.RPDelay = 2;
   SdramTiming.RCDDelay = 2;
 

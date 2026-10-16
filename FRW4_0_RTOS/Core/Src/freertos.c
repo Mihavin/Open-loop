@@ -39,6 +39,9 @@
 #include "fault_manager.h"
 #include "spi.h"
 #include "tim.h"
+#include "ui_api.h"
+#include "operator_input.h"
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -134,8 +137,7 @@ const osMessageQueueAttr_t HIDQ_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-static float UIEncoder_GetCounts(void);
-static void UIEncoder_Reset(void);
+static volatile uint32_t g_mode_change_request;
 /* USER CODE END FunctionPrototypes */
 
 void StartMotorTask(void *argument);
@@ -153,21 +155,12 @@ void vApplicationStackOverflowHook(xTaskHandle xTask, char *pcTaskName);
 void vApplicationMallocFailedHook(void);
 
 /* USER CODE BEGIN 4 */
-static float UIEncoder_GetCounts(void)
-{
-    return (float)__HAL_TIM_GET_COUNTER(&htim3);
-}
-
-static void UIEncoder_Reset(void)
-{
-    __HAL_TIM_SET_COUNTER(&htim3, 0);
-}
-
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
     (void)xTask;
     (void)pcTaskName;
 
+    Fault_Report(FAULT_CPU);
     taskDISABLE_INTERRUPTS();
     for (;;)
     {
@@ -178,6 +171,9 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 /* USER CODE BEGIN 5 */
 void vApplicationMallocFailedHook(void)
 {
+    Fault_Report(FAULT_CPU);
+    taskDISABLE_INTERRUPTS();
+    for (;;) {}
    /* vApplicationMallocFailedHook() will only be called if
    configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h. It is a hook
    function that will get called if a call to pvPortMalloc() fails.
@@ -218,6 +214,7 @@ void MX_FREERTOS_Init(void) {
   HIDQHandle = osMessageQueueNew (8, sizeof(uint16_t), &HIDQ_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
+  UI_InitCommandQueues();
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
@@ -275,19 +272,15 @@ void StartMotorTask(void *argument)
 
     MotorFOC_Init();
     MotorFOC_Start();
-    while (MotorFOC_GetState() == MOTOR_FOC_STATE_CALIB)
-    {
-        osDelay(1);
-    }
-   // MotorFOC_Arm();
-    MotorFOC_SetMode(MOTOR_FOC_MODE_SPEED);
-  //  MotorFOC_SetSpeedRPM(1500);
+    Fault_WatchdogStart();
     TickType_t last_wake = xTaskGetTickCount();
    // bool armed = false;
 
     for (;;)
     {
-        MotorFOC();      // runs alignment timing + speed loop
+        Fault_Heartbeat(FAULT_HEALTH_MOTOR);
+        Fault_WatchdogPoll();
+        MotorFOC();
         if (MotorFOC_GetState() == MOTOR_FOC_STATE_FAULT)
         {
             Fault_Report(FAULT_BLDC_DRIVER);
@@ -330,39 +323,74 @@ void StartGUITask(void *argument)
 void StartHIDTask(void *argument)
 {
   /* USER CODE BEGIN StartHIDTask */
-  /* Infinite loop */
-  for(;;)
+  (void)argument;
+  uint32_t previous = __HAL_TIM_GET_COUNTER(&htim3);
+  UI_ControlSource_t previous_source = UI_GetControlSource();
+  float setpoint = 0.0f;
+  float position_origin_rev = 0.0f;
+  MotorFOC_Mode_t mode = MotorFOC_GetRequestedMode();
+  bool changing = false;
+  uint32_t change_start = 0, standstill_start = 0;
+  for (;;)
   {
-
-
-	  //	float ped_enc = (float)__HAL_TIM_GET_COUNTER(&htim4);
-		ped_enc = UIEncoder_GetCounts();
-	  /*
-		if (UI_enc != bight)
-		{
-			__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, UI_enc);
-			bight = UI_enc;
-		}
-	  */
-		const MotorFOC_Mode_t requested_mode = MotorFOC_GetRequestedMode();
-
-		if (requested_mode == MOTOR_FOC_MODE_POSITION)
-		{
-			MotorFOC_SetPositionRevolutions(ped_enc * 0.1f);
-		}
-		else if (requested_mode == MOTOR_FOC_MODE_SPEED)
-		{
-			MotorFOC_SetSpeedRPM(ped_enc);
-		}
-		else if (requested_mode == MOTOR_FOC_MODE_TORQUE)
-		{
-			MotorFOC_SetTorqueCurrentA(ped_enc * 0.01f);
-		}
-
-
-    osDelay(100);
+    Fault_Heartbeat(FAULT_HEALTH_HID);
+    uint32_t now = HAL_GetTick();
+    uint32_t count = __HAL_TIM_GET_COUNTER(&htim3);
+    int32_t delta = Operator_EncoderDelta(count, previous, __HAL_TIM_GET_AUTORELOAD(&htim3) + 1u);
+    previous = count;
+    UI_ControlSource_t source = UI_GetControlSource();
+    if (source != previous_source || mode != MotorFOC_GetRequestedMode())
+    { setpoint = 0; delta = 0; mode = MotorFOC_GetRequestedMode();
+      position_origin_rev = (float)MotorFOC_GetPositionCounts() / MOTOR_FOC_ENCODER_CPR; }
+    previous_source = source;
+    if (__atomic_exchange_n(&g_mode_change_request, 0u, __ATOMIC_ACQ_REL) && !changing)
+    {
+      MotorFOC_RequestStop();
+      changing = true; change_start = now; standstill_start = 0;
+    }
+    if (changing)
+    {
+      /* Nonblocking: EXTI can continue handling limits while motion coasts. */
+      if ((uint32_t)(now - change_start) > 2000u)
+      { Fault_Report(FAULT_MOTION_TIMEOUT); changing = false; }
+      else if (MotorFOC_GetState() == MOTOR_FOC_STATE_IDLE && fabsf(MotorFOC_GetSpeedRPM()) <= 10.0f)
+      {
+        if (!standstill_start) standstill_start = now;
+        if ((uint32_t)(now - standstill_start) >= 100u)
+        {
+          mode = (MotorFOC_Mode_t)(((unsigned)mode + 1u) % 3u);
+          MotorFOC_SetMode(mode);
+          MotorFOC_SetCommand(mode, 0, 0, MotorFOC_GetPositionCounts());
+          setpoint = 0; changing = false;
+          position_origin_rev = (float)MotorFOC_GetPositionCounts() / MOTOR_FOC_ENCODER_CPR;
+          /* Deliberately no encoder zero and no implicit re-arm. */
+        }
+      }
+      else standstill_start = 0;
+    }
+    else if (source == UI_CONTROL_KNOB && delta != 0 && !Fault_IsCriticalActive())
+    {
+      uint32_t key = __get_PRIMASK(); __disable_irq();
+      if (UI_GetControlSource() != UI_CONTROL_KNOB) { __set_PRIMASK(key); osDelay(10); continue; }
+      if (mode == MOTOR_FOC_MODE_SPEED)
+      {
+        setpoint = Operator_AddBounded(setpoint, (float)delta * MOTOR_FOC_GEAR_RATIO, MOTOR_FOC_SPEED_MAX_RPM);
+        MotorFOC_SetSpeedRPM(setpoint); /* one count = one shaft rpm */
+      }
+      else if (mode == MOTOR_FOC_MODE_TORQUE)
+      {
+        setpoint = Operator_AddBounded(setpoint, (float)delta * 0.01f, MOTOR_FOC_IQ_MAX_A);
+        MotorFOC_SetTorqueCurrentA(setpoint);
+      }
+      else
+      {
+        setpoint = Operator_AddBounded(setpoint, (float)delta * 0.1f * MOTOR_FOC_GEAR_RATIO, MOTOR_FOC_POSITION_MAX_REVS);
+        MotorFOC_SetPositionRevolutions(position_origin_rev + setpoint);
+      }
+      __set_PRIMASK(key);
+    }
+    osDelay(10);
   }
-
   /* USER CODE END StartHIDTask */
 }
 
@@ -412,7 +440,7 @@ void StartStorageTask(void *argument)
 void StartEXTITask(void *argument)
 {
   /* USER CODE BEGIN StartEXTITask */
-	uint32_t ui_button_click_count = 0;
+
     uint32_t events;
 
     // per-input debounce timestamps
@@ -451,32 +479,13 @@ void StartEXTITask(void *argument)
       if ((events & EVT_FAN) && (now - t_fan) > db)
       {
           t_fan = now;
-          Fault_Report(FAULT_FAN);
+          /* This net is the PWM command; no rotation feedback exists. */
       }
 
       if ((events & EVT_UI) && (now - t_ui) > db)
       {
           t_ui = now;
-          ped_enc = 0;
-          TickType_t wait_start = xTaskGetTickCount();
-          while (MotorFOC_GetSpeedRPM() > 10.0f)
-          {
-              if ((xTaskGetTickCount() - wait_start) > pdMS_TO_TICKS(2000))
-              {
-                  break;
-              }
-
-              osDelay(5);
-          }
-
-          ui_button_click_count++;
-          if (ui_button_click_count > 2) {ui_button_click_count = 0;}
-          MotorFOC_SetMode(ui_button_click_count); //toggle modes
-          UIEncoder_Reset();
-
-          MotorFOC_RequestDisarm();
-          MotorFOC_RequestZeroEncoder();
-          MotorFOC_RequestArm();
+          __atomic_store_n(&g_mode_change_request, 1u, __ATOMIC_RELEASE);
       }
 
       if ((events & EVT_ENC_I) && (now - t_enc_I) > db)
@@ -541,7 +550,25 @@ void StartStepperTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-      TMC2130Motion_Task(&g_stepper_motion, 0.001f);
+      static TickType_t previous = 0;
+      TickType_t now = xTaskGetTickCount();
+      float dt = previous ? (float)(now - previous) / configTICK_RATE_HZ : 0.001f;
+      previous = now;
+      Fault_Heartbeat(FAULT_HEALTH_STEPPER);
+      UI_ProcessStepperCommands();
+      static TickType_t status_tick = 0;
+      if ((TickType_t)(now - status_tick) >= pdMS_TO_TICKS(50))
+      {
+          uint32_t status, gstat;
+          status_tick = now;
+          if (TMC2130_ReadDRVStatus(&g_tmc2130, &status) != HAL_OK ||
+              TMC2130_ReadGSTAT(&g_tmc2130, &gstat) != HAL_OK)
+              Fault_Report(FAULT_STEPPER_DRIVER | FAULT_SPI);
+          else if ((status & ((1u << 25) | (1u << 27) | (1u << 28))) || (gstat & 7u))
+              Fault_Report(FAULT_STEPPER_DRIVER); /* overtemperature, short or reset/UV */
+      }
+      TMC2130Motion_Task(&g_stepper_motion, dt);
+      UI_PublishStepperSnapshot();
       vTaskDelayUntil(&last, pdMS_TO_TICKS(1));
   }
   /* USER CODE END StartStepperTask */
@@ -554,13 +581,17 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     BaseType_t hpw = pdFALSE;
     uint32_t bits = 0;
 
-    if (GPIO_Pin == LIMIT_BUTTON_Pin) bits |= EVT_LIMIT;
+    if (GPIO_Pin == LIMIT_BUTTON_Pin)
+    {
+        Fault_Report(FAULT_LIMIT); /* Immediate output inhibit, before debounce/task notification. */
+        bits |= EVT_LIMIT;
+    }
 
     if (GPIO_Pin == SIDE_BUTTON_Pin)  bits |= EVT_SIDE;
 
     if (GPIO_Pin == BACK_BUTTON_Pin)  bits |= EVT_BACK;
 
-    if (GPIO_Pin == FAN_FAULT_Pin)  bits |= EVT_FAN;
+    /* FAN_FAULT is actually the MAX31740 PWM output; never report it as a fault. */
 
     if (GPIO_Pin == UI_ENC_BUTTON_Pin) bits |= EVT_UI;
 

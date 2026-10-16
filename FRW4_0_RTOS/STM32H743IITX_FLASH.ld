@@ -34,7 +34,7 @@ MEMORY
   RAM_D2  (xrw) : ORIGIN = 0x30000000, LENGTH = 32K
   RAM_D3  (xrw) : ORIGIN = 0x38000000, LENGTH = 16K
 
-  ExtFlash (rx) : ORIGIN = 0x90000000, LENGTH = 64M    /* QSPI mapped */
+  ExtFlash (rx) : ORIGIN = 0x90000000, LENGTH = 32M    /* QSPI mapped */
   SDRAM (xrw)   : ORIGIN = 0xC0000000, LENGTH = 8M
 }
 

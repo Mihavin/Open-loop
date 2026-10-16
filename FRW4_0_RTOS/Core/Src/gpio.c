@@ -77,7 +77,8 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOD, DC_EN_Pin|LED2_Pin|LED1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, DRV_ENN_Pin|QSPI_RST_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(DRV_ENN_GPIO_Port, DRV_ENN_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOG, QSPI_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(ENC_NSS_GPIO_Port, ENC_NSS_Pin, GPIO_PIN_SET);
@@ -146,7 +147,8 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : FAN_FAULT_Pin */
   GPIO_InitStruct.Pin = FAN_FAULT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  /* MAX31740 PWM command monitor, not a tachometer or fault. */
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(FAN_FAULT_GPIO_Port, &GPIO_InitStruct);
 

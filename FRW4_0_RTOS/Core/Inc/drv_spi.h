@@ -121,20 +121,21 @@ typedef enum { DRV_CSA_GAIN_5=0, DRV_CSA_GAIN_10=1, DRV_CSA_GAIN_20=2, DRV_CSA_G
 typedef enum { DRV_SEN_LVL_0P25=0, DRV_SEN_LVL_0P5=1, DRV_SEN_LVL_0P75=2, DRV_SEN_LVL_1P0=3 } drv_sen_lvl_t;
 
 // ============================ Default register values ============================
-// These are the datasheet reset defaults for 11-bit fields.
+// Conservative board bring-up policy, not the silicon reset defaults.
+// 120 mA source / 240 mA sink; qualify switching and fault waveforms on hardware.
 #define DRV_DEFAULT_REG2  (0u)                                           // Driver Control: all 0, PWM_MODE=00
 #define DRV_DEFAULT_REG3  ((DRV_LOCK_UNLOCK_CODE<<DRV_GDHS_LOCK_Pos) |   \
-                           (0xFu<<DRV_GDHS_IDRIVEP_HS_Pos) |             \
-                           (0xFu<<DRV_GDHS_IDRIVEN_HS_Pos))              // LOCK=011, IDRIVEP_HS=1111, IDRIVEN_HS=1111
-#define DRV_DEFAULT_REG4  ((1u<<DRV_GDLS_CBC_Pos) |                      \
+                           (0x4u<<DRV_GDHS_IDRIVEP_HS_Pos) |             \
+                           (0x4u<<DRV_GDHS_IDRIVEN_HS_Pos))
+#define DRV_DEFAULT_REG4  ((0u<<DRV_GDLS_CBC_Pos) |                      \
                            (DRV_TDRIVE_4000NS<<DRV_GDLS_TDRIVE_Pos) |    \
-                           (0xFu<<DRV_GDLS_IDRIVEP_LS_Pos) |             \
-                           (0xFu<<DRV_GDLS_IDRIVEN_LS_Pos))              // CBC=1, TDRIVE=11, IDRIVEP/IDRIVEN=1111
+                           (0x4u<<DRV_GDLS_IDRIVEP_LS_Pos) |             \
+                           (0x4u<<DRV_GDLS_IDRIVEN_LS_Pos))
 #define DRV_DEFAULT_REG5  ((0u<<DRV_OCP_TRETRY_Pos) |                    \
-                           (DRV_DEADTIME_100NS<<DRV_OCP_DEAD_TIME_Pos) | \
-                           (DRV_OCP_MODE_RETRY<<DRV_OCP_OCP_MODE_Pos) |  \
-                           (DRV_OCP_DEG_4US<<DRV_OCP_OCP_DEG_Pos) |      \
-                           (0x9u<<DRV_OCP_VDS_LVL_Pos))                  // VDS_LVL=1001
+                           (DRV_DEADTIME_200NS<<DRV_OCP_DEAD_TIME_Pos) | \
+                           (DRV_OCP_MODE_LATCH<<DRV_OCP_OCP_MODE_Pos) |  \
+                           (DRV_OCP_DEG_2US<<DRV_OCP_OCP_DEG_Pos) |      \
+                           (0x0u<<DRV_OCP_VDS_LVL_Pos))                  // 60 mV: qualify for switching false trips
 #define DRV_DEFAULT_REG6  ((0u<<DRV_CSA_CSA_FET_Pos) |                   \
                            (1u<<DRV_CSA_VREF_DIV_Pos) |                  \
                            (0u<<DRV_CSA_LS_REF_Pos) |                    \
@@ -143,7 +144,7 @@ typedef enum { DRV_SEN_LVL_0P25=0, DRV_SEN_LVL_0P5=1, DRV_SEN_LVL_0P75=2, DRV_SE
                            (0u<<DRV_CSA_CSA_CAL_A_Pos) |                 \
                            (0u<<DRV_CSA_CSA_CAL_B_Pos) |                 \
                            (0u<<DRV_CSA_CSA_CAL_C_Pos) |                 \
-                           (DRV_SEN_LVL_1P0<<DRV_CSA_SEN_LVL_Pos))
+                           (DRV_SEN_LVL_0P25<<DRV_CSA_SEN_LVL_Pos))
 
 // ============================ Driver object / config ============================
 typedef struct
@@ -174,16 +175,14 @@ typedef struct
 void     drv8323_cfg_set_defaults(drv8323_cfg_t *cfg);
 
 HAL_StatusTypeDef drv8323_init(drv8323_spi_t *dev, const drv8323_cfg_t *cfg);
+HAL_StatusTypeDef drv8323_verify_config(drv8323_spi_t *dev, const drv8323_cfg_t *cfg);
 
 HAL_StatusTypeDef drv8323_read_reg (drv8323_spi_t *dev, drv_reg_t reg, uint16_t *data11);
 HAL_StatusTypeDef drv8323_write_reg(drv8323_spi_t *dev, drv_reg_t reg, uint16_t data11, uint16_t *prev_data11);
 
 HAL_StatusTypeDef drv8323_clear_faults(drv8323_spi_t *dev);
 
-// Simple comms self-test:
-// - Reads status regs
-// - Writes a pattern to a RW reg (Gate Drive LS) and reads back
-// - Restores original value
+// Non-mutating readback of the board defaults and fault status.
 HAL_StatusTypeDef drv8323_comm_test(drv8323_spi_t *dev, bool *pass);
 
 // Helper: decode “any fault active” from status1 bit10

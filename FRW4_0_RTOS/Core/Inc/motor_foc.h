@@ -13,7 +13,7 @@
   *          SOB -> PA6  -> ADC2  (Phase B current)
   *          SOC -> PF7  -> ADC3  (Phase C current)
   *   - Encoder: TIM2 CH1/CH2 on PA0/PA1
-  *   - Driver enable: EN_DRV pin (GPIOC, PC14)
+  *   - Driver enable: DRV_EN pin (GPIOF, PF6)
   *
   * Notes:
   *  - You MUST set the motor/board-specific constants below (shunt, gain, pole pairs, encoder CPR, bus voltage).
@@ -69,21 +69,21 @@ typedef enum
 #endif
 
 #ifndef MOTOR_FOC_ADC_VREF
-#define MOTOR_FOC_ADC_VREF            (3.35f)       /* ADC reference voltage */
+#define MOTOR_FOC_ADC_VREF            (3.0f)       /* ADC reference voltage */
 #endif
 
 #ifndef MOTOR_FOC_ADC_FULL_SCALE
-#define MOTOR_FOC_ADC_FULL_SCALE      (65536.0f)    /* 12-bit ADC -> 4096 */
+#define MOTOR_FOC_ADC_FULL_SCALE      (65536.0f)    /* 16-bit ADC */
 #endif
 
 /* DC bus voltage (if you don't measure it, set nominal here) */
 #ifndef MOTOR_FOC_VBUS_VOLTS
-#define MOTOR_FOC_VBUS_VOLTS          (24.0f)
+#define MOTOR_FOC_VBUS_VOLTS          (15.0f)
 #endif
 
 /* Control rates */
 #ifndef MOTOR_FOC_PWM_HZ
-#define MOTOR_FOC_PWM_HZ              (40000.0f)   /* should match TIM1 PWM frequency */
+#define MOTOR_FOC_PWM_HZ              (225000000.0f / (2.0f * 2.0f * 2812.0f))   /* should match TIM1 PWM frequency */
 #endif
 
 #ifndef MOTOR_FOC_SPEED_HZ
@@ -100,7 +100,7 @@ typedef enum
 #endif
 
 #ifndef MOTOR_FOC_SPEED_MAX_RPM
-#define MOTOR_FOC_SPEED_MAX_RPM       (3000.0f)
+#define MOTOR_FOC_SPEED_MAX_RPM       (2000.0f) /* motor rpm = 1,000 shaft rpm at 2:1 */
 #endif
 
 /* Alignment (encoder offset calibration) */
@@ -158,20 +158,28 @@ typedef enum
  *  - If 1: after offset calibration it performs alignment and enters RUN automatically.
  */
 #ifndef MOTOR_FOC_AUTOSTART
-#define MOTOR_FOC_AUTOSTART           (1)
+#define MOTOR_FOC_AUTOSTART           (0)
 #endif
+#if MOTOR_FOC_AUTOSTART
+#error "Production firmware requires explicit arming"
+#endif
+/* Bring-up limits; qualify these against the exact motor and mechanism. */
+#define MOTOR_FOC_CURRENT_TRIP_A (3.2f)
+#define MOTOR_FOC_POSITION_MAX_REVS (10.0f)
+#define MOTOR_FOC_POSITION_MAX_COUNTS ((int32_t)(MOTOR_FOC_POSITION_MAX_REVS * MOTOR_FOC_ENCODER_CPR))
+#define MOTOR_FOC_GEAR_RATIO (2.0f)
 /* -------------------------------------------------------------------------- */
 
 void MotorFOC_Init(void);
 void MotorFOC_Start(void);
 
-/* Queue a controlled peripheral shutdown; applied by the MotorFOC() owner loop. */
+/* Queue output inhibit/coast; acquisition and encoder remain live for restart. */
 void MotorFOC_Stop(void);
 
 /* Queue driver enable and alignment; applied by the MotorFOC() slow loop. */
 void MotorFOC_Arm(void);
 
-/* Queue driver disable; applied by the MotorFOC() slow loop. */
+/* Queue PWM output inhibit; applied by the MotorFOC() owner loop. */
 void MotorFOC_Disarm(void);
 
 void MotorFOC_RequestArm(void);
