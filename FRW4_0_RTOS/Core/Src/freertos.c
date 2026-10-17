@@ -55,7 +55,7 @@ extern TIM_HandleTypeDef htim5;
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 // bitmask events
-#define EVT_LIMIT   (1u << 0)
+#define EVT_PEDAL_HOME (1u << 0)
 #define EVT_SIDE    (1u << 1)
 #define EVT_BACK    (1u << 2)
 #define EVT_FAN	    (1u << 3)
@@ -455,11 +455,11 @@ void StartEXTITask(void *argument)
 
       TickType_t now = xTaskGetTickCount();
 
-      if ((events & EVT_LIMIT) && (now - t_limit) > db)
+      if ((events & EVT_PEDAL_HOME) && (now - t_limit) > db)
       {
           t_limit = now;
-          Fault_Report(FAULT_LIMIT);
-          __HAL_TIM_SET_COUNTER(&htim4, 0); //reset pedal counter
+          /* Pedal home switch: re-zero the pedal encoder. Not a fault. */
+          __HAL_TIM_SET_COUNTER(&htim4, 0);
 
       }
 
@@ -581,11 +581,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     BaseType_t hpw = pdFALSE;
     uint32_t bits = 0;
 
-    if (GPIO_Pin == LIMIT_BUTTON_Pin)
-    {
-        Fault_Report(FAULT_LIMIT); /* Immediate output inhibit, before debounce/task notification. */
-        bits |= EVT_LIMIT;
-    }
+    if (GPIO_Pin == LIMIT_BUTTON_Pin) bits |= EVT_PEDAL_HOME; /* pedal home switch: zero TIM4 */
 
     if (GPIO_Pin == SIDE_BUTTON_Pin)  bits |= EVT_SIDE;
 

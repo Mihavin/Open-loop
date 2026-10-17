@@ -142,7 +142,7 @@ static void startup_stop_restart(void) {
 static void faults_and_adc(void) {
     reset();calibrated();MotorFOC_RequestArm();owner_tick();
     mock_tim12.CR1=TIM_CR1_CEN;mock_tim12.CCER=TIM_CCER_CC2E;mock_tim12.DIER=TIM_DIER_CC2IE;
-    Fault_Report(FAULT_LIMIT);assert(!(mock_tim1.BDTR&TIM_BDTR_MOE));assert(!mock_tim12.CR1 && !mock_tim12.DIER);
+    Fault_Report(FAULT_BLDC_DRIVER);assert(!(mock_tim1.BDTR&TIM_BDTR_MOE));assert(!mock_tim12.CR1 && !mock_tim12.DIER);
     assert(mock_gpio_f.BSRR==((uint32_t)DRV_EN_Pin<<16));assert(mock_gpio_g.BSRR==DRV_ENN_Pin);
     Fault_Clear(0xffffffff);assert(Fault_IsCriticalActive());MotorFOC_RequestArm();owner_tick();assert(MotorFOC_GetState()==MOTOR_FOC_STATE_FAULT);
     reset();calibrated();MotorFOC_RequestArm();owner_tick();hadc2.raw=50000;sample();assert(Fault_GetActive()&FAULT_CURRENT);
@@ -151,8 +151,9 @@ static void faults_and_adc(void) {
     for(unsigned i=0;i<512;i++) { sample(); }
     assert(Fault_GetActive()&FAULT_ADC);assert(!g_calibrated);
     reset();calibrated();ticks+=11;MotorFOC();assert(Fault_GetActive()&FAULT_ADC);
-    reset();calibrated();limit_clear=false;MotorFOC_RequestArm();owner_tick();assert(Fault_GetActive()&FAULT_LIMIT);
-    assert(!(mock_tim1.BDTR&TIM_BDTR_MOE));
+    /* Pedal home switch held: it only zeroes the pedal encoder, so it must not fault or block arming. */
+    reset();calibrated();limit_clear=false;MotorFOC_RequestArm();owner_tick();
+    assert(!Fault_IsActive());assert(MotorFOC_GetState()==MOTOR_FOC_STATE_ALIGN);
     puts("PASS: immediate two-axis fault latch, overcurrent, missing/stale ADC and invalid offsets");
 }
 static void bounded_input(void) {
