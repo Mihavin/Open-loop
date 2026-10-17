@@ -6,7 +6,7 @@ using namespace touchgfx;
 
 static const char* const ITEM_NAMES[SettingsScreenView::ITEMS] = {
     "Lead screw lead", "Carriage travel", "Pedal full travel", "Max shaft speed",
-    "Knob step", "RPM mode torque limit", "Torque mode speed limit", "Dry run time", "Buzzer", "Vibration", "Backlight"
+    "Knob step", "RPM torque limit", "Torque speed limit", "Dry run time", "Buzzer", "Vibration", "Backlight"
 };
 static const char* const ITEM_HELP[SettingsScreenView::ITEMS] = {
     "mm the carriage moves per stepper turn", "usable travel before sync releases",
