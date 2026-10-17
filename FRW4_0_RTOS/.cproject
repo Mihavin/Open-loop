@@ -127,7 +127,7 @@
               <tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.1113673624" name="MCU/MPU G++ Linker" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker">
                 <option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.script.1090475751" name="Linker Script (-T)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.script" value="${workspace_loc:/${ProjName}/STM32H743IITX_FLASH.ld}" valueType="string"/>
                 <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.directories.7611342205" name="Library search path (-L)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.directories" valueType="libPaths">
-                  <listOptionValue builtIn="false" value="&quot;${workspace_loc:/FRW3_1_RTOS/Middlewares/ST/touchgfx/lib/core/cortex_m7/gcc}&quot;"/>
+                  <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Middlewares/ST/touchgfx/lib/core/cortex_m7/gcc}&quot;"/>
                 </option>
                 <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.libraries.8184356645" name="Libraries (-l)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.libraries" valueType="libs">
                   <listOptionValue builtIn="false" value=":libtouchgfx-float-abi-hard.a"/>
@@ -277,7 +277,7 @@
               <tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.224535790" name="MCU/MPU G++ Linker" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker">
                 <option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.script.1024498043" name="Linker Script (-T)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.script" value="${workspace_loc:/${ProjName}/STM32H743IITX_FLASH.ld}" valueType="string"/>
                 <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.directories.6657219597" name="Library search path (-L)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.directories" valueType="libPaths">
-                  <listOptionValue builtIn="false" value="&quot;${workspace_loc:/FRW3_1_RTOS/Middlewares/ST/touchgfx/lib/core/cortex_m7/gcc}&quot;"/>
+                  <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Middlewares/ST/touchgfx/lib/core/cortex_m7/gcc}&quot;"/>
                 </option>
                 <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.libraries.0439388072" name="Libraries (-l)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.libraries" valueType="libs">
                   <listOptionValue builtIn="false" value=":libtouchgfx-float-abi-hard.a"/>

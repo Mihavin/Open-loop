@@ -38,6 +38,7 @@ struct Plant
     float cmdRpm, cmdIq, cmdPosRev;
     float snapCounts, snapOrigin, snapHoldIq;
     float extRpm; /* torque mode: spindle turned from outside, braked by cmdIq */
+    float speedLimit, iqLimit;
     uint32_t idleFrames;
     float rpm;
     float posCounts;
@@ -158,6 +159,8 @@ void step()
             float brake = p.cmdIq / g_limits.maxTorqueA * 1500.0f; /* rpm/s at full current */
             p.extRpm += (brake - p.extRpm * 0.15f) * dt;
             if (p.extRpm * (p.extRpm - brake * dt) < 0.0f) p.extRpm = 0.0f;
+            if (p.extRpm > p.speedLimit) p.extRpm = p.speedLimit;   /* speed ceiling brakes it */
+            if (p.extRpm < -p.speedLimit) p.extRpm = -p.speedLimit;
             target = p.extRpm;
         }
         else
@@ -194,6 +197,8 @@ void init()
     memset(&q, 0, sizeof(q));
     p.mode = MODE_SPEED;
     p.state = BLDC_IDLE;
+    p.speedLimit = g_limits.maxMotorRpm;
+    p.iqLimit = g_limits.maxTorqueA;
     g_script = getenv("FRW4_SIM_SCRIPT");
     g_shots = getenv("FRW4_SIM_SHOTS");
     const char* e = getenv("FRW4_SIM_EXIT");
@@ -231,6 +236,8 @@ void read(Telemetry& out)
     out.bldcMode = p.mode;
     out.speedRpm = p.rpm;
     float iq = p.state == BLDC_RUN ? 0.15f + fabsf(p.rpm) / g_limits.maxMotorRpm * 1.1f : 0.0f;
+    if (p.mode == MODE_TORQUE) iq = fabsf(p.cmdIq);
+    if (iq > p.iqLimit) iq = p.iqLimit;
     float ph = p.posCounts / g_limits.encoderCpr * 6.2831853f * 7.0f;
     out.ia = iq * cosf(ph);
     out.ib = iq * cosf(ph - 2.0944f);
@@ -255,6 +262,7 @@ void setMode(Mode mode)
 void setSpeed(float motorRpm) { p.cmdRpm = motorRpm; p.cmdIq = 0; }
 void setTorque(float iqA) { p.cmdIq = iqA; p.cmdRpm = 0; }
 void setPositionRev(float motorRev) { p.cmdPosRev = motorRev; p.idleFrames = 0; }
+void setOperatingLimits(float speedLimitMotorRpm, float iqLimitA) { p.speedLimit = speedLimitMotorRpm; p.iqLimit = iqLimitA; }
 void setPositionSnap(float pitchDeg, int32_t originCounts, float holdIqA)
 {
     p.snapCounts = pitchDeg > 0.0f ? pitchDeg / 360.0f * g_limits.encoderCpr : 0.0f;

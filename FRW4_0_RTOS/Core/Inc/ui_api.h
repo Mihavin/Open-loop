@@ -44,6 +44,8 @@ void UI_SetBldcTorque(float iq_a);
 void UI_SetBldcPositionRev(float rev);
 /* Position-mode detent: pitch in degrees (0 = off), grid anchored at origin_counts. */
 void UI_SetBldcPositionSnap(float pitch_deg, int32_t origin_counts, float hold_iq_a);
+/* Operator limits: speed ceiling (motor rpm) and torque ceiling (A), see MotorFOC_SetOperatingLimits. */
+void UI_SetBldcLimits(float speed_limit_rpm, float iq_limit_a);
 
 void UI_BldcArm(void);
 void UI_BldcDisarm(void);

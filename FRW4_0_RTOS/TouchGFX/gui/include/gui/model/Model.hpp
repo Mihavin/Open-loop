@@ -37,6 +37,8 @@ public:
         int dryMinutes;
         int snapDeg;            /* interpolation detent pitch, shaft degrees, 0 = off */
         float holdTorqueA;      /* holding current while the detent is active */
+        float rpmModeTorqueA;   /* torque ceiling while the speed loop drives (RPM, Dry, Interp) */
+        int torqueModeMaxRpm;   /* shaft rpm ceiling in Torque mode: the drive brakes above it */
         bool buzzer;
         bool vibration;
         int backlightPercent;
@@ -111,6 +113,7 @@ private:
     void enterFault();
     void resetOrigin();
     void applySnap();
+    void applyLimits();
     void reverseSpindle();
     void toggleBrake();
     ui::Mode firmwareMode(int m) const;

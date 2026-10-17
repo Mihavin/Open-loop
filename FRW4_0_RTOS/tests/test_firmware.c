@@ -353,7 +353,29 @@ static void position_detent(void) {
     MotorFOC_SetPositionSnap(-5,0,NAN);assert(g_cmd.snap_counts==0);
     puts("PASS: position detent snaps at half a pitch after idle, limits hold current, stays put when off");
 }
+static void operating_limits(void) {
+    /* Speed mode: the operator torque limit caps the speed loop output. */
+    reset();calibrated();MotorFOC_RequestArm();owner_tick();
+    for(unsigned i=0;i<5000&&MotorFOC_GetState()!=MOTOR_FOC_STATE_RUN;i++){owner_tick();}
+    assert(MotorFOC_GetState()==MOTOR_FOC_STATE_RUN);
+    MotorFOC_SetOperatingLimits(2000.0f,0.5f);MotorFOC_SetSpeedRPM(1500.0f);
+    for(unsigned i=0;i<2000;i++){owner_tick();}
+    assert(g_foc.iq_ref>0.45f&&g_foc.iq_ref<=0.5f+1e-6f);
+    /* Torque mode: above the speed ceiling the drive brakes against the operator's torque. */
+    reset();calibrated();MotorFOC_SetMode(MOTOR_FOC_MODE_TORQUE);MotorFOC_RequestArm();owner_tick();
+    for(unsigned i=0;i<5000&&MotorFOC_GetState()!=MOTOR_FOC_STATE_RUN;i++){owner_tick();}
+    MotorFOC_SetOperatingLimits(600.0f,MOTOR_FOC_IQ_MAX_A);MotorFOC_SetTorqueCurrentA(0.2f);
+    for(unsigned i=0;i<200;i++){mock_tim2.CNT+=20;owner_tick();} /* 300 rpm: inside the limit */
+    assert(fabsf(g_foc.iq_ref-0.2f)<1e-6f);
+    for(unsigned i=0;i<400;i++){mock_tim2.CNT+=100;owner_tick();} /* 1500 rpm: braked */
+    assert(g_foc.iq_ref<0.0f);
+    for(unsigned i=0;i<400;i++){mock_tim2.CNT-=100;owner_tick();} /* -1500 rpm: braked the other way */
+    assert(g_foc.iq_ref>0.2f);
+    MotorFOC_SetOperatingLimits(NAN,9.0f);assert(g_cmd.speed_limit_rpm==600.0f);
+    MotorFOC_SetOperatingLimits(99999.0f,9.0f);assert(g_cmd.speed_limit_rpm==MOTOR_FOC_SPEED_MAX_RPM&&g_cmd.iq_limit_a==MOTOR_FOC_IQ_MAX_A);
+    puts("PASS: operator torque limit caps the speed loop, torque-mode speed ceiling brakes both ways");
+}
 int main(void) {
-    driver_frames();startup_stop_restart();faults_and_adc();bounded_input();operator_input();confirmed_fault_clear();counted_steps();stepper_owner();watchdog_health();rotor_wrap();current_sampling();position_detent();
+    driver_frames();startup_stop_restart();faults_and_adc();bounded_input();operator_input();confirmed_fault_clear();counted_steps();stepper_owner();watchdog_health();rotor_wrap();current_sampling();position_detent();operating_limits();
     puts("All firmware regression scenarios passed.");return 0;
 }

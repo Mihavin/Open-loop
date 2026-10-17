@@ -6,12 +6,13 @@ using namespace touchgfx;
 
 static const char* const ITEM_NAMES[SettingsScreenView::ITEMS] = {
     "Lead screw lead", "Carriage travel", "Pedal full travel", "Max shaft speed",
-    "Knob step", "Dry run time", "Buzzer", "Vibration", "Backlight"
+    "Knob step", "RPM torque limit", "Torque speed limit", "Dry run time", "Buzzer", "Vibration", "Backlight"
 };
 static const char* const ITEM_HELP[SettingsScreenView::ITEMS] = {
     "mm the carriage moves per stepper turn", "usable travel before sync releases",
     "pedal encoder counts at full press", "limit for the speed setpoint",
-    "shaft rpm per knob detent", "minutes the dry run turns before it beeps", "key clicks and alerts",
+    "shaft rpm per knob detent", "most current the speed loop may drive", "spindle is braked above this speed",
+    "minutes the dry run turns before it beeps", "key clicks and alerts",
     "vibration on arm, warn and fault", "display brightness"
 };
 static const int16_t LIST_Y = 44;
@@ -63,9 +64,11 @@ void SettingsScreenView::formatValue(int item, char* out, int size) const
     case 2: snprintf(out, size, "%u counts", (unsigned)s.pedalFullCounts); break;
     case 3: snprintf(out, size, "%d rpm", s.maxShaftRpm); break;
     case 4: snprintf(out, size, "%d rpm", s.rpmPerDetent); break;
-    case 5: snprintf(out, size, "%d min", s.dryMinutes); break;
-    case 6: snprintf(out, size, "%s", s.buzzer ? "on" : "off"); break;
-    case 7: snprintf(out, size, "%s", s.vibration ? "on" : "off"); break;
+    case 5: snprintf(out, size, "%d.%02d A", (int)s.rpmModeTorqueA, (int)(s.rpmModeTorqueA * 100 + 0.5f) % 100); break;
+    case 6: snprintf(out, size, "%d rpm", s.torqueModeMaxRpm); break;
+    case 7: snprintf(out, size, "%d min", s.dryMinutes); break;
+    case 8: snprintf(out, size, "%s", s.buzzer ? "on" : "off"); break;
+    case 9: snprintf(out, size, "%s", s.vibration ? "on" : "off"); break;
     default: snprintf(out, size, "%d %%", s.backlightPercent); break;
     }
 }
@@ -87,9 +90,11 @@ void SettingsScreenView::adjust(int item, int d)
         s.rpmPerDetent = knobSteps[clampInt(idx + (d > 0 ? 1 : -1), 0, 4)];
         break;
     }
-    case 5: s.dryMinutes = clampInt(s.dryMinutes + d, 1, 240); break;
-    case 6: s.buzzer = !s.buzzer; break;
-    case 7: s.vibration = !s.vibration; break;
+    case 5: s.rpmModeTorqueA = clampFloat(floorf(s.rpmModeTorqueA * 20.0f + 0.5f + (float)d) / 20.0f, 0.1f, ui::limits().maxTorqueA); break;
+    case 6: s.torqueModeMaxRpm = clampInt(s.torqueModeMaxRpm + 10 * d, 10, 1000); break;
+    case 7: s.dryMinutes = clampInt(s.dryMinutes + d, 1, 240); break;
+    case 8: s.buzzer = !s.buzzer; break;
+    case 9: s.vibration = !s.vibration; break;
     default:
         s.backlightPercent = clampInt(s.backlightPercent + 5 * d, 10, 100);
         ui::setBacklight((uint8_t)s.backlightPercent); /* live preview */

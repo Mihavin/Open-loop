@@ -10,7 +10,7 @@
 class SettingsScreenView : public SettingsScreenViewBase
 {
 public:
-    static const int ITEMS = 9;
+    static const int ITEMS = 11;
     static const int VISIBLE = 7;
     SettingsScreenView();
     virtual ~SettingsScreenView() {}

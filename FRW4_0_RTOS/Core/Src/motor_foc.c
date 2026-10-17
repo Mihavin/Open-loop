@@ -172,6 +172,8 @@ typedef struct
   int32_t snap_counts;        /* detent pitch, 0 = off */
   int32_t snap_origin_counts; /* detent grid anchor */
   float snap_hold_iq_a;       /* holding current while idle with the detent active */
+  float speed_limit_rpm;      /* operator speed ceiling (torque mode brakes above it) */
+  float iq_limit_a;           /* operator torque ceiling for the speed and position loops */
   uint32_t requests;
   uint32_t seq;
 } MotorFOC_Command_t;
@@ -230,6 +232,8 @@ static void foc_cmd_init(int32_t initial_pos_counts)
   g_cmd.snap_counts = 0;
   g_cmd.snap_origin_counts = initial_pos_counts;
   g_cmd.snap_hold_iq_a = 0.0f;
+  g_cmd.speed_limit_rpm = MOTOR_FOC_SPEED_MAX_RPM;
+  g_cmd.iq_limit_a = MOTOR_FOC_IQ_MAX_A;
   g_cmd.requests = MOTOR_FOC_REQ_NONE;
   g_cmd.seq = 0u;
   g_snap_seen_seq = 0u;
@@ -674,6 +678,19 @@ void MotorFOC_SetPositionSnap(int32_t snap_counts, int32_t origin_counts, float 
   foc_irq_unlock(primask);
 }
 
+void MotorFOC_SetOperatingLimits(float speed_limit_rpm, float iq_limit_A)
+{
+  if (!isfinite(speed_limit_rpm) || !isfinite(iq_limit_A)) return;
+  speed_limit_rpm = clamp_f(speed_limit_rpm, 0.0f, MOTOR_FOC_SPEED_MAX_RPM);
+  iq_limit_A = clamp_f(iq_limit_A, 0.0f, MOTOR_FOC_IQ_MAX_A);
+
+  uint32_t primask = foc_irq_lock();
+  g_cmd.speed_limit_rpm = speed_limit_rpm;
+  g_cmd.iq_limit_a = iq_limit_A;
+  g_cmd.seq++;
+  foc_irq_unlock(primask);
+}
+
 int32_t MotorFOC_GetPositionRefCounts(void)
 {
   uint32_t primask = foc_irq_lock();
@@ -1099,7 +1116,8 @@ void MotorFOC(void)
     const float err = requested - rpm;
 
     float iq_cmd = PI_Run(&g_foc.pi_speed, err, g_foc.dt_w);
-    iq_cmd = clamp_f(iq_cmd, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
+    iq_cmd = clamp_f(iq_cmd, -cmd.iq_limit_a, cmd.iq_limit_a);
+    g_foc.pi_speed.integrator = clamp_f(g_foc.pi_speed.integrator, -cmd.iq_limit_a, cmd.iq_limit_a);
 
     g_foc.speed_ref_rpm = requested;   /* debug/telemetry copy */
     foc_set_current_refs(0.0f, iq_cmd);
@@ -1108,6 +1126,7 @@ void MotorFOC(void)
   {
     float iq_limit;
     const int32_t ref_counts = foc_snap_reference(&cmd, enc_now, elapsed_ms, &iq_limit);
+    if (iq_limit > cmd.iq_limit_a) iq_limit = cmd.iq_limit_a;
     const int64_t err_counts = (int64_t)ref_counts - (int64_t)enc_now;
     const float err_rev = (float)err_counts / (float)MOTOR_FOC_ENCODER_CPR;
 
@@ -1129,6 +1148,22 @@ void MotorFOC(void)
   else
   {
     float iq_cmd = clamp_f(cmd.torque_iq_ref_a, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
+    /* Speed ceiling: outside +/- speed_limit the speed loop takes over with the
+       limit as its reference, and only ever adds braking to the operator's torque. */
+    const float limit = cmd.speed_limit_rpm;
+    if (rpm > limit || rpm < -limit)
+    {
+      const float ref = rpm > 0.0f ? limit : -limit;
+      float iq_brake = PI_Run(&g_foc.pi_speed, ref - rpm, g_foc.dt_w);
+      iq_brake = clamp_f(iq_brake, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
+      if (rpm > 0.0f) { if (iq_brake < iq_cmd) iq_cmd = iq_brake; }
+      else            { if (iq_brake > iq_cmd) iq_cmd = iq_brake; }
+    }
+    else
+    {
+      g_foc.pi_speed.integrator = 0.0f;
+    }
+    g_foc.speed_ref_rpm = 0.0f;
     foc_set_current_refs(0.0f, iq_cmd);
   }
 }

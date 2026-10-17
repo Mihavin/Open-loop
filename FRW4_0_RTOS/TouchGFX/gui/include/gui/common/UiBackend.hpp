@@ -82,6 +82,8 @@ void setTorque(float iqA);
 void setPositionRev(float motorRev);
 /* Position-mode detent: pitch in motor degrees (0 = off) around originCounts. */
 void setPositionSnap(float pitchDeg, int32_t originCounts, float holdIqA);
+/* Operator limits: speed ceiling in motor rpm, torque ceiling in A (both capped by Limits). */
+void setOperatingLimits(float speedLimitMotorRpm, float iqLimitA);
 void arm();
 void disarm();
 void stop();
