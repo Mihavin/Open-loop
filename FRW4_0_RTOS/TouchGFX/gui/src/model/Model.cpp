@@ -33,6 +33,8 @@ Model::Model()
     cfg.dryMinutes = 30;
     cfg.snapDeg = 45;
     cfg.holdTorqueA = 0.4f;
+    cfg.rpmModeTorqueA = 1.0f;
+    cfg.torqueModeMaxRpm = 300;
     cfg.buzzer = true;
     cfg.vibration = true;
     cfg.backlightPercent = 75;
@@ -155,6 +157,15 @@ void Model::applySnap()
     /* The detent grid lives in motor counts: shaft pitch times the gear ratio. */
     float pitch = modeSel == OM_INTERP ? (float)cfg.snapDeg * ui::limits().gearRatio : 0.0f;
     ui::setPositionSnap(pitch, originCounts, cfg.holdTorqueA);
+}
+
+void Model::applyLimits()
+{
+    const ui::Limits& lim = ui::limits();
+    if (modeSel == OM_TORQUE)
+        ui::setOperatingLimits((float)cfg.torqueModeMaxRpm * lim.gearRatio, lim.maxTorqueA);
+    else
+        ui::setOperatingLimits((float)cfg.maxShaftRpm * lim.gearRatio, cfg.rpmModeTorqueA);
 }
 
 /* ---------------- navigation ---------------- */
@@ -334,6 +345,7 @@ void Model::startArming()
     }
     if (currentScreen != SCR_RUN) goTo(SCR_RUN);
     ui::setMode(firmwareMode(modeSel));
+    applyLimits();
     resetOrigin();
     brakeOff = false;
     dryActive = false;
@@ -578,6 +590,7 @@ bool Model::selectMode(OpMode m)
     dryActive = false;
     resetOrigin();
     ui::setMode(firmwareMode(modeSel));
+    applyLimits();
     ui::feedback(ui::FB_CONFIRM);
     return true;
 }
@@ -695,7 +708,11 @@ void Model::applySettings()
     if (cfg.holdTorqueA > ui::limits().maxTorqueA) cfg.holdTorqueA = ui::limits().maxTorqueA;
     ui::setPedalFullCounts(cfg.pedalFullCounts);
     ui::setFeedbackEnabled(cfg.buzzer, cfg.vibration);
+    if (cfg.rpmModeTorqueA < 0.1f) cfg.rpmModeTorqueA = 0.1f;
+    if (cfg.rpmModeTorqueA > ui::limits().maxTorqueA) cfg.rpmModeTorqueA = ui::limits().maxTorqueA;
+    if (cfg.torqueModeMaxRpm < 10) cfg.torqueModeMaxRpm = 10;
     ui::setBacklight((uint8_t)cfg.backlightPercent);
+    applyLimits();
     int keep = modeSel;
     for (int m = 0; m < OM_COUNT; ++m)
     {

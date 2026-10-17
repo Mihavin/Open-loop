@@ -75,6 +75,7 @@ void setSpeed(float motorRpm) { UI_SetBldcSpeed(motorRpm); }
 void setTorque(float iqA) { UI_SetBldcTorque(iqA); }
 void setPositionRev(float motorRev) { UI_SetBldcPositionRev(motorRev); }
 void setPositionSnap(float pitchDeg, int32_t originCounts, float holdIqA) { UI_SetBldcPositionSnap(pitchDeg, originCounts, holdIqA); }
+void setOperatingLimits(float speedLimitMotorRpm, float iqLimitA) { UI_SetBldcLimits(speedLimitMotorRpm, iqLimitA); }
 void arm() { UI_BldcArm(); }
 void disarm() { UI_BldcDisarm(); }
 void stop() { UI_BldcStop(); }

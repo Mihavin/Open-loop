@@ -253,6 +253,12 @@ void MotorFOC_SetPositionCounts(int32_t pos_counts);
 #define MOTOR_FOC_SNAP_IDLE_MS        (300u)
 #endif
 void MotorFOC_SetPositionSnap(int32_t snap_counts, int32_t origin_counts, float hold_iq_A);
+
+/* Operating limits the operator sets per mode, both capped by the hardware
+ * limits above: speed mode never drives more than iq_limit_A (torque limit),
+ * torque mode never lets the shaft exceed speed_limit_rpm (the speed loop
+ * brakes it back inside). Position mode uses iq_limit_A as its torque cap. */
+void MotorFOC_SetOperatingLimits(float speed_limit_rpm, float iq_limit_A);
 int32_t MotorFOC_GetPositionRefCounts(void);
 
 /* Convenience helper: set an absolute mechanical position in revolutions.

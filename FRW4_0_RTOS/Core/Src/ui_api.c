@@ -99,6 +99,12 @@ void UI_SetBldcPositionRev(float rev)
     MotorFOC_SetPositionRevolutions(rev);
 }
 
+void UI_SetBldcLimits(float speed_limit_rpm, float iq_limit_a)
+{
+    claim_api();
+    MotorFOC_SetOperatingLimits(speed_limit_rpm, iq_limit_a);
+}
+
 void UI_SetBldcPositionSnap(float pitch_deg, int32_t origin_counts, float hold_iq_a)
 {
     claim_api();

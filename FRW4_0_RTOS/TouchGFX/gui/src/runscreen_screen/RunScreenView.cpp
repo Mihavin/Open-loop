@@ -453,7 +453,8 @@ void RunScreenView::updateDisarmed()
     case Model::OM_TORQUE:
         setLabel.set("BRAKE AT FULL PEDAL");
         setValue.setFloat(m.setpoint(), 2);
-        setSub.set("amps  ·  pedal sets the braking force");
+        snprintf(buf, sizeof(buf), "amps  ·  speed limit %d rpm", m.settings().torqueModeMaxRpm);
+        setSub.set(buf);
         break;
     case Model::OM_INTERP:
         setLabel.set("STROKE");
@@ -470,7 +471,7 @@ void RunScreenView::updateDisarmed()
     default:
         setLabel.set("SPEED AT FULL PEDAL");
         setValue.setInt((int)(m.setpoint() + 0.5f));
-        snprintf(buf, sizeof(buf), "shaft rpm  ·  %s  ·  actual %d", d, (int)(fabsf(m.shaftRpm()) + 0.5f));
+        snprintf(buf, sizeof(buf), "shaft rpm  ·  %s  ·  torque limit %d.%02d A", d, (int)m.settings().rpmModeTorqueA, (int)(m.settings().rpmModeTorqueA * 100 + 0.5f) % 100);
         setSub.set(buf);
         break;
     }
@@ -497,7 +498,7 @@ void RunScreenView::updateArmed()
         gaugeMax.setFloat(max, 1);
         actValue.setFloat(m.currentA(), 2);
         actUnit.set("brake amps");
-        snprintf(buf, sizeof(buf), "full pedal %d.%02d A  ·  %d rpm", (int)m.setpoint(), (int)(m.setpoint() * 100) % 100, (int)(rpm + 0.5f));
+        snprintf(buf, sizeof(buf), "full pedal %d.%02d A  ·  %d of max %d rpm", (int)m.setpoint(), (int)(m.setpoint() * 100) % 100, (int)(rpm + 0.5f), cfg.torqueModeMaxRpm);
         cardATitle.set("BRAKE");
         cardAValue.set(t.pedalPermille > 30 ? "ON" : "FREE");
         break;
@@ -535,7 +536,7 @@ void RunScreenView::updateArmed()
         gaugeMax.setInt((int)maxRpm);
         actValue.setInt((int)(rpm + 0.5f));
         actUnit.set("shaft rpm");
-        snprintf(buf, sizeof(buf), "full pedal %d rpm", (int)(m.setpoint() + 0.5f));
+        snprintf(buf, sizeof(buf), "full pedal %d rpm  ·  max %d.%02d A", (int)(m.setpoint() + 0.5f), (int)cfg.rpmModeTorqueA, (int)(cfg.rpmModeTorqueA * 100 + 0.5f) % 100);
         cardATitle.set("DIRECTION");
         if (m.brakeReleased()) cardAValue.set("FREE");
         else if (m.reversing()) cardAValue.set("REVERSING");
