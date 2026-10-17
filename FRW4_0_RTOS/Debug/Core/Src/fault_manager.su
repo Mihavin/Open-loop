@@ -1,9 +1,0 @@
-../Core/Src/fault_manager.c:8:6:Fault_OutputsOff	4	static,ignoring_inline_asm
-../Core/Src/fault_manager.c:26:6:Fault_Report	16	static
-../Core/Src/fault_manager.c:32:6:Fault_Clear	16	static
-../Core/Src/fault_manager.c:38:10:Fault_GetActive	4	static,ignoring_inline_asm
-../Core/Src/fault_manager.c:43:6:Fault_IsActive	8	static
-../Core/Src/fault_manager.c:48:6:Fault_IsCriticalActive	8	static
-../Core/Src/fault_manager.c:53:6:Fault_Heartbeat	24	static,ignoring_inline_asm
-../Core/Src/fault_manager.c:59:6:Fault_WatchdogStart	24	static
-../Core/Src/fault_manager.c:89:6:Fault_WatchdogPoll	16	static,ignoring_inline_asm

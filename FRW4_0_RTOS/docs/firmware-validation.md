@@ -63,6 +63,20 @@ limits or a demonstrated short-circuit rating.
   long-running absolute motion. Electrical phase and speed deltas handle counter
   wrap; this does not make the public position an unlimited multi-turn value.
 
+## Production-readiness follow-up, 17 October 2026
+
+| Area | Change | Still needs |
+| --- | --- | --- |
+| Current sampling | The injected ADC trigger (TIM1 OC4REF, PWM mode 2) now fires `MOTOR_FOC_ADC_TRIGGER_LEAD_COUNTS` (300) before the counter peak, so the sample is centred on the low-side conduction window. Previously it fired about 3.2 us after the peak, outside the window above about 75% duty. Set at `MotorFOC_Start()`, so CubeMX regeneration of `tim.c` cannot undo it. | Scope CSA output against TRGO2 and set the lead to half the real injected sampling time. |
+| Duty limit | Phase duty is capped at `MOTOR_FOC_DUTY_MAX` (0.95) for bootstrap refresh and a minimum low-side window. The current-loop voltage limit is derived from it (0.52 x Vbus instead of 0.577 x Vbus), so there is no clamp distortion or windup. | About 10% less voltage headroom; confirm the speed target at minimum supply. |
+| Phase reconstruction | A phase whose duty exceeded `MOTOR_FOC_SAMPLE_DUTY_MAX` (0.88) when it was sampled is rebuilt from the other two. If two phases are untrusted, the previous currents are held, and more than four consecutive held periods latch `FAULT_CURRENT`. Raw-range checks apply only to trusted phases. | Validate the threshold with the measured sampling window. |
+| Interrupt priority | ADC_IRQn and ADC3_IRQn run at priority 2 (`MOTOR_FOC_ADC_IRQ_PRIORITY`), above every other peripheral interrupt (5), so display/DMA/SPI/EXTI handlers cannot delay the current loop or provoke false `FAULT_ADC`. The ADC callback uses no FreeRTOS API. | Measure ISR execution time and jitter under full GUI load. |
+| QSPI | The flash must answer with a 256 Mbit Cypress/Infineon JEDEC ID, and reset, init and memory-mapped mode must succeed. Otherwise `Error_Handler()` latches outputs off, instead of a later bus fault inside TouchGFX. | None. |
+| HAL asserts | `assert_failed()` now calls `Error_Handler()` instead of silently continuing. | None. |
+| Build | `tools/build_firmware.py --config release` builds `-O2 -DNDEBUG`. Sources come from `tools/firmware_sources.txt`, not the IDE's `Debug/objects.list`. `Debug/`, `.metadata/`, object files, `Middlewares/ST/touchgfx_backup/` and `backup_FRW4_0_RTOS.ioc` are no longer tracked. | Ship the release image only after the timing above is measured on it. |
+
+Verified on 17 October 2026: native scenarios (now nine groups) pass with GCC `-Werror`. Both debug and release configurations compile all 140 translation units and link with arm-none-eabi-gcc 13.2.1. The only warnings are the same unused-parameter ones in generated code.
+
 ## Reproduce software validation
 
 From `FRW4_0_RTOS`, with Python 3.9+ and a native GCC:
@@ -81,7 +95,7 @@ analog circuit, interrupt execution time or electrical pin waveforms.
 For the full firmware, supply the directory containing GNU Arm compiler tools:
 
 ```text
-python tools/build_firmware.py --toolchain <arm-toolchain-bin-directory>
+python tools/build_firmware.py --toolchain <arm-toolchain-bin-directory> [--config release]
 ```
 
 The build compiles all 140 production translation units listed in the project's

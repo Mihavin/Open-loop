@@ -403,8 +403,11 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
-	/* User can add his own implementation to report the file name and line number,
-	 ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+	/* A HAL parameter check failed: treat it like any other HAL error and
+	   latch outputs off instead of continuing with an invalid configuration. */
+	(void)file;
+	(void)line;
+	Error_Handler();
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

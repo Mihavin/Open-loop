@@ -31,6 +31,10 @@ static uint32_t g_driver_poll_tick;
 static int32_t g_position_origin;
 static uint32_t g_angle_raw;
 static volatile int32_t g_angle_mod;
+/* Duties last written to TIM1. CCR preload applies them at the next update
+   event, so at the following ADC sample they are the duties in effect. */
+static volatile float g_duty[3] = {0.5f, 0.5f, 0.5f};
+static uint32_t g_held_samples;
 
 #include <math.h>
 
@@ -246,9 +250,12 @@ static float adc_counts_to_amps(float adc_counts)
 
 static void pwm_set_duty_abc(float duty_a, float duty_b, float duty_c)
 {
-  duty_a = clamp_f(duty_a, 0.0f, 1.0f);
-  duty_b = clamp_f(duty_b, 0.0f, 1.0f);
-  duty_c = clamp_f(duty_c, 0.0f, 1.0f);
+  duty_a = clamp_f(duty_a, 0.0f, MOTOR_FOC_DUTY_MAX);
+  duty_b = clamp_f(duty_b, 0.0f, MOTOR_FOC_DUTY_MAX);
+  duty_c = clamp_f(duty_c, 0.0f, MOTOR_FOC_DUTY_MAX);
+  g_duty[0] = duty_a;
+  g_duty[1] = duty_b;
+  g_duty[2] = duty_c;
 
   const uint32_t arr = __HAL_TIM_GET_AUTORELOAD(&htim1);
 
@@ -351,7 +358,9 @@ void MotorFOC_Init(void)
   g_foc.dt_w = 1.0f / MOTOR_FOC_SPEED_HZ;
 
   g_foc.vbus = MOTOR_FOC_VBUS_VOLTS;
-  g_foc.v_limit = g_foc.vbus * 0.57735026919f; /* ~Vbus/sqrt(3) */
+  /* SVPWM with min/max centring reaches duty 0.5 + |v|*sqrt(3)/(2*Vbus); limit
+     |v| so no phase exceeds MOTOR_FOC_DUTY_MAX (Vbus/sqrt(3) at duty 1.0). */
+  g_foc.v_limit = g_foc.vbus * (MOTOR_FOC_DUTY_MAX - 0.5f) * 1.1547005384f;
 
   /* PI output limits (voltages) */
   PI_Init(&g_foc.pi_id, MOTOR_FOC_KP_ID, MOTOR_FOC_KI_ID, -g_foc.v_limit, g_foc.v_limit);
@@ -403,6 +412,12 @@ void MotorFOC_Start(void)
   if (g_started || Fault_IsCriticalActive()) return;
   HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_RESET);
   pwm_set_duty_abc(0.5f, 0.5f, 0.5f);
+  /* ADC trigger: OC4REF in PWM mode 2 rises while counting up through
+     ARR - lead, centring the injected sample on the counter peak where every
+     low-side FET conducts. Set here so CubeMX regeneration cannot undo it. */
+  MODIFY_REG(htim1.Instance->CCMR2, TIM_CCMR2_OC4M, TIM_OCMODE_PWM2 << 8);
+  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4,
+                        __HAL_TIM_GET_AUTORELOAD(&htim1) - MOTOR_FOC_ADC_TRIGGER_LEAD_COUNTS);
   /* Start all timer channels behind the disabled external driver. */
   if (HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL) != HAL_OK ||
       HAL_TIM_Base_Start(&htim1) != HAL_OK ||
@@ -430,7 +445,10 @@ void MotorFOC_Start(void)
   g_driver_poll_tick = g_slow_tick;
   g_foc.state = MOTOR_FOC_STATE_CALIB;
   /* All three completion callbacks rendezvous before consuming a sample. */
-  HAL_NVIC_SetPriority(ADC3_IRQn, 5, 0);
+  /* Both current-loop IRQs preempt display/DMA/SPI/EXTI handlers. Equal
+     priority keeps the three completions from preempting one another. */
+  HAL_NVIC_SetPriority(ADC_IRQn, MOTOR_FOC_ADC_IRQ_PRIORITY, 0);
+  HAL_NVIC_SetPriority(ADC3_IRQn, MOTOR_FOC_ADC_IRQ_PRIORITY, 0);
   HAL_NVIC_EnableIRQ(ADC3_IRQn);
   if (HAL_ADCEx_InjectedStart_IT(&hadc2) != HAL_OK ||
       HAL_ADCEx_InjectedStart_IT(&hadc3) != HAL_OK ||
@@ -777,10 +795,34 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
     return;
   }
 
+  /* A phase is only trusted if its low-side window (around the counter peak)
+     was long enough for the sample. */
+  const bool ok_a = g_duty[0] <= MOTOR_FOC_SAMPLE_DUTY_MAX;
+  const bool ok_b = g_duty[1] <= MOTOR_FOC_SAMPLE_DUTY_MAX;
+  const bool ok_c = g_duty[2] <= MOTOR_FOC_SAMPLE_DUTY_MAX;
+
   /* Convert to amps using offsets */
-  const float ia = adc_counts_to_amps((float)raw_ia - g_foc.off_ia);
-  const float ib = adc_counts_to_amps((float)raw_ib - g_foc.off_ib);
-  const float ic = adc_counts_to_amps((float)raw_ic - g_foc.off_ic);
+  float ia = adc_counts_to_amps((float)raw_ia - g_foc.off_ia);
+  float ib = adc_counts_to_amps((float)raw_ib - g_foc.off_ib);
+  float ic = adc_counts_to_amps((float)raw_ic - g_foc.off_ic);
+
+  /* Rebuild one untrusted phase from the other two (ia + ib + ic = 0). With
+     two untrusted phases (sector boundary at full modulation) hold the
+     previous currents, but never long enough to blind current protection. */
+  if (ok_a + ok_b + ok_c >= 2) g_held_samples = 0u;
+  if (ok_a + ok_b + ok_c == 2)
+  {
+    if (!ok_a)      ia = -ib - ic;
+    else if (!ok_b) ib = -ia - ic;
+    else            ic = -ia - ib;
+  }
+  else if (ok_a + ok_b + ok_c < 2)
+  {
+    if (++g_held_samples > MOTOR_FOC_MAX_HELD_SAMPLES) { Fault_Report(FAULT_CURRENT); return; }
+    ia = g_foc.ia;
+    ib = g_foc.ib;
+    ic = g_foc.ic;
+  }
 
   g_foc.ia = ia;
   g_foc.ib = ib;
@@ -795,8 +837,10 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
   }
 
   if (fabsf(ia) > MOTOR_FOC_CURRENT_TRIP_A || fabsf(ib) > MOTOR_FOC_CURRENT_TRIP_A ||
-      fabsf(ic) > MOTOR_FOC_CURRENT_TRIP_A || raw_ia < 1024u || raw_ib < 1024u || raw_ic < 1024u ||
-      raw_ia > 64511u || raw_ib > 64511u || raw_ic > 64511u)
+      fabsf(ic) > MOTOR_FOC_CURRENT_TRIP_A ||
+      (ok_a && (raw_ia < 1024u || raw_ia > 64511u)) ||
+      (ok_b && (raw_ib < 1024u || raw_ib > 64511u)) ||
+      (ok_c && (raw_ic < 1024u || raw_ic > 64511u)))
   { Fault_Report(FAULT_CURRENT); return; }
 
   /* Clarke transform (assuming ia+ib+ic ~= 0) */

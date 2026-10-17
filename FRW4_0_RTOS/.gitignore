@@ -1,3 +1,15 @@
 /build-validation/
 /tests/build/
 __pycache__/
+
+# STM32CubeIDE build output and workspace state
+/Debug/
+/Release/
+/.metadata/
+*.o
+*.d
+*.su
+*.cyclo
+*.elf
+*.map
+*.list

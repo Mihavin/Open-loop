@@ -1,6 +1,6 @@
 """Clean, out-of-tree firmware build; no stale Debug objects or absolute IDE paths.
 
-python tools/build_firmware.py --toolchain <directory containing arm-none-eabi-gcc>
+python tools/build_firmware.py --toolchain <directory containing arm-none-eabi-gcc> [--config release]
 """
 from pathlib import Path
 import argparse
@@ -16,6 +16,8 @@ def main():
     parser.add_argument('--toolchain', type=Path, required=True)
     parser.add_argument('--output', type=Path, default=ROOT / 'build-validation')
     parser.add_argument('--jobs', type=int, default=4)
+    parser.add_argument('--config', choices=['debug', 'release'], default='debug',
+                        help='release: -O2, NDEBUG, no DEBUG define (the image intended for shipping)')
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -32,14 +34,18 @@ def main():
         'TouchGFX/target/generated', 'TouchGFX/gui/include',
         *['TouchGFX/generated/' + p + '/include' for p in ['fonts','gui_generated','images','texts','videos']],
     ]]
+    config_flags = {'debug': ['-DDEBUG', '-O0', '-g3'],
+                    'release': ['-DNDEBUG', '-O2', '-g']}[args.config]
     common = ['-mcpu=cortex-m7', '-mthumb', '-mfpu=fpv5-d16', '-mfloat-abi=hard',
-              '-DDEBUG', '-DUSE_PWR_LDO_SUPPLY', '-DUSE_HAL_DRIVER', '-DSTM32H743xx',
-              '-O0', '-g3', '-ffunction-sections', '-fdata-sections', '-Wall', '-Wextra', '--specs=nano.specs']
+              *config_flags, '-DUSE_PWR_LDO_SUPPLY', '-DUSE_HAL_DRIVER', '-DSTM32H743xx',
+              '-ffunction-sections', '-fdata-sections', '-Wall', '-Wextra', '--specs=nano.specs']
     common += [arg for p in includes for arg in ['-I', str(p)]]
     sources = []
-    # The IDE production manifest excludes the simulator and its nested build outputs.
-    for line in (ROOT / 'Debug/objects.list').read_text().splitlines():
-        base = ROOT / line.strip().strip('"').removeprefix('./')
+    # Production source manifest (simulator excluded); paths without extension.
+    for line in (ROOT / 'tools/firmware_sources.txt').read_text().splitlines():
+        if not line.strip():
+            continue
+        base = ROOT / line.strip()
         choices = [base.with_suffix(ext) for ext in ['.c', '.cpp', '.s', '.S']]
         source = next((p for p in choices if p.exists()), None)
         if source is None: raise RuntimeError('Source missing for ' + str(base))
@@ -59,7 +65,7 @@ def main():
     failures = [r for r in results if r['exit']]
     for r in failures:
         print(r['source'], r['diagnostics'], flush=True)
-    summary = {'compiler': subprocess.run([str(cc), '--version'], capture_output=True, text=True).stdout.splitlines()[0],
+    summary = {'config': args.config, 'compiler': subprocess.run([str(cc), '--version'], capture_output=True, text=True).stdout.splitlines()[0],
                'translation_units': len(results), 'compile_failures': len(failures), 'results': results}
     if not failures:
         response = out / 'objects.rsp'
