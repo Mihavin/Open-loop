@@ -4,10 +4,10 @@
 namespace theme
 {
 static const AccentPair g_pairs[ACCENT_COUNT] = {
-    { 0xF2A33A, 0xFF5F6D },
-    { 0x3FB6D9, 0x7B61FF },
+    { 0xF2A33A, 0xE8632C },
+    { 0x3FB6D9, 0x2F6FE8 },
     { 0x3DD68C, 0x2BB3C0 },
-    { 0x7D9BFF, 0x3D5AF1 },
+    { 0x6FA8FF, 0x2F5BD6 },
     { 0xE5484D, 0xFF8A65 },
 };
 
