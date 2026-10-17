@@ -1,6 +1,0 @@
-../Core/Src/fmc.c:28:13:SDRAM_Initialization_Sequence	6
-../Core/Src/fmc.c:82:6:MX_FMC_Init	2
-../Core/Src/fmc.c:129:13:HAL_FMC_MspInit	2
-../Core/Src/fmc.c:247:6:HAL_SDRAM_MspInit	1
-../Core/Src/fmc.c:259:13:HAL_FMC_MspDeInit	2
-../Core/Src/fmc.c:334:6:HAL_SDRAM_MspDeInit	1

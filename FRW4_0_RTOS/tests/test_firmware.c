@@ -253,7 +253,30 @@ static void rotor_wrap(void) {
     }
     puts("PASS: electrical angle remains continuous at signed and hardware encoder wrap");
 }
+static void current_sampling(void) {
+    reset();calibrated();
+    assert((mock_tim1.CCMR2&TIM_CCMR2_OC4M)==(TIM_OCMODE_PWM2<<8));
+    assert(mock_tim1.CCR4==2812u-MOTOR_FOC_ADC_TRIGGER_LEAD_COUNTS);
+    assert(fabsf(g_foc.v_limit-15.0f*(MOTOR_FOC_DUTY_MAX-0.5f)*1.1547005f)<1e-4f);
+    pwm_set_duty_abc(1.0f,1.0f,1.0f);assert(mock_tim1.CCR1==(uint32_t)(MOTOR_FOC_DUTY_MAX*2812.0f));
+    MotorFOC_RequestArm();owner_tick();assert(MotorFOC_GetState()==MOTOR_FOC_STATE_ALIGN);
+    /* Phase A at high duty: its garbage sample is replaced by -(ib+ic). */
+    pwm_set_duty_abc(0.93f,0.5f,0.5f);hadc1.raw=65535;hadc2.raw=32768+1000;hadc3.raw=32768-1000;sample();
+    assert(!Fault_IsCriticalActive());assert(fabsf(g_foc.ia)<1e-4f);assert(g_foc.ib>0.2f && g_foc.ic<-0.2f);
+    /* Two untrusted phases: hold the previous currents. */
+    float ia=g_foc.ia,ib=g_foc.ib,ic=g_foc.ic;
+    pwm_set_duty_abc(0.93f,0.93f,0.1f);hadc1.raw=hadc2.raw=65535;hadc3.raw=32768;sample();
+    assert(!Fault_IsCriticalActive());assert(g_foc.ia==ia && g_foc.ib==ib && g_foc.ic==ic);
+    for(unsigned i=1;i<MOTOR_FOC_MAX_HELD_SAMPLES;i++){pwm_set_duty_abc(0.93f,0.93f,0.1f);sample();}
+    assert(!Fault_IsCriticalActive());pwm_set_duty_abc(0.93f,0.93f,0.1f);sample();
+    assert(Fault_GetActive()&FAULT_CURRENT);
+    reset();calibrated();MotorFOC_RequestArm();owner_tick();
+    /* A trusted phase out of range still trips. */
+    pwm_set_duty_abc(0.5f,0.5f,0.5f);hadc1.raw=65535;hadc2.raw=hadc3.raw=32768;sample();
+    assert(Fault_GetActive()&FAULT_CURRENT);
+    puts("PASS: ADC trigger centred on the low-side window, duty cap, high-duty phase reconstruction and bounded hold");
+}
 int main(void) {
-    driver_frames();startup_stop_restart();faults_and_adc();bounded_input();counted_steps();stepper_owner();watchdog_health();rotor_wrap();
+    driver_frames();startup_stop_restart();faults_and_adc();bounded_input();counted_steps();stepper_owner();watchdog_health();rotor_wrap();current_sampling();
     puts("All firmware regression scenarios passed.");return 0;
 }

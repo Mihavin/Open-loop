@@ -18,7 +18,7 @@
   * Notes:
   *  - You MUST set the motor/board-specific constants below (shunt, gain, pole pairs, encoder CPR, bus voltage).
   *  - Current loop runs from ADC injected conversion complete callback (typically at PWM frequency).
-  *  - Speed loop runs from TIM7 interrupt (default 1 kHz as configured in .ioc).
+  *  - Speed/position loops run from MotorFOC(), called by MotorTask every 1 ms.
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -88,6 +88,43 @@ typedef enum
 
 #ifndef MOTOR_FOC_SPEED_HZ
 #define MOTOR_FOC_SPEED_HZ            (1000.0f)    /* should match TIM7 update rate */
+#endif
+
+/* Current sampling window.
+ * The low-side shunts only carry phase current while the low-side FET conducts,
+ * centred on the TIM1 counter peak. The injected ADC trigger (TIM1 OC4REF ->
+ * TRGO2) is placed MOTOR_FOC_ADC_TRIGGER_LEAD_COUNTS before the peak so the
+ * sample/hold interval is centred in that window. Verify on a scope (CSA output
+ * vs. TRGO2) and adjust the lead to half the actual injected sampling time.
+ */
+#ifndef MOTOR_FOC_ADC_TRIGGER_LEAD_COUNTS
+#define MOTOR_FOC_ADC_TRIGGER_LEAD_COUNTS (300u)   /* TIM1 counts @225 MHz, ~1.3 us */
+#endif
+
+/* Highest phase duty ever written: keeps a bootstrap refresh and a minimum
+ * low-side window on every phase. The voltage limit is derived from it. */
+#ifndef MOTOR_FOC_DUTY_MAX
+#define MOTOR_FOC_DUTY_MAX            (0.95f)
+#endif
+
+/* Above this duty a phase's low-side window is too short for a valid sample;
+ * that phase is reconstructed from the other two (ia + ib + ic = 0). */
+#ifndef MOTOR_FOC_SAMPLE_DUTY_MAX
+#define MOTOR_FOC_SAMPLE_DUTY_MAX     (0.88f)
+#endif
+
+/* Consecutive PWM periods with two untrusted phases (currents held) before a
+ * current fault is latched instead of running without current feedback. */
+#ifndef MOTOR_FOC_MAX_HELD_SAMPLES
+#define MOTOR_FOC_MAX_HELD_SAMPLES    (4u)
+#endif
+
+/* NVIC preemption priority of the ADC current-loop interrupts. Must be
+ * numerically below configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY (5) so display,
+ * DMA, SPI and EXTI handlers cannot delay the current loop. The ADC callback
+ * therefore must never call a FreeRTOS API. */
+#ifndef MOTOR_FOC_ADC_IRQ_PRIORITY
+#define MOTOR_FOC_ADC_IRQ_PRIORITY    (2u)
 #endif
 
 /* Limits */

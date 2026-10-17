@@ -6,7 +6,7 @@
 typedef enum { HAL_OK, HAL_ERROR, HAL_BUSY, HAL_TIMEOUT } HAL_StatusTypeDef;
 typedef enum { GPIO_PIN_RESET, GPIO_PIN_SET } GPIO_PinState;
 typedef struct { uint32_t BSRR; } GPIO_TypeDef;
-typedef struct { uint32_t BDTR, DIER, CCER, CR1, CCMR1, CNT, CCR1, CCR2, CCR3, CCR4, PSC, ARR, SR; } TIM_TypeDef;
+typedef struct { uint32_t BDTR, DIER, CCER, CR1, CCMR1, CCMR2, CNT, CCR1, CCR2, CCR3, CCR4, PSC, ARR, SR; } TIM_TypeDef;
 typedef struct { TIM_TypeDef *Instance; struct {uint32_t Prescaler, Period;} Init; uint32_t Channel; } TIM_HandleTypeDef;
 typedef struct { struct { uint32_t DataSize, FirstBit, CLKPolarity, CLKPhase; } Init; } SPI_HandleTypeDef;
 typedef struct { uint32_t raw; } ADC_HandleTypeDef;
@@ -58,6 +58,9 @@ extern MockIWDG mock_iwdg;
 #define ADC_CALIB_OFFSET_LINEARITY 0u
 #define ADC_SINGLE_ENDED 0u
 #define ADC3_IRQn 1u
+#define ADC_IRQn 3u
+#define TIM_CCMR2_OC4M 0x01007000u
+#define TIM_OCMODE_PWM2 0x70u
 #define TIM8_BRK_TIM12_IRQn 2u
 #define __NOP() ((void)0)
 #define __DMB() ((void)0)

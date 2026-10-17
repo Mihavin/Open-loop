@@ -51,13 +51,18 @@ void MX_QUADSPI_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN QUADSPI_Init 2 */
-  // Optional: if you wired a reset pin to the flash, call:
-  S25FL256S_Reset(&hqspi, QSPI_RST_GPIO_Port, QSPI_RST_Pin);
-
-  S25FL256S_Init(&hqspi);
-
-  // Optional: enable memory-mapped reads at 0x9000_0000
-  S25FL256S_EnableMemoryMappedMode(&hqspi);
+  /* TouchGFX reads its assets directly from 0x9000_0000. If the flash does not
+     answer, stop here with outputs off rather than bus-faulting later inside
+     the GUI on the first asset read. */
+  S25FL256S_JEDEC_ID flash_id = {0};
+  if (S25FL256S_Reset(&hqspi, QSPI_RST_GPIO_Port, QSPI_RST_Pin) != HAL_OK ||
+      S25FL256S_ReadJEDECID(&hqspi, &flash_id) != HAL_OK ||
+      flash_id.manufacturer_id != 0x01u || flash_id.capacity != 0x19u || /* Cypress/Infineon, 256 Mbit */
+      S25FL256S_Init(&hqspi) != HAL_OK ||
+      S25FL256S_EnableMemoryMappedMode(&hqspi) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE END QUADSPI_Init 2 */
 
 }
