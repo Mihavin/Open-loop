@@ -41,6 +41,7 @@
 #include "tim.h"
 #include "ui_api.h"
 #include "operator_input.h"
+#include "ui_input.h"
 #include <math.h>
 /* USER CODE END Includes */
 
@@ -56,13 +57,8 @@ extern TIM_HandleTypeDef htim5;
 /* USER CODE BEGIN PD */
 // bitmask events
 #define EVT_PEDAL_HOME (1u << 0)
-#define EVT_SIDE    (1u << 1)
-#define EVT_BACK    (1u << 2)
 #define EVT_FAN	    (1u << 3)
-#define EVT_UI		(1u << 4)
 #define EVT_ENC_I	(1u << 5)
-#define EVT_FRW     (1u << 6)
-#define EVT_REV     (1u << 7)
 
 #ifndef ENABLE_DEBUG_TELEMETRY
 #define ENABLE_DEBUG_TELEMETRY 0
@@ -137,7 +133,6 @@ const osMessageQueueAttr_t HIDQ_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-static volatile uint32_t g_mode_change_request;
 /* USER CODE END FunctionPrototypes */
 
 void StartMotorTask(void *argument);
@@ -280,6 +275,7 @@ void StartMotorTask(void *argument)
     {
         Fault_Heartbeat(FAULT_HEALTH_MOTOR);
         Fault_WatchdogPoll();
+        (void)Fault_ServiceClearRequest();
         MotorFOC();
         if (MotorFOC_GetState() == MOTOR_FOC_STATE_FAULT)
         {
@@ -313,6 +309,17 @@ void StartGUITask(void *argument)
   /* USER CODE END StartGUITask */
 }
 
+static void hid_tone(uint32_t hz)
+{
+  if (hz) (void)Buzzer_ToneHz(&g_buzzer, hz, 50u);
+  else (void)Buzzer_Stop(&g_buzzer);
+}
+
+static void hid_vibration(bool on)
+{
+  HAL_GPIO_WritePin(VIB_GPIO_Port, VIB_Pin, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
+}
+
 /* USER CODE BEGIN Header_StartHIDTask */
 /**
 * @brief Function implementing the HIDTask thread.
@@ -324,13 +331,11 @@ void StartHIDTask(void *argument)
 {
   /* USER CODE BEGIN StartHIDTask */
   (void)argument;
+  /* Operator input is decoded here and consumed by the TouchGFX model
+     (ui_input.h). Setpoints, arming and mode changes are owned by the UI. */
   uint32_t previous = __HAL_TIM_GET_COUNTER(&htim3);
-  UI_ControlSource_t previous_source = UI_GetControlSource();
-  float setpoint = 0.0f;
-  float position_origin_rev = 0.0f;
-  MotorFOC_Mode_t mode = MotorFOC_GetRequestedMode();
-  bool changing = false;
-  uint32_t change_start = 0, standstill_start = 0;
+  UI_InputInit();
+  UI_FeedbackBind(hid_tone, hid_vibration);
   for (;;)
   {
     Fault_Heartbeat(FAULT_HEALTH_HID);
@@ -338,57 +343,16 @@ void StartHIDTask(void *argument)
     uint32_t count = __HAL_TIM_GET_COUNTER(&htim3);
     int32_t delta = Operator_EncoderDelta(count, previous, __HAL_TIM_GET_AUTORELOAD(&htim3) + 1u);
     previous = count;
-    UI_ControlSource_t source = UI_GetControlSource();
-    if (source != previous_source || mode != MotorFOC_GetRequestedMode())
-    { setpoint = 0; delta = 0; mode = MotorFOC_GetRequestedMode();
-      position_origin_rev = (float)MotorFOC_GetPositionCounts() / MOTOR_FOC_ENCODER_CPR; }
-    previous_source = source;
-    if (__atomic_exchange_n(&g_mode_change_request, 0u, __ATOMIC_ACQ_REL) && !changing)
-    {
-      MotorFOC_RequestStop();
-      changing = true; change_start = now; standstill_start = 0;
-    }
-    if (changing)
-    {
-      /* Nonblocking: EXTI can continue handling limits while motion coasts. */
-      if ((uint32_t)(now - change_start) > 2000u)
-      { Fault_Report(FAULT_MOTION_TIMEOUT); changing = false; }
-      else if (MotorFOC_GetState() == MOTOR_FOC_STATE_IDLE && fabsf(MotorFOC_GetSpeedRPM()) <= 10.0f)
-      {
-        if (!standstill_start) standstill_start = now;
-        if ((uint32_t)(now - standstill_start) >= 100u)
-        {
-          mode = (MotorFOC_Mode_t)(((unsigned)mode + 1u) % 3u);
-          MotorFOC_SetMode(mode);
-          MotorFOC_SetCommand(mode, 0, 0, MotorFOC_GetPositionCounts());
-          setpoint = 0; changing = false;
-          position_origin_rev = (float)MotorFOC_GetPositionCounts() / MOTOR_FOC_ENCODER_CPR;
-          /* Deliberately no encoder zero and no implicit re-arm. */
-        }
-      }
-      else standstill_start = 0;
-    }
-    else if (source == UI_CONTROL_KNOB && delta != 0 && !Fault_IsCriticalActive())
-    {
-      uint32_t key = __get_PRIMASK(); __disable_irq();
-      if (UI_GetControlSource() != UI_CONTROL_KNOB) { __set_PRIMASK(key); osDelay(10); continue; }
-      if (mode == MOTOR_FOC_MODE_SPEED)
-      {
-        setpoint = Operator_AddBounded(setpoint, (float)delta * MOTOR_FOC_GEAR_RATIO, MOTOR_FOC_SPEED_MAX_RPM);
-        MotorFOC_SetSpeedRPM(setpoint); /* one count = one shaft rpm */
-      }
-      else if (mode == MOTOR_FOC_MODE_TORQUE)
-      {
-        setpoint = Operator_AddBounded(setpoint, (float)delta * 0.01f, MOTOR_FOC_IQ_MAX_A);
-        MotorFOC_SetTorqueCurrentA(setpoint);
-      }
-      else
-      {
-        setpoint = Operator_AddBounded(setpoint, (float)delta * 0.1f * MOTOR_FOC_GEAR_RATIO, MOTOR_FOC_POSITION_MAX_REVS);
-        MotorFOC_SetPositionRevolutions(position_origin_rev + setpoint);
-      }
-      __set_PRIMASK(key);
-    }
+    uint32_t pressed = 0;
+    /* Knob, SIDE and BACK are active low; FRW and REV are active high. */
+    if (HAL_GPIO_ReadPin(UI_ENC_BUTTON_GPIO_Port, UI_ENC_BUTTON_Pin) == GPIO_PIN_RESET) pressed |= 1u << UI_KEY_KNOB;
+    if (HAL_GPIO_ReadPin(SIDE_BUTTON_GPIO_Port, SIDE_BUTTON_Pin) == GPIO_PIN_RESET) pressed |= 1u << UI_KEY_SIDE;
+    if (HAL_GPIO_ReadPin(BACK_BUTTON_GPIO_Port, BACK_BUTTON_Pin) == GPIO_PIN_RESET) pressed |= 1u << UI_KEY_BACK;
+    if (HAL_GPIO_ReadPin(FRW_BUT_GPIO_Port, FRW_BUT_Pin) == GPIO_PIN_SET) pressed |= 1u << UI_KEY_FRW;
+    if (HAL_GPIO_ReadPin(REV_BUT_GPIO_Port, REV_BUT_Pin) == GPIO_PIN_SET) pressed |= 1u << UI_KEY_REV;
+    UI_InputPoll(now, delta, pressed);
+    UI_PedalSetCounts((int16_t)__HAL_TIM_GET_COUNTER(&htim4));
+    UI_FeedbackTick(now);
     osDelay(10);
   }
   /* USER CODE END StartHIDTask */
@@ -444,7 +408,7 @@ void StartEXTITask(void *argument)
     uint32_t events;
 
     // per-input debounce timestamps
-    TickType_t t_limit = 0, t_side = 0, t_back = 0, t_fan = 0, t_ui = 0, t_enc_I = 0, t_frw = 0, t_rev = 0;
+    TickType_t t_limit = 0, t_fan = 0, t_enc_I = 0;
     const TickType_t db = pdMS_TO_TICKS(20); // 20ms debounce (buttons/switches)
 
   /* Infinite loop */
@@ -460,21 +424,12 @@ void StartEXTITask(void *argument)
           t_limit = now;
           /* Pedal home switch: re-zero the pedal encoder. Not a fault. */
           __HAL_TIM_SET_COUNTER(&htim4, 0);
+          UI_PedalMarkHomed();
 
       }
 
-      if ((events & EVT_SIDE) && (now - t_side) > db)
-      {
-          t_side = now;
-          // Handle side switch
-      }
-
-      if ((events & EVT_BACK) && (now - t_back) > db)
-      {
-          t_back = now;
-          // Handle back switch
-      }
-
+      /* SIDE, BACK, FRW, REV and the knob button are polled by the HID task
+         (debounce + hold timing live in ui_input.c). */
 
       if ((events & EVT_FAN) && (now - t_fan) > db)
       {
@@ -482,28 +437,10 @@ void StartEXTITask(void *argument)
           /* This net is the PWM command; no rotation feedback exists. */
       }
 
-      if ((events & EVT_UI) && (now - t_ui) > db)
-      {
-          t_ui = now;
-          __atomic_store_n(&g_mode_change_request, 1u, __ATOMIC_RELEASE);
-      }
-
       if ((events & EVT_ENC_I) && (now - t_enc_I) > db)
       {
           t_enc_I = now;
           // Handle encoder index pulse
-      }
-
-      if ((events & EVT_FRW) && (now - t_frw) > db)
-      {
-          t_frw = now;
-          // Handle forward button
-      }
-
-      if ((events & EVT_REV) && (now - t_rev) > db)
-      {
-          t_rev = now;
-          // Handle reverse button
       }
 
     osDelay(50);
@@ -583,19 +520,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
     if (GPIO_Pin == LIMIT_BUTTON_Pin) bits |= EVT_PEDAL_HOME; /* pedal home switch: zero TIM4 */
 
-    if (GPIO_Pin == SIDE_BUTTON_Pin)  bits |= EVT_SIDE;
-
-    if (GPIO_Pin == BACK_BUTTON_Pin)  bits |= EVT_BACK;
+    /* Buttons are polled by the HID task; their EXTI edges only wake the MCU. */
 
     /* FAN_FAULT is actually the MAX31740 PWM output; never report it as a fault. */
 
-    if (GPIO_Pin == UI_ENC_BUTTON_Pin) bits |= EVT_UI;
-
     if (GPIO_Pin == I_ENC_Pin) bits |= EVT_ENC_I;
-
-    if (GPIO_Pin == FRW_BUT_Pin) bits |= EVT_FRW;
-
-    if (GPIO_Pin == REV_BUT_Pin) bits |= EVT_REV;
 
     if (bits && EXTITaskHandle)
     {

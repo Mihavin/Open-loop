@@ -60,6 +60,7 @@ void UI_GetSnapshot(UI_SystemSnapshot_t *out)
     out->bldc_mode = MotorFOC_GetMode();
     out->bldc_speed_rpm = MotorFOC_GetSpeedRPM();
     out->bldc_position_counts = MotorFOC_GetPositionCounts();
+    out->bldc_position_ref_counts = MotorFOC_GetPositionRefCounts();
     out->ia = MotorFOC_GetIa();
     out->ib = MotorFOC_GetIb();
     out->ic = MotorFOC_GetIc();
@@ -96,6 +97,15 @@ void UI_SetBldcPositionRev(float rev)
 {
     claim_api();
     MotorFOC_SetPositionRevolutions(rev);
+}
+
+void UI_SetBldcPositionSnap(float pitch_deg, int32_t origin_counts, float hold_iq_a)
+{
+    claim_api();
+    int32_t counts = 0;
+    if (pitch_deg > 0.0f && pitch_deg <= 360.0f)
+        counts = (int32_t)(pitch_deg / 360.0f * (float)MOTOR_FOC_ENCODER_CPR + 0.5f);
+    MotorFOC_SetPositionSnap(counts, origin_counts, hold_iq_a);
 }
 
 void UI_BldcArm(void)

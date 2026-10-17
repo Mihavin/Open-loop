@@ -4,56 +4,37 @@
     <Language Id="GB" />
   </Languages>
   <Texts>
-    <TextGroup Id="Group1" />
-    <TextGroup Id="Unsorted">
-      <Text Id="__SingleUse_6XJE" Alignment="Left" TypographyId="Large">
-        <Translation Language="GB">RPM</Translation>
-      </Text>
-      <Text Id="__SingleUse_9VVZ" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">02:20:36</Translation>
-      </Text>
-      <Text Id="__SingleUse_22SY" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">Start</Translation>
-      </Text>
-      <Text Id="rpm_value" Alignment="Left" TypographyId="veryLarge">
-        <Translation Language="GB">200</Translation>
-      </Text>
-      <Text Id="__SingleUse_4W5M" Alignment="Left" TypographyId="Large">
-        <Translation Language="GB">Diagnostic</Translation>
-      </Text>
-      <Text Id="__SingleUse_SACW" Alignment="Left" TypographyId="Large">
-        <Translation Language="GB">Settings</Translation>
-      </Text>
-      <Text Id="__SingleUse_LLIH" Alignment="Left" TypographyId="Large">
-        <Translation Language="GB">Dry Mode</Translation>
-      </Text>
-      <Text Id="__SingleUse_GVY5" Alignment="Left" TypographyId="Large">
-        <Translation Language="GB">Torque Mode</Translation>
-      </Text>
-      <Text Id="__SingleUse_594K" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">Start</Translation>
-      </Text>
-      <Text Id="__SingleUse_SH02" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">RPM Mode</Translation>
-      </Text>
-      <Text Id="__SingleUse_0VWK" Alignment="Left" TypographyId="Small">
-        <Translation Language="GB">Scan for User Manual</Translation>
-      </Text>
-      <Text Id="__SingleUse_1A5Y" Alignment="Left" TypographyId="Small">
-        <Translation Language="GB">Initializing....</Translation>
-      </Text>
-      <Text Id="FW_Version" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">Firmware 4.0</Translation>
-      </Text>
-      <Text Id="DeviceName" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">Dorado Rod Wrapper</Translation>
-      </Text>
+    <!-- Every visible string is produced at runtime by the GUI code, so the
+         database only carries one wildcard text per typography and alignment.
+         tools/touchgfx_assets.py regenerates generated/fonts and generated/texts
+         from this file; the TouchGFX Designer can do the same on Windows. -->
+    <TextGroup Id="Wildcards">
+      <Text Id="small_l" Alignment="Left" TypographyId="Small"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="small_c" Alignment="Center" TypographyId="Small"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="small_r" Alignment="Right" TypographyId="Small"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="body_l" Alignment="Left" TypographyId="Body"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="body_c" Alignment="Center" TypographyId="Body"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="body_r" Alignment="Right" TypographyId="Body"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="title_l" Alignment="Left" TypographyId="Title"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="title_c" Alignment="Center" TypographyId="Title"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="title_r" Alignment="Right" TypographyId="Title"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="medium_l" Alignment="Left" TypographyId="Medium"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="medium_c" Alignment="Center" TypographyId="Medium"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="medium_r" Alignment="Right" TypographyId="Medium"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="large_l" Alignment="Left" TypographyId="Large"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="large_c" Alignment="Center" TypographyId="Large"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="large_r" Alignment="Right" TypographyId="Large"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="big_l" Alignment="Left" TypographyId="Big"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="big_c" Alignment="Center" TypographyId="Big"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="big_r" Alignment="Right" TypographyId="Big"><Translation Language="GB">&lt;v&gt;</Translation></Text>
     </TextGroup>
   </Texts>
   <Typographies>
-    <Typography Id="Default" Font="verdana.ttf" Size="20" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
-    <Typography Id="Large" Font="verdana.ttf" Size="40" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
-    <Typography Id="Small" Font="verdana.ttf" Size="10" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
-    <Typography Id="veryLarge" Font="verdana.ttf" Size="100" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
+    <Typography Id="Small" Font="Inter-Regular.otf" Size="11" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0x20-0x7E,0xB0-0xB1,0xB5,0xB7,0xD7" />
+    <Typography Id="Body" Font="Inter-Regular.otf" Size="13" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0x20-0x7E,0xB0-0xB1,0xB5,0xB7,0xD7" />
+    <Typography Id="Title" Font="Inter-SemiBold.otf" Size="16" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0x20-0x7E,0xB0-0xB1,0xB5,0xB7,0xD7" />
+    <Typography Id="Medium" Font="Inter-SemiBold.otf" Size="22" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0x20-0x7E,0xB0-0xB1,0xB5,0xB7,0xD7" />
+    <Typography Id="Large" Font="InterDisplay-Bold.otf" Size="32" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0x20-0x7E,0xB0-0xB1,0xB5,0xB7,0xD7" />
+    <Typography Id="Big" Font="InterDisplay-Bold.otf" Size="50" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacters="0123456789.-+%: " />
   </Typographies>
 </TextDatabase>

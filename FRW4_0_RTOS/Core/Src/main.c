@@ -64,7 +64,7 @@ extern SPI_HandleTypeDef hspi1;
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-static Buzzer_Handle_t buzzer;
+Buzzer_Handle_t g_buzzer; /* shared with the HID task feedback patterns */
 drv8323_spi_t g_drv8323 = { .hspi = &hspi1,
 		.ncs_port = DRV_NSS_GPIO_Port, .ncs_pin = DRV_NSS_Pin, .en_port =
 				DRV_EN_GPIO_Port, .en_pin = DRV_EN_Pin, .spi_timeout_ms = 5, };
@@ -153,8 +153,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* MotorFOC_Start/Arm configure and verify DRV with timer outputs inhibited. */
-	Buzzer_Init(&buzzer, &htim8);
-	Buzzer_Beep(&buzzer, 2000, 80, 50);
+	Buzzer_Init(&g_buzzer, &htim8);
+	Buzzer_Beep(&g_buzzer, 2000, 80, 50);
 	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
 //	HAL_TIMEx_PWMN_Start(&htim5, TIM_CHANNEL_1);
 	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, 0);
@@ -165,6 +165,7 @@ int main(void)
 //	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, 25);
 //	HAL_Delay(5000);
 	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
+	HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL); /* pedal encoder, zeroed by the home switch */
 
 	HAL_GPIO_WritePin(VIB_GPIO_Port, VIB_Pin, GPIO_PIN_SET);
 	HAL_Delay(50);

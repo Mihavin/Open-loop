@@ -17,19 +17,63 @@ public:
 
     virtual void changeToStartScreen()
     {
-        gotoLoadScreenScreenNoTransition();
+        gotoBootScreenScreenNoTransition();
     }
 
-    // LoadScreen
-    void gotoLoadScreenScreenNoTransition();
+    // BootScreen
+    void gotoBootScreenScreenNoTransition();
+
+    // RunScreen
+    void gotoRunScreenScreenNoTransition();
+
+    // MenuScreen
+    void gotoMenuScreenScreenNoTransition();
+
+    // TraverseScreen
+    void gotoTraverseScreenScreenNoTransition();
+
+    // InterpScreen
+    void gotoInterpScreenScreenNoTransition();
+
+    // DiagnosticsScreen
+    void gotoDiagnosticsScreenScreenNoTransition();
+
+    // SettingsScreen
+    void gotoSettingsScreenScreenNoTransition();
+
+    // FaultScreen
+    void gotoFaultScreenScreenNoTransition();
 
 protected:
     touchgfx::Callback<FrontendApplicationBase> transitionCallback;
     FrontendHeap& frontendHeap;
+
     Model& model;
 
-    // LoadScreen
-    void gotoLoadScreenScreenNoTransitionImpl();
+    // BootScreen
+    void gotoBootScreenScreenNoTransitionImpl();
+
+    // RunScreen
+    void gotoRunScreenScreenNoTransitionImpl();
+
+    // MenuScreen
+    void gotoMenuScreenScreenNoTransitionImpl();
+
+    // TraverseScreen
+    void gotoTraverseScreenScreenNoTransitionImpl();
+
+    // InterpScreen
+    void gotoInterpScreenScreenNoTransitionImpl();
+
+    // DiagnosticsScreen
+    void gotoDiagnosticsScreenScreenNoTransitionImpl();
+
+    // SettingsScreen
+    void gotoSettingsScreenScreenNoTransitionImpl();
+
+    // FaultScreen
+    void gotoFaultScreenScreenNoTransitionImpl();
+
 };
 
 #endif // FRONTENDAPPLICATIONBASE_HPP

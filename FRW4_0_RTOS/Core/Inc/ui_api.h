@@ -17,6 +17,7 @@ typedef struct
     MotorFOC_Mode_t bldc_mode;
     float bldc_speed_rpm;
     int32_t bldc_position_counts;
+    int32_t bldc_position_ref_counts;
     float ia;
     float ib;
     float ic;
@@ -41,6 +42,8 @@ void UI_SetBldcMode(MotorFOC_Mode_t mode);
 void UI_SetBldcSpeed(float rpm);
 void UI_SetBldcTorque(float iq_a);
 void UI_SetBldcPositionRev(float rev);
+/* Position-mode detent: pitch in degrees (0 = off), grid anchored at origin_counts. */
+void UI_SetBldcPositionSnap(float pitch_deg, int32_t origin_counts, float hold_iq_a);
 
 void UI_BldcArm(void);
 void UI_BldcDisarm(void);

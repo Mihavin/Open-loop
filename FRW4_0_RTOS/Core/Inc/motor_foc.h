@@ -244,6 +244,17 @@ void MotorFOC_SetTorqueCurrentA(float iq_A);
  */
 void MotorFOC_SetPositionCounts(int32_t pos_counts);
 
+/* Position-mode detent ("snap"). While the position reference has been idle for
+ * MOTOR_FOC_SNAP_IDLE_MS, the holding torque is limited to hold_iq_A so the shaft
+ * can be turned by hand, and once it is pushed more than half a pitch away the
+ * reference jumps to the nearest multiple of snap_counts from origin_counts.
+ * snap_counts <= 0 disables the detent. Takes effect only in POSITION mode. */
+#ifndef MOTOR_FOC_SNAP_IDLE_MS
+#define MOTOR_FOC_SNAP_IDLE_MS        (300u)
+#endif
+void MotorFOC_SetPositionSnap(int32_t snap_counts, int32_t origin_counts, float hold_iq_A);
+int32_t MotorFOC_GetPositionRefCounts(void);
+
 /* Convenience helper: set an absolute mechanical position in revolutions.
  * revolutions * MOTOR_FOC_ENCODER_CPR -> encoder counts.
  */

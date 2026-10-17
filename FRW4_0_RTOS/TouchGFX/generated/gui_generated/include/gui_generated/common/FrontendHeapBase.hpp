@@ -7,24 +7,25 @@
 #include <common/Meta.hpp>
 #include <common/Partition.hpp>
 #include <mvp/MVPHeap.hpp>
-
 #include <touchgfx/transitions/NoTransition.hpp>
 #include <gui/common/FrontendApplication.hpp>
 #include <gui/model/Model.hpp>
-
-#include <gui/loadscreen_screen/LoadScreenView.hpp>
-#include <gui/loadscreen_screen/LoadScreenPresenter.hpp>
-#include <gui/screenrpm_screen/ScreenRPMView.hpp>
-#include <gui/screenrpm_screen/ScreenRPMPresenter.hpp>
-#include <gui/screentorque_screen/ScreenTorqueView.hpp>
-#include <gui/screentorque_screen/ScreenTorquePresenter.hpp>
-#include <gui/screendry_screen/ScreenDryView.hpp>
-#include <gui/screendry_screen/ScreenDryPresenter.hpp>
-#include <gui/screensettings_screen/ScreenSettingsView.hpp>
-#include <gui/screensettings_screen/ScreenSettingsPresenter.hpp>
-#include <gui/screendiagnostic_screen/ScreenDiagnosticView.hpp>
-#include <gui/screendiagnostic_screen/ScreenDiagnosticPresenter.hpp>
-
+#include <gui/bootscreen_screen/BootScreenView.hpp>
+#include <gui/bootscreen_screen/BootScreenPresenter.hpp>
+#include <gui/runscreen_screen/RunScreenView.hpp>
+#include <gui/runscreen_screen/RunScreenPresenter.hpp>
+#include <gui/menuscreen_screen/MenuScreenView.hpp>
+#include <gui/menuscreen_screen/MenuScreenPresenter.hpp>
+#include <gui/traversescreen_screen/TraverseScreenView.hpp>
+#include <gui/traversescreen_screen/TraverseScreenPresenter.hpp>
+#include <gui/interpscreen_screen/InterpScreenView.hpp>
+#include <gui/interpscreen_screen/InterpScreenPresenter.hpp>
+#include <gui/diagnosticsscreen_screen/DiagnosticsScreenView.hpp>
+#include <gui/diagnosticsscreen_screen/DiagnosticsScreenPresenter.hpp>
+#include <gui/settingsscreen_screen/SettingsScreenView.hpp>
+#include <gui/settingsscreen_screen/SettingsScreenPresenter.hpp>
+#include <gui/faultscreen_screen/FaultScreenView.hpp>
+#include <gui/faultscreen_screen/FaultScreenPresenter.hpp>
 
 /**
  * This class provides the memory that shall be used for memory allocations
@@ -46,13 +47,15 @@ public:
      * A list of all view types. Must end with meta::Nil.
      * @note All view types used in the application MUST be added to this list!
      */
-    typedef touchgfx::meta::TypeList< LoadScreenView,
-            touchgfx::meta::TypeList< ScreenRPMView,
-            touchgfx::meta::TypeList< ScreenTorqueView,
-            touchgfx::meta::TypeList< ScreenDryView,
-            touchgfx::meta::TypeList< ScreenSettingsView,
-            touchgfx::meta::TypeList< ScreenDiagnosticView,
-            touchgfx::meta::Nil > > > > >
+    typedef touchgfx::meta::TypeList< BootScreenView,
+            touchgfx::meta::TypeList< RunScreenView,
+            touchgfx::meta::TypeList< MenuScreenView,
+            touchgfx::meta::TypeList< TraverseScreenView,
+            touchgfx::meta::TypeList< InterpScreenView,
+            touchgfx::meta::TypeList< DiagnosticsScreenView,
+            touchgfx::meta::TypeList< SettingsScreenView,
+            touchgfx::meta::TypeList< FaultScreenView,
+            touchgfx::meta::Nil > > > > > > >
             > GeneratedViewTypes;
 
     /**
@@ -64,13 +67,15 @@ public:
      * A list of all presenter types. Must end with meta::Nil.
      * @note All presenter types used in the application MUST be added to this list!
      */
-    typedef touchgfx::meta::TypeList< LoadScreenPresenter,
-            touchgfx::meta::TypeList< ScreenRPMPresenter,
-            touchgfx::meta::TypeList< ScreenTorquePresenter,
-            touchgfx::meta::TypeList< ScreenDryPresenter,
-            touchgfx::meta::TypeList< ScreenSettingsPresenter,
-            touchgfx::meta::TypeList< ScreenDiagnosticPresenter,
-            touchgfx::meta::Nil > > > > >
+    typedef touchgfx::meta::TypeList< BootScreenPresenter,
+            touchgfx::meta::TypeList< RunScreenPresenter,
+            touchgfx::meta::TypeList< MenuScreenPresenter,
+            touchgfx::meta::TypeList< TraverseScreenPresenter,
+            touchgfx::meta::TypeList< InterpScreenPresenter,
+            touchgfx::meta::TypeList< DiagnosticsScreenPresenter,
+            touchgfx::meta::TypeList< SettingsScreenPresenter,
+            touchgfx::meta::TypeList< FaultScreenPresenter,
+            touchgfx::meta::Nil > > > > > > >
             > GeneratedPresenterTypes;
 
     /**
@@ -93,7 +98,7 @@ public:
 
     virtual void gotoStartScreen(FrontendApplication& app)
     {
-        app.gotoLoadScreenScreenNoTransition();
+        app.gotoBootScreenScreenNoTransition();
     }
 protected:
     FrontendHeapBase(touchgfx::AbstractPartition& presenters, touchgfx::AbstractPartition& views, touchgfx::AbstractPartition& transitions, FrontendApplication& app)

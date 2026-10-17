@@ -169,11 +169,16 @@ typedef struct
   float speed_ref_rpm;
   float torque_iq_ref_a;
   int32_t position_ref_counts;
+  int32_t snap_counts;        /* detent pitch, 0 = off */
+  int32_t snap_origin_counts; /* detent grid anchor */
+  float snap_hold_iq_a;       /* holding current while idle with the detent active */
   uint32_t requests;
   uint32_t seq;
 } MotorFOC_Command_t;
 
 static MotorFOC_Command_t g_cmd;
+static uint32_t g_snap_seen_seq;  /* last command seq seen by the position loop */
+static uint32_t g_snap_idle_ms;   /* time since the operator last moved the reference */
 
 /* Short critical section usable before/after scheduler start.
  * Do not use mutexes here: ADC ISR participates in the control path.
@@ -222,8 +227,13 @@ static void foc_cmd_init(int32_t initial_pos_counts)
   g_cmd.speed_ref_rpm = 0.0f;
   g_cmd.torque_iq_ref_a = 0.0f;
   g_cmd.position_ref_counts = initial_pos_counts;
+  g_cmd.snap_counts = 0;
+  g_cmd.snap_origin_counts = initial_pos_counts;
+  g_cmd.snap_hold_iq_a = 0.0f;
   g_cmd.requests = MOTOR_FOC_REQ_NONE;
   g_cmd.seq = 0u;
+  g_snap_seen_seq = 0u;
+  g_snap_idle_ms = 0u;
 
   foc_irq_unlock(primask);
 }
@@ -649,6 +659,60 @@ void MotorFOC_SetPositionCounts(int32_t pos_counts)
   foc_irq_unlock(primask);
 }
 
+void MotorFOC_SetPositionSnap(int32_t snap_counts, int32_t origin_counts, float hold_iq_A)
+{
+  if (!isfinite(hold_iq_A)) return;
+  if (snap_counts < 0) snap_counts = 0;
+  if (snap_counts > MOTOR_FOC_ENCODER_CPR) snap_counts = MOTOR_FOC_ENCODER_CPR;
+  hold_iq_A = clamp_f(hold_iq_A, 0.0f, MOTOR_FOC_IQ_MAX_A);
+
+  uint32_t primask = foc_irq_lock();
+  g_cmd.snap_counts = snap_counts;
+  g_cmd.snap_origin_counts = origin_counts;
+  g_cmd.snap_hold_iq_a = hold_iq_A;
+  g_cmd.seq++;
+  foc_irq_unlock(primask);
+}
+
+int32_t MotorFOC_GetPositionRefCounts(void)
+{
+  uint32_t primask = foc_irq_lock();
+  int32_t v = g_cmd.position_ref_counts;
+  foc_irq_unlock(primask);
+  return v;
+}
+
+/* Detent step for the position loop: returns the (possibly moved) reference and the
+ * torque limit to apply. Writes the moved reference back without bumping seq so the
+ * loop keeps counting idle time. */
+static int32_t foc_snap_reference(const MotorFOC_Command_t *cmd, int32_t enc_now, uint32_t elapsed_ms, float *iq_limit)
+{
+  int32_t ref = cmd->position_ref_counts;
+  *iq_limit = MOTOR_FOC_IQ_MAX_A;
+  if (cmd->snap_counts <= 0) { g_snap_seen_seq = cmd->seq; g_snap_idle_ms = 0u; return ref; }
+
+  if (cmd->seq != g_snap_seen_seq) { g_snap_seen_seq = cmd->seq; g_snap_idle_ms = 0u; }
+  else if (g_snap_idle_ms < 0xFFFFFFu) g_snap_idle_ms += elapsed_ms;
+  if (g_snap_idle_ms < MOTOR_FOC_SNAP_IDLE_MS) return ref;
+
+  *iq_limit = cmd->snap_hold_iq_a;
+  const int64_t pitch = cmd->snap_counts;
+  const int64_t deviation = (int64_t)enc_now - ref;
+  if (deviation > pitch / 2 || deviation < -(pitch / 2))
+  {
+    int64_t rel = (int64_t)enc_now - cmd->snap_origin_counts;
+    int64_t k = rel >= 0 ? (rel + pitch / 2) / pitch : -((-rel + pitch / 2) / pitch);
+    int64_t snapped = (int64_t)cmd->snap_origin_counts + k * pitch;
+    if (snapped > 2147483647LL) snapped = 2147483647LL;
+    if (snapped < -2147483648LL) snapped = -2147483648LL;
+    ref = (int32_t)snapped;
+    uint32_t primask = foc_irq_lock();
+    g_cmd.position_ref_counts = ref;
+    foc_irq_unlock(primask);
+  }
+  return ref;
+}
+
 void MotorFOC_SetPositionRevolutions(float revolutions)
 {
   if (!isfinite(revolutions)) return;
@@ -922,6 +986,9 @@ void MotorFOC(void)
 {
   MotorFOC_Command_t cmd = foc_cmd_snapshot_and_clear_requests();
   if (Fault_IsCriticalActive()) { foc_apply_emergency_stop(); return; }
+  /* FAULT is only ever entered on a critical fault; once the operator has
+     confirmed the clear, drop back to IDLE (outputs stay off until ARM). */
+  if (g_foc.state == MOTOR_FOC_STATE_FAULT) foc_apply_disarm();
   uint32_t now = HAL_GetTick();
   uint32_t elapsed_ms = now - g_slow_tick;
   if (g_started)
@@ -1039,7 +1106,9 @@ void MotorFOC(void)
   }
   else if (g_foc.mode == MOTOR_FOC_MODE_POSITION)
   {
-    const int64_t err_counts = (int64_t)cmd.position_ref_counts - (int64_t)enc_now;
+    float iq_limit;
+    const int32_t ref_counts = foc_snap_reference(&cmd, enc_now, elapsed_ms, &iq_limit);
+    const int64_t err_counts = (int64_t)ref_counts - (int64_t)enc_now;
     const float err_rev = (float)err_counts / (float)MOTOR_FOC_ENCODER_CPR;
 
     float speed_ref = PI_Run(&g_foc.pi_pos, err_rev, g_foc.dt_w);
@@ -1048,10 +1117,13 @@ void MotorFOC(void)
     const float err_speed = speed_ref - rpm;
 
     float iq_cmd = PI_Run(&g_foc.pi_speed, err_speed, g_foc.dt_w);
-    iq_cmd = clamp_f(iq_cmd, -MOTOR_FOC_IQ_MAX_A, MOTOR_FOC_IQ_MAX_A);
+    iq_cmd = clamp_f(iq_cmd, -iq_limit, iq_limit);
+    /* Keep the speed integrator inside the detent torque so a hand-turned shaft
+       does not wind it up and snap back hard. */
+    g_foc.pi_speed.integrator = clamp_f(g_foc.pi_speed.integrator, -iq_limit, iq_limit);
 
     g_foc.speed_ref_rpm = speed_ref;           /* debug/telemetry copy */
-    g_foc.pos_ref_counts = cmd.position_ref_counts;
+    g_foc.pos_ref_counts = ref_counts;
     foc_set_current_refs(0.0f, iq_cmd);
   }
   else

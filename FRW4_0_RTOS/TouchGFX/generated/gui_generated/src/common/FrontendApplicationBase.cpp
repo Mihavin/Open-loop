@@ -9,18 +9,22 @@
 #include <touchgfx/Texts.hpp>
 #include <touchgfx/hal/HAL.hpp>
 #include <platform/driver/lcd/LCD32bpp.hpp>
-#include <gui/loadscreen_screen/LoadScreenView.hpp>
-#include <gui/loadscreen_screen/LoadScreenPresenter.hpp>
-#include <gui/screenrpm_screen/ScreenRPMView.hpp>
-#include <gui/screenrpm_screen/ScreenRPMPresenter.hpp>
-#include <gui/screentorque_screen/ScreenTorqueView.hpp>
-#include <gui/screentorque_screen/ScreenTorquePresenter.hpp>
-#include <gui/screendry_screen/ScreenDryView.hpp>
-#include <gui/screendry_screen/ScreenDryPresenter.hpp>
-#include <gui/screensettings_screen/ScreenSettingsView.hpp>
-#include <gui/screensettings_screen/ScreenSettingsPresenter.hpp>
-#include <gui/screendiagnostic_screen/ScreenDiagnosticView.hpp>
-#include <gui/screendiagnostic_screen/ScreenDiagnosticPresenter.hpp>
+#include <gui/bootscreen_screen/BootScreenView.hpp>
+#include <gui/bootscreen_screen/BootScreenPresenter.hpp>
+#include <gui/runscreen_screen/RunScreenView.hpp>
+#include <gui/runscreen_screen/RunScreenPresenter.hpp>
+#include <gui/menuscreen_screen/MenuScreenView.hpp>
+#include <gui/menuscreen_screen/MenuScreenPresenter.hpp>
+#include <gui/traversescreen_screen/TraverseScreenView.hpp>
+#include <gui/traversescreen_screen/TraverseScreenPresenter.hpp>
+#include <gui/interpscreen_screen/InterpScreenView.hpp>
+#include <gui/interpscreen_screen/InterpScreenPresenter.hpp>
+#include <gui/diagnosticsscreen_screen/DiagnosticsScreenView.hpp>
+#include <gui/diagnosticsscreen_screen/DiagnosticsScreenPresenter.hpp>
+#include <gui/settingsscreen_screen/SettingsScreenView.hpp>
+#include <gui/settingsscreen_screen/SettingsScreenPresenter.hpp>
+#include <gui/faultscreen_screen/FaultScreenView.hpp>
+#include <gui/faultscreen_screen/FaultScreenPresenter.hpp>
 
 using namespace touchgfx;
 
@@ -33,23 +37,113 @@ FrontendApplicationBase::FrontendApplicationBase(Model& m, FrontendHeap& heap)
     touchgfx::HAL::getInstance()->setDisplayOrientation(touchgfx::ORIENTATION_PORTRAIT);
     touchgfx::Texts::setLanguage(GB);
     reinterpret_cast<touchgfx::LCD32bpp&>(touchgfx::HAL::lcd()).enableTextureMapperAll();
-    reinterpret_cast<touchgfx::LCD32bpp&>(touchgfx::HAL::lcd()).enableDecompressorL8_All();
-    reinterpret_cast<touchgfx::LCD32bpp&>(touchgfx::HAL::lcd()).enableDecompressorRGB();
 }
 
 /*
  * Screen Transition Declarations
  */
 
-// LoadScreen
+// BootScreen
 
-void FrontendApplicationBase::gotoLoadScreenScreenNoTransition()
+void FrontendApplicationBase::gotoBootScreenScreenNoTransition()
 {
-    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoLoadScreenScreenNoTransitionImpl);
+    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoBootScreenScreenNoTransitionImpl);
     pendingScreenTransitionCallback = &transitionCallback;
 }
 
-void FrontendApplicationBase::gotoLoadScreenScreenNoTransitionImpl()
+void FrontendApplicationBase::gotoBootScreenScreenNoTransitionImpl()
 {
-    touchgfx::makeTransition<LoadScreenView, LoadScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
+    touchgfx::makeTransition<BootScreenView, BootScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
 }
+
+// RunScreen
+
+void FrontendApplicationBase::gotoRunScreenScreenNoTransition()
+{
+    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoRunScreenScreenNoTransitionImpl);
+    pendingScreenTransitionCallback = &transitionCallback;
+}
+
+void FrontendApplicationBase::gotoRunScreenScreenNoTransitionImpl()
+{
+    touchgfx::makeTransition<RunScreenView, RunScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
+}
+
+// MenuScreen
+
+void FrontendApplicationBase::gotoMenuScreenScreenNoTransition()
+{
+    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoMenuScreenScreenNoTransitionImpl);
+    pendingScreenTransitionCallback = &transitionCallback;
+}
+
+void FrontendApplicationBase::gotoMenuScreenScreenNoTransitionImpl()
+{
+    touchgfx::makeTransition<MenuScreenView, MenuScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
+}
+
+// TraverseScreen
+
+void FrontendApplicationBase::gotoTraverseScreenScreenNoTransition()
+{
+    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoTraverseScreenScreenNoTransitionImpl);
+    pendingScreenTransitionCallback = &transitionCallback;
+}
+
+void FrontendApplicationBase::gotoTraverseScreenScreenNoTransitionImpl()
+{
+    touchgfx::makeTransition<TraverseScreenView, TraverseScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
+}
+
+// InterpScreen
+
+void FrontendApplicationBase::gotoInterpScreenScreenNoTransition()
+{
+    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoInterpScreenScreenNoTransitionImpl);
+    pendingScreenTransitionCallback = &transitionCallback;
+}
+
+void FrontendApplicationBase::gotoInterpScreenScreenNoTransitionImpl()
+{
+    touchgfx::makeTransition<InterpScreenView, InterpScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
+}
+
+// DiagnosticsScreen
+
+void FrontendApplicationBase::gotoDiagnosticsScreenScreenNoTransition()
+{
+    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoDiagnosticsScreenScreenNoTransitionImpl);
+    pendingScreenTransitionCallback = &transitionCallback;
+}
+
+void FrontendApplicationBase::gotoDiagnosticsScreenScreenNoTransitionImpl()
+{
+    touchgfx::makeTransition<DiagnosticsScreenView, DiagnosticsScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
+}
+
+// SettingsScreen
+
+void FrontendApplicationBase::gotoSettingsScreenScreenNoTransition()
+{
+    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoSettingsScreenScreenNoTransitionImpl);
+    pendingScreenTransitionCallback = &transitionCallback;
+}
+
+void FrontendApplicationBase::gotoSettingsScreenScreenNoTransitionImpl()
+{
+    touchgfx::makeTransition<SettingsScreenView, SettingsScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
+}
+
+// FaultScreen
+
+void FrontendApplicationBase::gotoFaultScreenScreenNoTransition()
+{
+    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoFaultScreenScreenNoTransitionImpl);
+    pendingScreenTransitionCallback = &transitionCallback;
+}
+
+void FrontendApplicationBase::gotoFaultScreenScreenNoTransitionImpl()
+{
+    touchgfx::makeTransition<FaultScreenView, FaultScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
+}
+
