@@ -926,9 +926,6 @@ void MotorFOC(void)
   uint32_t elapsed_ms = now - g_slow_tick;
   if (g_started)
   {
-    /* Catch a limit already held at boot as well as EXTI edges. */
-    if (HAL_GPIO_ReadPin(LIMIT_BUTTON_GPIO_Port, LIMIT_BUTTON_Pin) == GPIO_PIN_RESET)
-    { Fault_Report(FAULT_LIMIT); return; }
     if (HAL_GPIO_ReadPin(DRV_NFAULT_GPIO_Port, DRV_NFAULT_Pin) == GPIO_PIN_RESET ||
         __HAL_TIM_GET_FLAG(&htim1, TIM_FLAG_BREAK))
     { Fault_Report(FAULT_BLDC_DRIVER); return; }

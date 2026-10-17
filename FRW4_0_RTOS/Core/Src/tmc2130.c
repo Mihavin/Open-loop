@@ -327,8 +327,6 @@ HAL_StatusTypeDef TMC2130_InitEx(TMC2130_Handle_t *dev,
 HAL_StatusTypeDef TMC2130_Enable(TMC2130_Handle_t *dev, bool enable)
 {
     if (!dev) return HAL_ERROR;
-    if (enable && HAL_GPIO_ReadPin(LIMIT_BUTTON_GPIO_Port, LIMIT_BUTTON_Pin) == GPIO_PIN_RESET)
-    { Fault_Report(FAULT_LIMIT); return HAL_ERROR; }
     uint32_t key = __get_PRIMASK(); __disable_irq();
     if (enable && Fault_IsCriticalActive()) { __set_PRIMASK(key); return HAL_ERROR; }
     HAL_GPIO_WritePin(DRV_ENN_GPIO_Port, DRV_ENN_Pin, enable ? GPIO_PIN_RESET : GPIO_PIN_SET);

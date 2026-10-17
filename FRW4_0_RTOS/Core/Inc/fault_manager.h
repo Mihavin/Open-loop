@@ -14,7 +14,7 @@ typedef enum
     FAULT_BLDC_DRIVER     = 1u << 0,
     FAULT_STEPPER_DRIVER  = 1u << 1,
     FAULT_FAN             = 1u << 2,
-    FAULT_LIMIT           = 1u << 3,
+    /* 1u << 3 unused: LIMIT_BUTTON is the pedal home switch; it zeroes the pedal encoder and is not a fault. */
     FAULT_SPI             = 1u << 4,
     FAULT_MOTION_TIMEOUT  = 1u << 5,
     FAULT_CPU             = 1u << 6,
@@ -25,7 +25,6 @@ typedef enum
 
 #define FAULT_CRITICAL_MASK (FAULT_BLDC_DRIVER | \
                              FAULT_STEPPER_DRIVER | \
-                             FAULT_LIMIT | \
                              FAULT_SPI | \
                              FAULT_MOTION_TIMEOUT | FAULT_CPU | \
                              FAULT_CURRENT | FAULT_ADC | FAULT_USER_STOP)
