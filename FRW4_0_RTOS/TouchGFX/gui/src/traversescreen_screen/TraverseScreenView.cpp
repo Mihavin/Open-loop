@@ -4,7 +4,7 @@
 
 using namespace touchgfx;
 
-static const int16_t CX = 136, CY = 150, R = 64;
+static const int16_t RING_CX = 136, RING_CY = 150, RING_R = 64;
 static const float ROT_MAX = 10.0f; /* ring full scale */
 
 TraverseScreenView::TraverseScreenView() : tick(0), shownFrac(0.0f) {}
@@ -17,22 +17,22 @@ void TraverseScreenView::setupScreen()
     const theme::AccentPair& p = theme::accent(theme::ACCENT_MINT);
 
     ringTrackPainter.setColor(theme::rgb(theme::WHITE));
-    setupArc(ringTrack, ringTrackPainter, CX, CY, R, 10, -135, 135);
+    setupArc(ringTrack, ringTrackPainter, RING_CX, RING_CY, RING_R, 10, -135, 135);
     ringTrack.setAlpha(28);
     add(ringTrack);
-    setupArc(ringValue, ringValuePainter, CX, CY, R, 10, -135, -135);
+    setupArc(ringValue, ringValuePainter, RING_CX, RING_CY, RING_R, 10, -135, -135);
     setGradientArc(ringValue, ringValuePainter, theme::ACCENT_MINT);
     add(ringValue);
 
-    title.init(0, CY - 40, theme::SCREEN_W, 14, T_SMALL_C, theme::TEXT_DIM);
+    title.init(0, RING_CY - 40, theme::SCREEN_W, 14, T_SMALL_C, theme::TEXT_DIM);
     title.set("TRAVERSE SYNC");
     add(title);
-    value.init(0, CY - 28, theme::SCREEN_W, 60, T_BIG_C, theme::TEXT);
+    value.init(0, RING_CY - 28, theme::SCREEN_W, 60, T_BIG_C, theme::TEXT);
     add(value);
-    unit.init(0, CY + 34, theme::SCREEN_W, 16, T_SMALL_C, theme::TEXT_DIM);
+    unit.init(0, RING_CY + 34, theme::SCREEN_W, 16, T_SMALL_C, theme::TEXT_DIM);
     unit.set("rot / mm");
     add(unit);
-    hint.init(0, CY + 78, theme::SCREEN_W, 16, T_SMALL_C, theme::TEXT_DIM);
+    hint.init(0, RING_CY + 78, theme::SCREEN_W, 16, T_SMALL_C, theme::TEXT_DIM);
     hint.set("turn the knob in 0.05 steps");
     add(hint);
 
@@ -138,7 +138,7 @@ void TraverseScreenView::update()
     Model& m = presenter->theModel();
     const Model::Settings& cfg = m.settings();
     const theme::AccentPair& p = theme::accent(theme::ACCENT_MINT);
-    char buf[40];
+    char buf[80];
 
     float frac = cfg.rotPerMm / ROT_MAX;
     if (frac > 1.0f) frac = 1.0f;

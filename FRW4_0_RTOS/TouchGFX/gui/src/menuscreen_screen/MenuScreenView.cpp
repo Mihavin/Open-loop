@@ -162,7 +162,7 @@ void MenuScreenView::handleInput(const ui::InputEvent& e)
 void MenuScreenView::update()
 {
     Model& m = presenter->theModel();
-    char buf[48];
+    char buf[80];
     switch (selected)
     {
     case 0: caption.set((int)m.opMode() == selected ? "current mode  ·  press to run" : "pedal sets the speed"); break;

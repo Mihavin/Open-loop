@@ -339,7 +339,7 @@ void RunScreenView::updateTopBar()
 {
     Model& m = presenter->theModel();
     const ui::Telemetry& t = m.telemetry();
-    char buf[48];
+    char buf[80];
     switch (m.opState())
     {
     case Model::OP_ARMED:
@@ -446,7 +446,7 @@ void RunScreenView::updateDisarmed()
         }
     }
 
-    char buf[48];
+    char buf[80];
     const char* d = m.direction() > 0 ? "FWD" : "REV";
     switch (m.opMode())
     {
@@ -485,7 +485,7 @@ void RunScreenView::updateArmed()
     const ui::Telemetry& t = m.telemetry();
     const Model::Settings& cfg = m.settings();
     float rpm = fabsf(m.shaftRpm());
-    char buf[48];
+    char buf[80];
     float frac = 0.0f;
 
     switch (m.opMode())
