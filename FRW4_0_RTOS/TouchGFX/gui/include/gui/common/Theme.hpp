@@ -31,7 +31,7 @@ enum Accent
     ACCENT_AMBER = 0,  /* speed mode */
     ACCENT_CYAN,       /* torque mode */
     ACCENT_MINT,       /* position mode */
-    ACCENT_PURPLE,     /* menus and editing */
+    ACCENT_BLUE,       /* dry run, menus and editing */
     ACCENT_RED,        /* faults */
     ACCENT_COUNT
 };

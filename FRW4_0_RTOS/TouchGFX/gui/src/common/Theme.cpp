@@ -7,7 +7,7 @@ static const AccentPair g_pairs[ACCENT_COUNT] = {
     { 0xF2A33A, 0xFF5F6D },
     { 0x3FB6D9, 0x7B61FF },
     { 0x3DD68C, 0x2BB3C0 },
-    { 0xB48CFF, 0xFF6FB5 },
+    { 0x7D9BFF, 0x3D5AF1 },
     { 0xE5484D, 0xFF8A65 },
 };
 
@@ -23,7 +23,7 @@ Accent accentForMode(int mode)
     {
     case 1: return ACCENT_CYAN;
     case 2: return ACCENT_MINT;
-    case 3: return ACCENT_PURPLE;
+    case 3: return ACCENT_BLUE;
     default: return ACCENT_AMBER;
     }
 }

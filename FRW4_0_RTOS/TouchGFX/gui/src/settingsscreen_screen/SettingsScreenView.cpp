@@ -24,10 +24,10 @@ void SettingsScreenView::setupScreen()
 {
     SettingsScreenViewBase::setupScreen();
     add(backdrop);
-    backdrop.setAccent(theme::ACCENT_PURPLE);
+    backdrop.setAccent(theme::ACCENT_BLUE);
 
     highlight.init(12, LIST_Y, 248, ROW_H - 4);
-    highlight.setAccent(theme::accent(theme::ACCENT_PURPLE).a, 40);
+    highlight.setAccent(theme::accent(theme::ACCENT_BLUE).a, 40);
     add(highlight);
     for (int i = 0; i < VISIBLE; ++i)
     {
@@ -42,7 +42,7 @@ void SettingsScreenView::setupScreen()
 
     add(topBar);
     topBar.setLeft("SETTINGS");
-    topBar.setDot(theme::accent(theme::ACCENT_PURPLE).a, true);
+    topBar.setDot(theme::accent(theme::ACCENT_BLUE).a, true);
     add(legend);
     draft = presenter->theModel().settings();
     layout();
@@ -121,7 +121,7 @@ void SettingsScreenView::layout()
             char edit[40];
             snprintf(edit, sizeof(edit), "<  %s  >", buf);
             values[i].set(edit);
-            values[i].setRgb(theme::accent(theme::ACCENT_PURPLE).a);
+            values[i].setRgb(theme::accent(theme::ACCENT_BLUE).a);
         }
         else
         {
@@ -171,7 +171,7 @@ void SettingsScreenView::handleInput(const ui::InputEvent& e)
             m.applySettings();
             draft = m.settings();
             editing = false;
-            highlight.setAccent(theme::accent(theme::ACCENT_PURPLE).a, 40);
+            highlight.setAccent(theme::accent(theme::ACCENT_BLUE).a, 40);
             m.feedback(ui::FB_CONFIRM);
         }
         else
@@ -188,7 +188,7 @@ void SettingsScreenView::handleInput(const ui::InputEvent& e)
             draft = m.settings();
             ui::setBacklight((uint8_t)draft.backlightPercent);
             editing = false;
-            highlight.setAccent(theme::accent(theme::ACCENT_PURPLE).a, 40);
+            highlight.setAccent(theme::accent(theme::ACCENT_BLUE).a, 40);
             m.feedback(ui::FB_CLICK);
             layout();
         }
