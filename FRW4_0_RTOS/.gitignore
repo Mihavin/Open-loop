@@ -17,3 +17,4 @@ __pycache__/
 # TouchGFX PC simulator output
 /TouchGFX/build/
 /TouchGFX/screenshots/
+/Middlewares/ST/touchgfx_backup*/

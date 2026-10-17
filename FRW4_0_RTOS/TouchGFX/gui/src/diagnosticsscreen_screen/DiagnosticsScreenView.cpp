@@ -144,7 +144,7 @@ void DiagnosticsScreenView::update()
 {
     Model& m = presenter->theModel();
     const ui::Telemetry& t = m.telemetry();
-    char buf[56];
+    char buf[80];
 
     switch (source)
     {

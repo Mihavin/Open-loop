@@ -4,7 +4,7 @@
 
 using namespace touchgfx;
 
-static const int16_t CX = 136, CY = 136, R = 72;
+static const int16_t DIAL_CX = 136, DIAL_CY = 136, DIAL_R = 72;
 static const int16_t ROWS_Y = 240;
 static const int16_t ROW_H = 46;
 static const float PI_F = 3.14159265f;
@@ -25,17 +25,17 @@ void InterpScreenView::setupScreen()
     const theme::AccentPair& p = theme::accent(theme::ACCENT_MINT);
 
     dialTrackPainter.setColor(theme::rgb(theme::WHITE));
-    setupArc(dialTrack, dialTrackPainter, CX, CY, R, 10, 0, 360);
+    setupArc(dialTrack, dialTrackPainter, DIAL_CX, DIAL_CY, DIAL_R, 10, 0, 360);
     dialTrack.setAlpha(26);
     add(dialTrack);
-    setupArc(dialArc, dialArcPainter, CX, CY, R, 10, 0, 0);
+    setupArc(dialArc, dialArcPainter, DIAL_CX, DIAL_CY, DIAL_R, 10, 0, 0);
     setGradientArc(dialArc, dialArcPainter, theme::ACCENT_MINT);
     add(dialArc);
 
     tickPainter.setColor(theme::rgb(theme::WHITE));
     for (int i = 0; i < MAX_TICKS; ++i)
     {
-        ticks[i].setPosition(CX - R - 4, CY - R - 4, 2 * R + 8, 2 * R + 8);
+        ticks[i].setPosition(DIAL_CX - DIAL_R - 4, DIAL_CY - DIAL_R - 4, 2 * DIAL_R + 8, 2 * DIAL_R + 8);
         ticks[i].setLineWidth(2);
         ticks[i].setPainter(tickPainter);
         ticks[i].setAlpha(120);
@@ -44,17 +44,17 @@ void InterpScreenView::setupScreen()
     }
 
     pointerPainter.setColor(theme::rgb(p.a));
-    pointer.setPosition(CX - R - 10, CY - R - 10, 2 * R + 20, 2 * R + 20);
-    pointer.setCircle(R + 10, 10, 6);
+    pointer.setPosition(DIAL_CX - DIAL_R - 10, DIAL_CY - DIAL_R - 10, 2 * DIAL_R + 20, 2 * DIAL_R + 20);
+    pointer.setCircle(DIAL_R + 10, 10, 6);
     pointer.setPainter(pointerPainter);
     add(pointer);
 
-    angleValue.init(0, CY - 30, theme::SCREEN_W, 62, T_BIG_C, theme::TEXT);
+    angleValue.init(0, DIAL_CY - 30, theme::SCREEN_W, 62, T_BIG_C, theme::TEXT);
     add(angleValue);
-    angleUnit.init(0, CY + 30, theme::SCREEN_W, 16, T_SMALL_C, theme::TEXT_DIM);
+    angleUnit.init(0, DIAL_CY + 30, theme::SCREEN_W, 16, T_SMALL_C, theme::TEXT_DIM);
     angleUnit.set("spindle angle");
     add(angleUnit);
-    angleHint.init(0, (int16_t)(CY + R + 12), theme::SCREEN_W, 14, T_SMALL_C, theme::TEXT_DIM);
+    angleHint.init(0, (int16_t)(DIAL_CY + DIAL_R + 12), theme::SCREEN_W, 14, T_SMALL_C, theme::TEXT_DIM);
     add(angleHint);
 
     for (int i = 0; i < PARAMS; ++i)
@@ -100,15 +100,15 @@ void InterpScreenView::layoutTicks()
     if (n > MAX_TICKS) n = MAX_TICKS;
     if (n == shownTicks) return;
     shownTicks = n;
-    const float c = (float)(R + 4);
+    const float c = (float)(DIAL_R + 4);
     for (int i = 0; i < MAX_TICKS; ++i)
     {
         bool on = i < n;
         if (on)
         {
             float a = (float)i * 2.0f * PI_F / (float)n;
-            float sx = c + (R - 12) * sinf(a), sy = c - (R - 12) * cosf(a);
-            float ex = c + (R + 2) * sinf(a), ey = c - (R + 2) * cosf(a);
+            float sx = c + (DIAL_R - 12) * sinf(a), sy = c - (DIAL_R - 12) * cosf(a);
+            float ex = c + (DIAL_R + 2) * sinf(a), ey = c - (DIAL_R + 2) * cosf(a);
             ticks[i].setLine(sx, sy, ex, ey);
         }
         ticks[i].setVisible(on);
@@ -145,7 +145,7 @@ void InterpScreenView::handleTickEvent()
         while (shownAngle >= 360.0f) shownAngle -= 360.0f;
         float a = shownAngle * PI_F / 180.0f;
         pointer.invalidate();
-        pointer.setCircle((R + 10) + R * sinf(a), (R + 10) - R * cosf(a), 6);
+        pointer.setCircle((DIAL_R + 10) + DIAL_R * sinf(a), (DIAL_R + 10) - DIAL_R * cosf(a), 6);
         pointer.invalidate();
         dialArc.updateArc(0, (int)(shownAngle + 0.5f));
     }
@@ -186,7 +186,7 @@ void InterpScreenView::update()
 {
     Model& m = presenter->theModel();
     const Model::Settings& cfg = m.settings();
-    char buf[48];
+    char buf[80];
     angleValue.setInt((int)(m.spindleAngleDeg() + 0.5f) % 360);
     if (m.opState() == Model::OP_ARMED)
         angleHint.set(cfg.snapDeg > 0 ? "turn the spindle: it clicks into the detents" : "detent off: spindle holds anywhere");
