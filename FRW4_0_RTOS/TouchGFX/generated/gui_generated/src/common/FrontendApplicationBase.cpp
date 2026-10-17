@@ -37,6 +37,8 @@ FrontendApplicationBase::FrontendApplicationBase(Model& m, FrontendHeap& heap)
     touchgfx::HAL::getInstance()->setDisplayOrientation(touchgfx::ORIENTATION_PORTRAIT);
     touchgfx::Texts::setLanguage(GB);
     reinterpret_cast<touchgfx::LCD32bpp&>(touchgfx::HAL::lcd()).enableTextureMapperAll();
+    reinterpret_cast<touchgfx::LCD32bpp&>(touchgfx::HAL::lcd()).enableDecompressorL8_All();
+    reinterpret_cast<touchgfx::LCD32bpp&>(touchgfx::HAL::lcd()).enableDecompressorRGB();
 }
 
 /*
@@ -55,95 +57,3 @@ void FrontendApplicationBase::gotoBootScreenScreenNoTransitionImpl()
 {
     touchgfx::makeTransition<BootScreenView, BootScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
 }
-
-// RunScreen
-
-void FrontendApplicationBase::gotoRunScreenScreenNoTransition()
-{
-    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoRunScreenScreenNoTransitionImpl);
-    pendingScreenTransitionCallback = &transitionCallback;
-}
-
-void FrontendApplicationBase::gotoRunScreenScreenNoTransitionImpl()
-{
-    touchgfx::makeTransition<RunScreenView, RunScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
-}
-
-// MenuScreen
-
-void FrontendApplicationBase::gotoMenuScreenScreenNoTransition()
-{
-    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoMenuScreenScreenNoTransitionImpl);
-    pendingScreenTransitionCallback = &transitionCallback;
-}
-
-void FrontendApplicationBase::gotoMenuScreenScreenNoTransitionImpl()
-{
-    touchgfx::makeTransition<MenuScreenView, MenuScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
-}
-
-// TraverseScreen
-
-void FrontendApplicationBase::gotoTraverseScreenScreenNoTransition()
-{
-    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoTraverseScreenScreenNoTransitionImpl);
-    pendingScreenTransitionCallback = &transitionCallback;
-}
-
-void FrontendApplicationBase::gotoTraverseScreenScreenNoTransitionImpl()
-{
-    touchgfx::makeTransition<TraverseScreenView, TraverseScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
-}
-
-// InterpScreen
-
-void FrontendApplicationBase::gotoInterpScreenScreenNoTransition()
-{
-    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoInterpScreenScreenNoTransitionImpl);
-    pendingScreenTransitionCallback = &transitionCallback;
-}
-
-void FrontendApplicationBase::gotoInterpScreenScreenNoTransitionImpl()
-{
-    touchgfx::makeTransition<InterpScreenView, InterpScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
-}
-
-// DiagnosticsScreen
-
-void FrontendApplicationBase::gotoDiagnosticsScreenScreenNoTransition()
-{
-    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoDiagnosticsScreenScreenNoTransitionImpl);
-    pendingScreenTransitionCallback = &transitionCallback;
-}
-
-void FrontendApplicationBase::gotoDiagnosticsScreenScreenNoTransitionImpl()
-{
-    touchgfx::makeTransition<DiagnosticsScreenView, DiagnosticsScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
-}
-
-// SettingsScreen
-
-void FrontendApplicationBase::gotoSettingsScreenScreenNoTransition()
-{
-    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoSettingsScreenScreenNoTransitionImpl);
-    pendingScreenTransitionCallback = &transitionCallback;
-}
-
-void FrontendApplicationBase::gotoSettingsScreenScreenNoTransitionImpl()
-{
-    touchgfx::makeTransition<SettingsScreenView, SettingsScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
-}
-
-// FaultScreen
-
-void FrontendApplicationBase::gotoFaultScreenScreenNoTransition()
-{
-    transitionCallback = touchgfx::Callback<FrontendApplicationBase>(this, &FrontendApplicationBase::gotoFaultScreenScreenNoTransitionImpl);
-    pendingScreenTransitionCallback = &transitionCallback;
-}
-
-void FrontendApplicationBase::gotoFaultScreenScreenNoTransitionImpl()
-{
-    touchgfx::makeTransition<FaultScreenView, FaultScreenPresenter, touchgfx::NoTransition, Model >(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
-}
-

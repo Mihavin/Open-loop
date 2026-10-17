@@ -175,17 +175,7 @@ void Model::goTo(ScreenId id)
     if (id == currentScreen && uiInitialised) return;
     currentScreen = id;
     FrontendApplication& app = *static_cast<FrontendApplication*>(touchgfx::Application::getInstance());
-    switch (id)
-    {
-    case SCR_BOOT: app.gotoBootScreenScreenNoTransition(); break;
-    case SCR_RUN: app.gotoRunScreenScreenNoTransition(); break;
-    case SCR_MENU: app.gotoMenuScreenScreenNoTransition(); break;
-    case SCR_TRAVERSE: app.gotoTraverseScreenScreenNoTransition(); break;
-    case SCR_INTERP: app.gotoInterpScreenScreenNoTransition(); break;
-    case SCR_DIAGNOSTICS: app.gotoDiagnosticsScreenScreenNoTransition(); break;
-    case SCR_SETTINGS: app.gotoSettingsScreenScreenNoTransition(); break;
-    case SCR_FAULT: app.gotoFaultScreenScreenNoTransition(); break;
-    }
+    app.showScreen((FrontendApplication::ScreenIndex)id); /* same order as ScreenId */
 }
 
 /* ---------------- per frame ---------------- */

@@ -23,12 +23,12 @@ struct Typography
 
 struct TypographyFontIndex
 {
-    static const touchgfx::FontId SMALL  = 0; // Inter_Regular_11_4bpp
-    static const touchgfx::FontId BODY   = 1; // Inter_Regular_13_4bpp
-    static const touchgfx::FontId TITLE  = 2; // Inter_SemiBold_16_4bpp
-    static const touchgfx::FontId MEDIUM = 3; // Inter_SemiBold_22_4bpp
-    static const touchgfx::FontId LARGE  = 4; // InterDisplay_Bold_32_4bpp
-    static const touchgfx::FontId BIG    = 5; // InterDisplay_Bold_50_4bpp
+    static const touchgfx::FontId SMALL = 0;  // Inter_Regular_otf_11_4bpp
+    static const touchgfx::FontId BODY = 1;   // Inter_Regular_otf_13_4bpp
+    static const touchgfx::FontId TITLE = 2;  // Inter_SemiBold_otf_16_4bpp
+    static const touchgfx::FontId MEDIUM = 3; // Inter_SemiBold_otf_22_4bpp
+    static const touchgfx::FontId LARGE = 4;  // InterDisplay_Bold_otf_32_4bpp
+    static const touchgfx::FontId BIG = 5;    // InterDisplay_Bold_otf_50_4bpp
     static const uint16_t NUMBER_OF_FONTS = 6;
 };
 

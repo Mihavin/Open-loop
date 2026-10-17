@@ -4,29 +4,61 @@
     <Language Id="GB" />
   </Languages>
   <Texts>
-    <!-- Every visible string is produced at runtime by the GUI code, so the
-         database only carries one wildcard text per typography and alignment.
-         tools/touchgfx_assets.py regenerates generated/fonts and generated/texts
-         from this file; the TouchGFX Designer can do the same on Windows. -->
     <TextGroup Id="Wildcards">
-      <Text Id="small_l" Alignment="Left" TypographyId="Small"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="small_c" Alignment="Center" TypographyId="Small"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="small_r" Alignment="Right" TypographyId="Small"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="body_l" Alignment="Left" TypographyId="Body"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="body_c" Alignment="Center" TypographyId="Body"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="body_r" Alignment="Right" TypographyId="Body"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="title_l" Alignment="Left" TypographyId="Title"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="title_c" Alignment="Center" TypographyId="Title"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="title_r" Alignment="Right" TypographyId="Title"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="medium_l" Alignment="Left" TypographyId="Medium"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="medium_c" Alignment="Center" TypographyId="Medium"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="medium_r" Alignment="Right" TypographyId="Medium"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="large_l" Alignment="Left" TypographyId="Large"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="large_c" Alignment="Center" TypographyId="Large"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="large_r" Alignment="Right" TypographyId="Large"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="big_l" Alignment="Left" TypographyId="Big"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="big_c" Alignment="Center" TypographyId="Big"><Translation Language="GB">&lt;v&gt;</Translation></Text>
-      <Text Id="big_r" Alignment="Right" TypographyId="Big"><Translation Language="GB">&lt;v&gt;</Translation></Text>
+      <Text Id="small_l" Alignment="Left" TypographyId="Small">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="small_c" Alignment="Center" TypographyId="Small">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="small_r" Alignment="Right" TypographyId="Small">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="body_l" Alignment="Left" TypographyId="Body">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="body_c" Alignment="Center" TypographyId="Body">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="body_r" Alignment="Right" TypographyId="Body">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="title_l" Alignment="Left" TypographyId="Title">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="title_c" Alignment="Center" TypographyId="Title">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="title_r" Alignment="Right" TypographyId="Title">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="medium_l" Alignment="Left" TypographyId="Medium">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="medium_c" Alignment="Center" TypographyId="Medium">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="medium_r" Alignment="Right" TypographyId="Medium">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="large_l" Alignment="Left" TypographyId="Large">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="large_c" Alignment="Center" TypographyId="Large">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="large_r" Alignment="Right" TypographyId="Large">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="big_l" Alignment="Left" TypographyId="Big">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="big_c" Alignment="Center" TypographyId="Big">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
+      <Text Id="big_r" Alignment="Right" TypographyId="Big">
+        <Translation Language="GB">&lt;v&gt;</Translation>
+      </Text>
     </TextGroup>
   </Texts>
   <Typographies>

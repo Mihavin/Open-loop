@@ -93,7 +93,8 @@ def load_xml():
 
 
 def font_name(typo):
-    stem = os.path.splitext(typo["font"])[0].replace("-", "_").replace(" ", "_")
+    # Same naming as the TouchGFX Designer: the whole file name, "-", " " and "." as "_".
+    stem = typo["font"].replace("-", "_").replace(" ", "_").replace(".", "_")
     return "%s_%d_%dbpp" % (stem, typo["size"], typo["bpp"])
 
 

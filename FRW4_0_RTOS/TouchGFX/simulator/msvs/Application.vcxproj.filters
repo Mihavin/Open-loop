@@ -244,6 +244,102 @@
     <Filter Include="Header Files\generated\gui_generated\screensettings_screen">
       <UniqueIdentifier>96348EF2-0693-E9AD-AE58-DAC84ABFF4D5</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\gui\diagnosticsscreen_screen">
+      <UniqueIdentifier>0CDA6F1A-06AC-0FC9-6115-5AC1FF5FEABC</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\diagnosticsscreen_screen">
+      <UniqueIdentifier>497E3744-EBAC-EDFA-C01E-BC5C11B31322</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\traversescreen_screen">
+      <UniqueIdentifier>5BFFD184-4F07-4D29-82A5-90D563B1E121</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\runscreen_screen">
+      <UniqueIdentifier>8FD02C9B-2048-95DC-8BBB-95525AC9F1AD</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\runscreen_screen">
+      <UniqueIdentifier>922A2B89-7745-26DD-60F5-8A3BCB1EDA5B</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\menuscreen_screen">
+      <UniqueIdentifier>ED38B036-FAD3-3158-173D-9A8C39507627</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\menuscreen_screen">
+      <UniqueIdentifier>41DE70C7-3FCA-4BCE-3A2B-6E3AAF756D17</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\settingsscreen_screen">
+      <UniqueIdentifier>E3327380-B227-5275-CCB6-1FFE18918346</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\faultscreen_screen">
+      <UniqueIdentifier>75F4A2CC-9A1D-6E10-4302-79B6EEBA9D54</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\interpscreen_screen">
+      <UniqueIdentifier>0605503B-4C8C-CF8E-4A49-487DD0934D51</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\settingsscreen_screen">
+      <UniqueIdentifier>B5A17B2F-2495-EC8F-CE8F-4C2F5F67C746</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\faultscreen_screen">
+      <UniqueIdentifier>CFDDE621-F7C2-8FFD-010B-4C90429CEF04</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\interpscreen_screen">
+      <UniqueIdentifier>53CDBED1-E614-B5F2-2237-038C03D8C19F</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\bootscreen_screen">
+      <UniqueIdentifier>7D20510F-2DD5-F4AC-86E2-C5B3EDA44D52</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\bootscreen_screen">
+      <UniqueIdentifier>CCE4D5FF-D0B3-CF46-33A5-ED0F70A242D2</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\traversescreen_screen">
+      <UniqueIdentifier>8420B917-6831-D13D-BE19-2D6DA9B9F552</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\bootscreen_screen">
+      <UniqueIdentifier>49A662B0-0376-C9DB-30FE-2FD58A47A57C</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\settingsscreen_screen">
+      <UniqueIdentifier>01C3E208-1217-CA75-9307-E18398450BA1</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\settingsscreen_screen">
+      <UniqueIdentifier>61480FD0-7106-E207-C59F-F3160E1C5A7F</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\runscreen_screen">
+      <UniqueIdentifier>1EDAB093-A518-71D1-40F6-F2E6F14A12FE</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\runscreen_screen">
+      <UniqueIdentifier>916896F0-9781-EEC9-EEFA-492CCEABD521</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\bootscreen_screen">
+      <UniqueIdentifier>2FCE7CB0-4AE6-0C57-9564-172BD695B4FB</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\diagnosticsscreen_screen">
+      <UniqueIdentifier>ECC39124-A25C-9F03-9B17-7357DF707C69</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\menuscreen_screen">
+      <UniqueIdentifier>9E23962D-214B-FB06-3799-F73698880ADC</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\menuscreen_screen">
+      <UniqueIdentifier>C71A48AC-4C80-8AE2-38AC-5927CD7578B4</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\interpscreen_screen">
+      <UniqueIdentifier>01810CA8-7BF4-9A21-4605-93A312198182</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\interpscreen_screen">
+      <UniqueIdentifier>9C1BED72-ED39-4D16-9C68-A5F605931752</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\traversescreen_screen">
+      <UniqueIdentifier>5626D509-2C35-8A69-5905-A5194EAE49C5</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\faultscreen_screen">
+      <UniqueIdentifier>890EB409-7131-9967-D17E-8CD416E17D02</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\traversescreen_screen">
+      <UniqueIdentifier>A2A30B7C-E581-E4E3-6120-86E0757E4E5A</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\faultscreen_screen">
+      <UniqueIdentifier>B34E208E-FE5F-02AF-86B5-5E58ED6DC9D7</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\diagnosticsscreen_screen">
+      <UniqueIdentifier>CBFDB926-0476-260D-7347-E00525FB6657</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(TouchGFXReleasePath)\framework\source\platform\driver\touch\SDL2TouchController.cpp">
@@ -276,59 +372,83 @@
     <ClCompile Include="..\..\generated\simulator\src\video\SoftwareMJPEGDecoder.cpp">
       <Filter>Source Files\generated\simulator\video</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\loadscreen_screen\LoadScreenPresenter.cpp">
-      <Filter>Source Files\gui\loadscreen_screen</Filter>
+    <ClCompile Include="..\..\gui\src\bootscreen_screen\BootScreenPresenter.cpp">
+      <Filter>Source Files\gui\bootscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\loadscreen_screen\LoadScreenView.cpp">
-      <Filter>Source Files\gui\loadscreen_screen</Filter>
+    <ClCompile Include="..\..\gui\src\bootscreen_screen\BootScreenView.cpp">
+      <Filter>Source Files\gui\bootscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\generated\gui_generated\src\loadscreen_screen\LoadScreenViewBase.cpp">
-      <Filter>Source Files\generated\gui_generated\loadscreen_screen</Filter>
+    <ClCompile Include="..\..\generated\gui_generated\src\bootscreen_screen\BootScreenViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\bootscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\screendiagnostic_screen\ScreenDiagnosticPresenter.cpp">
-      <Filter>Source Files\gui\screendiagnostic_screen</Filter>
+    <ClCompile Include="..\..\gui\src\diagnosticsscreen_screen\DiagnosticsScreenPresenter.cpp">
+      <Filter>Source Files\gui\diagnosticsscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\screendiagnostic_screen\ScreenDiagnosticView.cpp">
-      <Filter>Source Files\gui\screendiagnostic_screen</Filter>
+    <ClCompile Include="..\..\gui\src\diagnosticsscreen_screen\DiagnosticsScreenView.cpp">
+      <Filter>Source Files\gui\diagnosticsscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\generated\gui_generated\src\screendiagnostic_screen\ScreenDiagnosticViewBase.cpp">
-      <Filter>Source Files\generated\gui_generated\screendiagnostic_screen</Filter>
+    <ClCompile Include="..\..\generated\gui_generated\src\diagnosticsscreen_screen\DiagnosticsScreenViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\diagnosticsscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\screendry_screen\ScreenDryPresenter.cpp">
-      <Filter>Source Files\gui\screendry_screen</Filter>
+    <ClCompile Include="..\..\gui\src\faultscreen_screen\FaultScreenPresenter.cpp">
+      <Filter>Source Files\gui\faultscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\screendry_screen\ScreenDryView.cpp">
-      <Filter>Source Files\gui\screendry_screen</Filter>
+    <ClCompile Include="..\..\gui\src\faultscreen_screen\FaultScreenView.cpp">
+      <Filter>Source Files\gui\faultscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\generated\gui_generated\src\screendry_screen\ScreenDryViewBase.cpp">
-      <Filter>Source Files\generated\gui_generated\screendry_screen</Filter>
+    <ClCompile Include="..\..\generated\gui_generated\src\faultscreen_screen\FaultScreenViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\faultscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\screenrpm_screen\ScreenRPMPresenter.cpp">
-      <Filter>Source Files\gui\screenrpm_screen</Filter>
+    <ClCompile Include="..\..\gui\src\interpscreen_screen\InterpScreenPresenter.cpp">
+      <Filter>Source Files\gui\interpscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\screenrpm_screen\ScreenRPMView.cpp">
-      <Filter>Source Files\gui\screenrpm_screen</Filter>
+    <ClCompile Include="..\..\gui\src\interpscreen_screen\InterpScreenView.cpp">
+      <Filter>Source Files\gui\interpscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\generated\gui_generated\src\screenrpm_screen\ScreenRPMViewBase.cpp">
-      <Filter>Source Files\generated\gui_generated\screenrpm_screen</Filter>
+    <ClCompile Include="..\..\generated\gui_generated\src\interpscreen_screen\InterpScreenViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\interpscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\screensettings_screen\ScreenSettingsPresenter.cpp">
-      <Filter>Source Files\gui\screensettings_screen</Filter>
+    <ClCompile Include="..\..\gui\src\menuscreen_screen\MenuScreenPresenter.cpp">
+      <Filter>Source Files\gui\menuscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\screensettings_screen\ScreenSettingsView.cpp">
-      <Filter>Source Files\gui\screensettings_screen</Filter>
+    <ClCompile Include="..\..\gui\src\menuscreen_screen\MenuScreenView.cpp">
+      <Filter>Source Files\gui\menuscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\generated\gui_generated\src\screensettings_screen\ScreenSettingsViewBase.cpp">
-      <Filter>Source Files\generated\gui_generated\screensettings_screen</Filter>
+    <ClCompile Include="..\..\generated\gui_generated\src\menuscreen_screen\MenuScreenViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\menuscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\screentorque_screen\ScreenTorquePresenter.cpp">
-      <Filter>Source Files\gui\screentorque_screen</Filter>
+    <ClCompile Include="..\..\gui\src\runscreen_screen\RunScreenPresenter.cpp">
+      <Filter>Source Files\gui\runscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\screentorque_screen\ScreenTorqueView.cpp">
-      <Filter>Source Files\gui\screentorque_screen</Filter>
+    <ClCompile Include="..\..\gui\src\runscreen_screen\RunScreenView.cpp">
+      <Filter>Source Files\gui\runscreen_screen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\generated\gui_generated\src\screentorque_screen\ScreenTorqueViewBase.cpp">
-      <Filter>Source Files\generated\gui_generated\screentorque_screen</Filter>
+    <ClCompile Include="..\..\generated\gui_generated\src\runscreen_screen\RunScreenViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\runscreen_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\settingsscreen_screen\SettingsScreenPresenter.cpp">
+      <Filter>Source Files\gui\settingsscreen_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\settingsscreen_screen\SettingsScreenView.cpp">
+      <Filter>Source Files\gui\settingsscreen_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\generated\gui_generated\src\settingsscreen_screen\SettingsScreenViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\settingsscreen_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\common\Theme.cpp">
+      <Filter>Source Files\gui\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\traversescreen_screen\TraverseScreenPresenter.cpp">
+      <Filter>Source Files\gui\traversescreen_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\traversescreen_screen\TraverseScreenView.cpp">
+      <Filter>Source Files\gui\traversescreen_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\generated\gui_generated\src\traversescreen_screen\TraverseScreenViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\traversescreen_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\common\Widgets.cpp">
+      <Filter>Source Files\gui\common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -772,59 +892,86 @@
     <ClInclude Include="..\..\generated\simulator\include\simulator\video\SoftwareMJPEGDecoder.hpp">
       <Filter>Header Files\generated\simulator\include\simulator\video</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\loadscreen_screen\LoadScreenPresenter.hpp">
-      <Filter>Header Files\gui\loadscreen_screen</Filter>
+    <ClInclude Include="..\..\gui\include\gui\bootscreen_screen\BootScreenPresenter.hpp">
+      <Filter>Header Files\gui\bootscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\loadscreen_screen\LoadScreenView.hpp">
-      <Filter>Header Files\gui\loadscreen_screen</Filter>
+    <ClInclude Include="..\..\gui\include\gui\bootscreen_screen\BootScreenView.hpp">
+      <Filter>Header Files\gui\bootscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\loadscreen_screen\LoadScreenViewBase.hpp">
-      <Filter>Header Files\generated\gui_generated\loadscreen_screen</Filter>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\bootscreen_screen\BootScreenViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\bootscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screendiagnostic_screen\ScreenDiagnosticPresenter.hpp">
-      <Filter>Header Files\gui\screendiagnostic_screen</Filter>
+    <ClInclude Include="..\..\gui\include\gui\diagnosticsscreen_screen\DiagnosticsScreenPresenter.hpp">
+      <Filter>Header Files\gui\diagnosticsscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screendiagnostic_screen\ScreenDiagnosticView.hpp">
-      <Filter>Header Files\gui\screendiagnostic_screen</Filter>
+    <ClInclude Include="..\..\gui\include\gui\diagnosticsscreen_screen\DiagnosticsScreenView.hpp">
+      <Filter>Header Files\gui\diagnosticsscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screendiagnostic_screen\ScreenDiagnosticViewBase.hpp">
-      <Filter>Header Files\generated\gui_generated\screendiagnostic_screen</Filter>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\diagnosticsscreen_screen\DiagnosticsScreenViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\diagnosticsscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screendry_screen\ScreenDryPresenter.hpp">
-      <Filter>Header Files\gui\screendry_screen</Filter>
+    <ClInclude Include="..\..\gui\include\gui\faultscreen_screen\FaultScreenPresenter.hpp">
+      <Filter>Header Files\gui\faultscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screendry_screen\ScreenDryView.hpp">
-      <Filter>Header Files\gui\screendry_screen</Filter>
+    <ClInclude Include="..\..\gui\include\gui\faultscreen_screen\FaultScreenView.hpp">
+      <Filter>Header Files\gui\faultscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screendry_screen\ScreenDryViewBase.hpp">
-      <Filter>Header Files\generated\gui_generated\screendry_screen</Filter>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\faultscreen_screen\FaultScreenViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\faultscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screenrpm_screen\ScreenRPMPresenter.hpp">
-      <Filter>Header Files\gui\screenrpm_screen</Filter>
+    <ClInclude Include="..\..\gui\include\gui\interpscreen_screen\InterpScreenPresenter.hpp">
+      <Filter>Header Files\gui\interpscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screenrpm_screen\ScreenRPMView.hpp">
-      <Filter>Header Files\gui\screenrpm_screen</Filter>
+    <ClInclude Include="..\..\gui\include\gui\interpscreen_screen\InterpScreenView.hpp">
+      <Filter>Header Files\gui\interpscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screenrpm_screen\ScreenRPMViewBase.hpp">
-      <Filter>Header Files\generated\gui_generated\screenrpm_screen</Filter>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\interpscreen_screen\InterpScreenViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\interpscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screensettings_screen\ScreenSettingsPresenter.hpp">
-      <Filter>Header Files\gui\screensettings_screen</Filter>
+    <ClInclude Include="..\..\gui\include\gui\menuscreen_screen\MenuScreenPresenter.hpp">
+      <Filter>Header Files\gui\menuscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screensettings_screen\ScreenSettingsView.hpp">
-      <Filter>Header Files\gui\screensettings_screen</Filter>
+    <ClInclude Include="..\..\gui\include\gui\menuscreen_screen\MenuScreenView.hpp">
+      <Filter>Header Files\gui\menuscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screensettings_screen\ScreenSettingsViewBase.hpp">
-      <Filter>Header Files\generated\gui_generated\screensettings_screen</Filter>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\menuscreen_screen\MenuScreenViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\menuscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screentorque_screen\ScreenTorquePresenter.hpp">
-      <Filter>Header Files\gui\screentorque_screen</Filter>
+    <ClInclude Include="..\..\gui\include\gui\runscreen_screen\RunScreenPresenter.hpp">
+      <Filter>Header Files\gui\runscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screentorque_screen\ScreenTorqueView.hpp">
-      <Filter>Header Files\gui\screentorque_screen</Filter>
+    <ClInclude Include="..\..\gui\include\gui\runscreen_screen\RunScreenView.hpp">
+      <Filter>Header Files\gui\runscreen_screen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screentorque_screen\ScreenTorqueViewBase.hpp">
-      <Filter>Header Files\generated\gui_generated\screentorque_screen</Filter>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\runscreen_screen\RunScreenViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\runscreen_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\settingsscreen_screen\SettingsScreenPresenter.hpp">
+      <Filter>Header Files\gui\settingsscreen_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\settingsscreen_screen\SettingsScreenView.hpp">
+      <Filter>Header Files\gui\settingsscreen_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\settingsscreen_screen\SettingsScreenViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\settingsscreen_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\common\Theme.hpp">
+      <Filter>Header Files\gui\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\traversescreen_screen\TraverseScreenPresenter.hpp">
+      <Filter>Header Files\gui\traversescreen_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\traversescreen_screen\TraverseScreenView.hpp">
+      <Filter>Header Files\gui\traversescreen_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\traversescreen_screen\TraverseScreenViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\traversescreen_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\common\UiBackend.hpp">
+      <Filter>Header Files\gui\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\common\Widgets.hpp">
+      <Filter>Header Files\gui\common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
