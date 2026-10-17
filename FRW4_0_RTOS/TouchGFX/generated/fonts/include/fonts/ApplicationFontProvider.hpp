@@ -13,17 +13,23 @@ class FlashDataReader;
 
 struct Typography
 {
-    static const touchgfx::FontId DEFAULT = 0;
-    static const touchgfx::FontId LARGE = 1;
-    static const touchgfx::FontId SMALL = 2;
+    static const touchgfx::FontId SMALL = 0;
+    static const touchgfx::FontId BODY = 1;
+    static const touchgfx::FontId TITLE = 2;
+    static const touchgfx::FontId MEDIUM = 3;
+    static const touchgfx::FontId LARGE = 4;
+    static const touchgfx::FontId BIG = 5;
 };
 
 struct TypographyFontIndex
 {
-    static const touchgfx::FontId DEFAULT = 0; // verdana_20_4bpp
-    static const touchgfx::FontId LARGE = 1;   // verdana_40_4bpp
-    static const touchgfx::FontId SMALL = 2;   // verdana_10_4bpp
-    static const uint16_t NUMBER_OF_FONTS = 3;
+    static const touchgfx::FontId SMALL  = 0; // Inter_Regular_11_4bpp
+    static const touchgfx::FontId BODY   = 1; // Inter_Regular_13_4bpp
+    static const touchgfx::FontId TITLE  = 2; // Inter_SemiBold_16_4bpp
+    static const touchgfx::FontId MEDIUM = 3; // Inter_SemiBold_22_4bpp
+    static const touchgfx::FontId LARGE  = 4; // InterDisplay_Bold_32_4bpp
+    static const touchgfx::FontId BIG    = 5; // InterDisplay_Bold_50_4bpp
+    static const uint16_t NUMBER_OF_FONTS = 6;
 };
 
 class ApplicationFontProvider : public touchgfx::FontProvider

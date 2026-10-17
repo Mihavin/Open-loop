@@ -4,6 +4,7 @@
 static volatile uint32_t g_fault_bits = FAULT_NONE;
 static volatile uint32_t g_health[FAULT_HEALTH_COUNT];
 static bool g_watchdog_started;
+static volatile uint32_t g_clear_request;
 
 void Fault_OutputsOff(void)
 {
@@ -33,6 +34,24 @@ void Fault_Clear(uint32_t fault_bits)
 {
     fault_bits &= ~FAULT_CRITICAL_MASK;
     (void)__atomic_fetch_and(&g_fault_bits, ~fault_bits, __ATOMIC_SEQ_CST);
+}
+
+bool Fault_CausePresent(void)
+{
+    return HAL_GPIO_ReadPin(DRV_NFAULT_GPIO_Port, DRV_NFAULT_Pin) == GPIO_PIN_RESET;
+}
+
+void Fault_RequestClear(void)
+{
+    __atomic_store_n(&g_clear_request, 1u, __ATOMIC_RELEASE);
+}
+
+bool Fault_ServiceClearRequest(void)
+{
+    if (!__atomic_exchange_n(&g_clear_request, 0u, __ATOMIC_ACQ_REL)) return false;
+    if (Fault_CausePresent()) return false;
+    __atomic_store_n(&g_fault_bits, FAULT_NONE, __ATOMIC_SEQ_CST);
+    return true;
 }
 
 uint32_t Fault_GetActive(void)

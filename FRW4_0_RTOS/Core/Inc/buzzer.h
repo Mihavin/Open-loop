@@ -20,6 +20,8 @@ typedef struct
  * @brief Initialize a buzzer instance for TIM8 CH1.
  *        TIM8 must already be initialized by CubeMX (MX_TIM8_Init()).
  */
+extern Buzzer_Handle_t g_buzzer; /* board buzzer, initialised in main() */
+
 void Buzzer_Init(Buzzer_Handle_t *bz, TIM_HandleTypeDef *htim8);
 
 /**

@@ -37,6 +37,12 @@ bool Fault_IsCriticalActive(void);
 /* No HAL, scheduler, SPI or delays; callable from an exception or ISR. */
 void Fault_OutputsOff(void);
 /* Critical faults latch until reset. Clear only acknowledges noncritical bits. */
+/* Operator confirm on the fault screen: the GUI requests, MotorTask services
+   it right before MotorFOC() so the FAULT state and the bits clear together.
+   Clearing is refused while a fault line is still asserted. */
+void Fault_RequestClear(void);
+bool Fault_ServiceClearRequest(void);
+bool Fault_CausePresent(void);
 typedef enum { FAULT_HEALTH_MOTOR, FAULT_HEALTH_HID, FAULT_HEALTH_STEPPER,
                FAULT_HEALTH_COUNT } Fault_Health_t;
 void Fault_Heartbeat(Fault_Health_t source);

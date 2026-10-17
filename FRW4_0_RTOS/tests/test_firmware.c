@@ -13,6 +13,7 @@
 #include "../Core/Src/tmc2130.c"
 #include "../Core/Src/tmc2130_motion.c"
 #include "../Core/Src/ui_api.c"
+#include "../Core/Src/ui_input.c"
 
 TIM_TypeDef mock_tim1, mock_tim2, mock_tim12, mock_tim8;
 MockRCC mock_rcc;
@@ -156,6 +157,54 @@ static void faults_and_adc(void) {
     assert(!Fault_IsActive());assert(MotorFOC_GetState()==MOTOR_FOC_STATE_ALIGN);
     puts("PASS: immediate two-axis fault latch, overcurrent, missing/stale ADC and invalid offsets");
 }
+static uint32_t fb_tone; static bool fb_vib; static unsigned fb_tone_calls;
+static void fb_tone_fn(uint32_t hz){fb_tone=hz;fb_tone_calls++;}
+static void fb_vib_fn(bool on){fb_vib=on;}
+static void operator_input(void) {
+    UI_InputEvent_t ev;UI_InputInit();
+    /* 10 ms sampling, two samples to debounce, hold after the per-key time. */
+    UI_InputPoll(0,0,1u<<UI_KEY_SIDE);assert(!UI_InputPop(&ev));
+    UI_InputPoll(10,0,1u<<UI_KEY_SIDE);assert(UI_InputPop(&ev)&&ev.type==UI_INPUT_PRESS&&ev.key==UI_KEY_SIDE);
+    for(uint32_t t=20;t<1000;t+=10){UI_InputPoll(t,0,1u<<UI_KEY_SIDE);assert(!UI_InputPop(&ev));}
+    assert(UI_KeyHeldMs(UI_KEY_SIDE,900)==890);
+    UI_InputPoll(1010,0,1u<<UI_KEY_SIDE);assert(UI_InputPop(&ev)&&ev.type==UI_INPUT_HOLD);
+    UI_InputPoll(1020,0,0);UI_InputPoll(1030,0,0);assert(UI_InputPop(&ev)&&ev.type==UI_INPUT_RELEASE&&ev.value==1);
+    /* A 15 ms glitch never produces an event; a short press releases with value 0. */
+    UI_InputPoll(2000,0,1u<<UI_KEY_BACK);UI_InputPoll(2010,0,0);UI_InputPoll(2020,0,0);assert(!UI_InputPop(&ev));
+    UI_InputPoll(2030,0,1u<<UI_KEY_BACK);UI_InputPoll(2040,0,1u<<UI_KEY_BACK);assert(UI_InputPop(&ev)&&ev.type==UI_INPUT_PRESS);
+    UI_InputPoll(2100,0,0);UI_InputPoll(2110,0,0);assert(UI_InputPop(&ev)&&ev.type==UI_INPUT_RELEASE&&ev.value==0&&ev.key==UI_KEY_BACK);
+    UI_InputPoll(2120,3,0);assert(UI_InputPop(&ev)&&ev.type==UI_INPUT_TURN&&ev.value==3);
+    UI_InputPoll(2130,-1,0);assert(UI_InputPop(&ev)&&ev.value==-1);assert(!UI_InputPop(&ev));
+    /* Queue overflow drops, never blocks or wraps onto unread events. */
+    for(int i=0;i<40;i++){UI_InputPoll(3000+10*i,1,0);}
+    int n=0;while(UI_InputPop(&ev)){assert(ev.value==1);n++;}assert(n==31);
+    /* Pedal: counts are unsigned travel from the home switch, clamped to full travel. */
+    UI_PedalSetFullCounts(200);UI_PedalSetCounts(100);assert(UI_PedalPermille()==500);
+    UI_PedalSetCounts(-100);assert(UI_PedalPermille()==500);UI_PedalSetCounts(900);assert(UI_PedalPermille()==1000);
+    UI_PedalSetFullCounts(0);assert(UI_PedalGetFullCounts()==1);UI_PedalSetFullCounts(200);
+    /* Feedback patterns are non-blocking and a click cannot interrupt a fault sound. */
+    UI_FeedbackBind(fb_tone_fn,fb_vib_fn);fb_tone_calls=0;
+    UI_FeedbackPlay(UI_FB_FAULT);UI_FeedbackPlay(UI_FB_CLICK);UI_FeedbackTick(0);assert(fb_tone==1200&&fb_vib);
+    UI_FeedbackTick(240);assert(fb_tone==1200);UI_FeedbackTick(250);assert(fb_tone==0&&!fb_vib);
+    for(uint32_t t=260;t<=1000;t+=10){UI_FeedbackTick(t);}
+    assert(fb_tone==0&&!fb_vib);
+    UI_FeedbackSetEnabled(false,true);UI_FeedbackPlay(UI_FB_CLICK);UI_FeedbackTick(2000);assert(fb_tone==0);
+    UI_FeedbackSetEnabled(true,true);
+    puts("PASS: debounce, hold timing, short/long release, pedal scaling and feedback patterns");
+}
+static void confirmed_fault_clear(void) {
+    /* Operator confirm clears a latched critical fault only once the cause is gone, and
+       the FOC drops from FAULT to IDLE in the same owner tick (no re-latch by MotorTask). */
+    reset();calibrated();MotorFOC_RequestArm();owner_tick();
+    n_fault=false;Fault_Report(FAULT_BLDC_DRIVER);owner_tick();assert(MotorFOC_GetState()==MOTOR_FOC_STATE_FAULT);
+    Fault_RequestClear();assert(Fault_CausePresent());assert(!Fault_ServiceClearRequest());assert(Fault_IsCriticalActive());
+    owner_tick();assert(MotorFOC_GetState()==MOTOR_FOC_STATE_FAULT);
+    n_fault=true;assert(!Fault_ServiceClearRequest()); /* request was consumed by the refused attempt */
+    Fault_RequestClear();assert(Fault_ServiceClearRequest());assert(!Fault_IsActive());
+    owner_tick();assert(MotorFOC_GetState()==MOTOR_FOC_STATE_IDLE);assert(!(mock_tim1.BDTR&TIM_BDTR_MOE));
+    MotorFOC_RequestArm();owner_tick();assert(MotorFOC_GetState()==MOTOR_FOC_STATE_ALIGN);
+    puts("PASS: confirmed fault clear refused while the cause is present, then FAULT -> IDLE -> re-arm");
+}
 static void bounded_input(void) {
     assert(Operator_EncoderDelta(9999,0,10000)==-1);assert(Operator_EncoderDelta(0,9999,10000)==1);
     for(unsigned i=0;i<10000;i++){
@@ -277,7 +326,34 @@ static void current_sampling(void) {
     assert(Fault_GetActive()&FAULT_CURRENT);
     puts("PASS: ADC trigger centred on the low-side window, duty cap, high-duty phase reconstruction and bounded hold");
 }
+static void position_detent(void) {
+    reset();calibrated();MotorFOC_SetMode(MOTOR_FOC_MODE_POSITION);MotorFOC_RequestArm();owner_tick();
+    for(unsigned i=0;i<5000&&MotorFOC_GetState()!=MOTOR_FOC_STATE_RUN;i++){owner_tick();}
+    assert(MotorFOC_GetState()==MOTOR_FOC_STATE_RUN);
+    MotorFOC_SetPositionCounts(0);MotorFOC_SetPositionSnap(1000,0,0.3f); /* 90 deg pitch at 4000 cpr */
+    for(unsigned i=0;i<400;i++){owner_tick();}
+    assert(g_cmd.position_ref_counts==0);
+    /* Turned by hand: the reference holds until half a pitch, then clicks to the next detent. */
+    for(unsigned i=0;i<480;i++){mock_tim2.CNT++;owner_tick();assert(g_cmd.position_ref_counts==0);}
+    assert(fabsf(g_foc.iq_ref)<=0.3f+1e-6f);
+    for(unsigned i=0;i<40;i++){mock_tim2.CNT++;owner_tick();}
+    assert(g_cmd.position_ref_counts==1000);assert(MotorFOC_GetPositionRefCounts()==1000);
+    for(unsigned i=0;i<960;i++){mock_tim2.CNT++;owner_tick();}
+    assert(g_cmd.position_ref_counts==1000);
+    for(unsigned i=0;i<40;i++){mock_tim2.CNT++;owner_tick();}
+    assert(g_cmd.position_ref_counts==2000);
+    for(unsigned i=0;i<1000;i++){mock_tim2.CNT--;owner_tick();}
+    assert(g_cmd.position_ref_counts==1000);
+    /* A fresh reference from the operator restarts the idle timer and keeps full torque. */
+    MotorFOC_SetPositionCounts(1000);for(unsigned i=0;i<200;i++){mock_tim2.CNT+=4;owner_tick();}
+    assert(g_cmd.position_ref_counts==1000);
+    /* Detent off: the reference never moves on its own. */
+    MotorFOC_SetPositionSnap(0,0,0.0f);for(unsigned i=0;i<1200;i++){mock_tim2.CNT++;owner_tick();}
+    assert(g_cmd.position_ref_counts==1000);
+    MotorFOC_SetPositionSnap(-5,0,NAN);assert(g_cmd.snap_counts==0);
+    puts("PASS: position detent snaps at half a pitch after idle, limits hold current, stays put when off");
+}
 int main(void) {
-    driver_frames();startup_stop_restart();faults_and_adc();bounded_input();counted_steps();stepper_owner();watchdog_health();rotor_wrap();current_sampling();
+    driver_frames();startup_stop_restart();faults_and_adc();bounded_input();operator_input();confirmed_fault_clear();counted_steps();stepper_owner();watchdog_health();rotor_wrap();current_sampling();position_detent();
     puts("All firmware regression scenarios passed.");return 0;
 }

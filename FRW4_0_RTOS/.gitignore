@@ -13,3 +13,7 @@ __pycache__/
 *.elf
 *.map
 *.list
+
+# TouchGFX PC simulator output
+/TouchGFX/build/
+/TouchGFX/screenshots/
