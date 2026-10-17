@@ -4,10 +4,10 @@
 namespace theme
 {
 static const AccentPair g_pairs[ACCENT_COUNT] = {
-    { 0xF2A33A, 0xFF5F6D },
-    { 0x3FB6D9, 0x7B61FF },
+    { 0xF2A33A, 0xE8632C },
+    { 0x3FB6D9, 0x2F6FE8 },
     { 0x3DD68C, 0x2BB3C0 },
-    { 0xB48CFF, 0xFF6FB5 },
+    { 0x6FA8FF, 0x2F5BD6 },
     { 0xE5484D, 0xFF8A65 },
 };
 
@@ -23,7 +23,7 @@ Accent accentForMode(int mode)
     {
     case 1: return ACCENT_CYAN;
     case 2: return ACCENT_MINT;
-    case 3: return ACCENT_PURPLE;
+    case 3: return ACCENT_BLUE;
     default: return ACCENT_AMBER;
     }
 }

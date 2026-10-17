@@ -17,9 +17,9 @@ void MenuScreenView::setupScreen()
 {
     MenuScreenViewBase::setupScreen();
     add(backdrop);
-    backdrop.setAccent(theme::ACCENT_PURPLE);
+    backdrop.setAccent(theme::ACCENT_BLUE);
 
-    const theme::AccentPair& p = theme::accent(theme::ACCENT_PURPLE);
+    const theme::AccentPair& p = theme::accent(theme::ACCENT_BLUE);
     band.init(12, CENTER_Y - BAND_H / 2, 248, BAND_H);
     band.setFill(26);
     add(band);
@@ -48,7 +48,7 @@ void MenuScreenView::setupScreen()
 
     add(topBar);
     topBar.setLeft("MENU");
-    topBar.setDot(theme::accent(theme::ACCENT_PURPLE).a, true);
+    topBar.setDot(theme::accent(theme::ACCENT_BLUE).a, true);
     add(legend);
     legend.setEntry(0, "KNOB", "scroll");
     legend.setEntry(1, "PRESS", "open");
@@ -68,7 +68,7 @@ void MenuScreenView::tearDownScreen()
 
 void MenuScreenView::layout()
 {
-    const theme::AccentPair& p = theme::accent(theme::ACCENT_PURPLE);
+    const theme::AccentPair& p = theme::accent(theme::ACCENT_BLUE);
     for (int s = 0; s < SLOTS; ++s)
     {
         int offset = s - SLOTS / 2;
