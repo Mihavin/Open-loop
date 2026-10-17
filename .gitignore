@@ -1,3 +1,8 @@
 /Open loop/Debug
 /.metadata
 /.metadata
+
+# IDE workspace state and regenerated caches (not sources)
+/.metadata/
+/FRW4_0_RTOS/.settings/language.settings.xml
+/FRW4_0_RTOS/TouchGFX/generated/fonts/cache/
