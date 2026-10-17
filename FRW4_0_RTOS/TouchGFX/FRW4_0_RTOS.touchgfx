@@ -3,49 +3,41 @@
     "Screens": [
       {
         "Name": "BootScreen",
-        "CanvasBufferSize": 12000,
         "Components": [],
         "Interactions": []
       },
       {
         "Name": "RunScreen",
-        "CanvasBufferSize": 12000,
         "Components": [],
         "Interactions": []
       },
       {
         "Name": "MenuScreen",
-        "CanvasBufferSize": 12000,
         "Components": [],
         "Interactions": []
       },
       {
         "Name": "TraverseScreen",
-        "CanvasBufferSize": 12000,
         "Components": [],
         "Interactions": []
       },
       {
         "Name": "InterpScreen",
-        "CanvasBufferSize": 12000,
         "Components": [],
         "Interactions": []
       },
       {
         "Name": "DiagnosticsScreen",
-        "CanvasBufferSize": 12000,
         "Components": [],
         "Interactions": []
       },
       {
         "Name": "SettingsScreen",
-        "CanvasBufferSize": 12000,
         "Components": [],
         "Interactions": []
       },
       {
         "Name": "FaultScreen",
-        "CanvasBufferSize": 12000,
         "Components": [],
         "Interactions": []
       }

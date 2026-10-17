@@ -7,9 +7,11 @@
 #include <common/Meta.hpp>
 #include <common/Partition.hpp>
 #include <mvp/MVPHeap.hpp>
+
 #include <touchgfx/transitions/NoTransition.hpp>
 #include <gui/common/FrontendApplication.hpp>
 #include <gui/model/Model.hpp>
+
 #include <gui/bootscreen_screen/BootScreenView.hpp>
 #include <gui/bootscreen_screen/BootScreenPresenter.hpp>
 #include <gui/runscreen_screen/RunScreenView.hpp>
@@ -26,6 +28,7 @@
 #include <gui/settingsscreen_screen/SettingsScreenPresenter.hpp>
 #include <gui/faultscreen_screen/FaultScreenView.hpp>
 #include <gui/faultscreen_screen/FaultScreenPresenter.hpp>
+
 
 /**
  * This class provides the memory that shall be used for memory allocations
